@@ -1,0 +1,11 @@
+
+feature: ['feature/*', 'feat/*', 'test/*']
+fix: ['fix/*', 'hotfix/*', 'bugfix/*']
+chore: ['chore/*']
+refactor: ['refactor/*']
+style: ['style/*']
+other: 'other/*'
+documentation: ['doc/*']
+revert: ['revert/*']
+remove: ['remove/*']
+skip-changelog: ['develop', 'dev', 'dev/*', 'testing', 'test/*']

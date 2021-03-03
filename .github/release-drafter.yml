@@ -1,0 +1,46 @@
+name-template: 'v$NEXT_PATCH_VERSION'
+tag-template: 'v$NEXT_PATCH_VERSION'
+categories:
+  - title: '✨ Features'
+    labels:
+      - 'feature'
+  - title: '🐛 Bug Fixes'
+    labels:
+      - 'fix'
+  - title: '⏪ Revert'
+    labels:
+      - 'revert'
+  - title: '🔥 Removed'
+    labels:
+      - 'remove'
+  - title: '🏡 Chore'
+    labels:
+      - 'chore'
+      - 'other'
+  - title: '💅 Refactors'
+    labels:
+      - 'refactor'
+  - title: '💄 Style'
+    labels:
+      - 'style'
+  - title: '📝 Documentation'
+    labels:
+      - 'documentation'
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
+exclude-labels:
+  - 'skip-changelog'
+template: |
+  ## Changes
+  $CHANGES
+  
