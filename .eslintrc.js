@@ -5,8 +5,9 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [
-          ['@', 'src/'],
-          ['@layouts', 'src/layouts'],
+          ['@', 'src'],
+          ['@styles', './src/styles'],
+          ['@layouts', './src/layouts'],
           ['@components', './src/components'],
         ],
         extensions: ['.js', '.jsx'],
@@ -25,6 +26,7 @@ module.exports = {
     'plugin:react/recommended',
   ],
   rules: {
+    'react/jsx-filename-extension': [0],
     'import/prefer-default-export': 'off',
     'arrow-body-style': ['error', 'as-needed'],
     'react/require-default-props': 0,
