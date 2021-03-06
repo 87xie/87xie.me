@@ -1,11 +1,11 @@
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable react/jsx-filename-extension */
 import React from 'react';
 import { ChakraProvider, CSSReset } from '@chakra-ui/react';
-import DefaultLayout from './src/layouts/default';
+import theme from './src/styles/theme';
+import DefaultLayout from './src/layouts/default/default-layout';
 
 export const wrapRootElement = ({ element }) => (
-  <ChakraProvider>
+  <ChakraProvider theme={theme}>
     <CSSReset />
     {element}
   </ChakraProvider>

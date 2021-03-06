@@ -17,7 +17,8 @@ module.exports = {
       resolve: 'gatsby-alias-imports',
       options: {
         aliases: {
-          '@': 'src/',
+          '@': 'src',
+          '@styles': 'src/styles',
           '@layouts': 'src/layouts',
           '@components': 'src/components',
         },
