@@ -6,6 +6,7 @@ module.exports = {
     'gatsby-plugin-emotion',
     'gatsby-plugin-eslint',
     'gatsby-plugin-react-helmet',
+    'gatsby-plugin-mdx',
     {
       resolve: '@chakra-ui/gatsby-plugin',
       options: {
@@ -22,6 +23,13 @@ module.exports = {
           '@layouts': 'src/layouts',
           '@components': 'src/components',
         },
+      },
+    },
+    {
+      resolve: 'gatsby-source-filesystem',
+      options: {
+        name: 'posts',
+        path: `${__dirname}/src/posts`,
       },
     },
   ],

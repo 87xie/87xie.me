@@ -54,7 +54,7 @@ const Header = () => {
           </ChakraLink>
           <ChakraLink
             as={GatsbyLink}
-            to="/blog"
+            to="/tags"
             textAlign="center"
           >
             <Icon as={FiTag} />
