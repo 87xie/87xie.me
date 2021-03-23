@@ -1,9 +1,9 @@
 /* eslint-disable */
 import React from 'react';
-import { MDXProvider } from '@mdx-js/react';
-import { MDXRenderer } from 'gatsby-plugin-mdx'
+import { Box } from '@chakra-ui/react';
 import { graphql } from 'gatsby';
 import PropTypes from 'prop-types';
+import MDXWrapper from '@components/mdx/mdx-wrapper';
 
 export const query = graphql`
   query ($id: String!) {
@@ -17,12 +17,13 @@ export const query = graphql`
 const PostTemplate = ({ pageContext, data }) => {
   const { id } = pageContext;
   return (
-    <div>
-      <div>{id}</div>
-      <MDXProvider>
-        <MDXRenderer>{data.mdx.body}</MDXRenderer>
-      </MDXProvider>
-    </div>
+    <Box
+      maxW="860px"
+      margin="60px auto"
+      paddingX="6"
+    >
+      <MDXWrapper>{data.mdx.body}</MDXWrapper>
+    </Box>
   );
 };
 
