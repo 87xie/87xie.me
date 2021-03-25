@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable react/prop-types */
 import React from 'react';
 import { useColorMode } from '@chakra-ui/react';
 import styled from '@emotion/styled';
@@ -62,10 +63,16 @@ const CodeBlock = ({ children }) => {
         language={language}
         theme={colorMode === 'dark' ? oceanicNext : duotoneLight}
       >
-        {({ className, style, tokens, getLineProps, getTokenProps }) => (
+        {({
+          className,
+          style,
+          tokens,
+          getLineProps,
+          getTokenProps,
+        }) => (
           <StyledPre className={className} style={style}>
             {tokens.map((line, i) => (
-              <Line {...getLineProps({ line, key: i })}>
+              <Line key={`line-${i}`} {...getLineProps({ line, key: i })}>
                 <LineNo>{i + 1}</LineNo>
                 <LineContent>
                   {line.map((token, key) => (

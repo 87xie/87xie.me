@@ -1,10 +1,10 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import {
   Box,
   useColorMode,
 } from '@chakra-ui/react';
 
-// eslint-disable-next-line react/prop-types
 const Code = ({ children }) => {
   const { colorMode } = useColorMode();
   const styles = {
