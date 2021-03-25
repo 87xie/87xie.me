@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 import React from 'react';
@@ -18,12 +19,36 @@ const StyledTagWrapper = styled.div`
     right: 1rem;
     padding: 0.1rem 0.5rem;
     border-radius: 0px 0px 0.25rem 0.25rem;
-    background: rgb(217, 215, 224);
     color: rgb(35, 33, 41);
     text-transform: uppercase;
     font-size: 0.7rem;
     letter-spacing: 0.025rem;
     line-height: 1.2rem;
+  }
+  &.is-ts::after {
+    background: rgb(0, 122, 204);
+  }
+  &.is-js::after {
+    background: rgb(247, 223, 30);
+  }
+  &.is-jsx::after {
+    background: rgb(97, 218, 251);
+  }
+  &.is-css::after {
+    background: #2965f1;
+  }
+  &.is-scss::after {
+    background: rgb(207, 100, 154);
+  }
+  &.is-html::after {
+    background: rgb(255, 87, 51);
+  }
+  
+  &.is-html::after,
+  &.is-scss::after,
+  &.is-css::after,
+  &.is-ts::after {
+    color: #fff;
   }
 `;
 
@@ -56,7 +81,7 @@ const CodeBlock = ({ children }) => {
   const language = children.props.className.replace(/language-/, '') || '';
 
   return (
-    <StyledTagWrapper language={language}>
+    <StyledTagWrapper className={`is-${language || 'bash'}`} language={language}>
       <Highlight
         {...defaultProps}
         code={children.props.children.trim()}

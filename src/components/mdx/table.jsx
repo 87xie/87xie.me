@@ -13,6 +13,7 @@ const StyledTable = styled.table`
     font-size: .875rem;
   }
   th {
+    text-align: left;
     white-space: nowrap;
     font-weight: 600;
     background: ${(props) => props.colorMode === 'dark' ? 'rgba(255, 255, 255, 0.06)' : '#F7FAFC'};
