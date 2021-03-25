@@ -15,7 +15,7 @@ const DefaultLayout = ({ children }) => (
   >
     <Header />
     <Global />
-    <Box as="main" minWidth="0">
+    <Box as="main" minWidth="0" px="6">
       {children}
     </Box>
     <Footer />

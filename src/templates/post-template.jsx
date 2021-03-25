@@ -20,7 +20,6 @@ const PostTemplate = ({ pageContext, data }) => {
     <Box
       maxW="860px"
       margin="60px auto"
-      paddingX="6"
     >
       <MDXWrapper>{data.mdx.body}</MDXWrapper>
     </Box>

@@ -33,6 +33,8 @@ const Header = () => {
       background={isDarkMode ? 'gray.800' : 'white'}
     >
       <Flex
+        maxWidth="960px"
+        margin="0 auto"
         alignItems="center"
         justifyContent="space-between"
         height="65px"
