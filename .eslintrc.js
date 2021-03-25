@@ -30,5 +30,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     'arrow-body-style': ['error', 'as-needed'],
     'react/require-default-props': 0,
+    'no-confusing-arrow': 0,
+    'react/jsx-props-no-spreading': 0,
   },
 };
