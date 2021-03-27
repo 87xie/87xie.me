@@ -18,7 +18,7 @@ const Blockquote = ({ children }) => {
   return (
     <Box
       as="blockquote"
-      my="4"
+      mb="4"
       paddingY="3"
       paddingX="4"
       borderLeft="4px"

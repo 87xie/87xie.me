@@ -15,7 +15,7 @@ export const query = graphql`
 
 const PostTemplate = ({ data }) => {
   return (
-    <Box maxW="860px" margin="2.5rem auto 2.5rem">
+    <Box maxW="4xl" marginX="auto">
       <MDXWrapper>{data.mdx.body}</MDXWrapper>
     </Box>
   );
