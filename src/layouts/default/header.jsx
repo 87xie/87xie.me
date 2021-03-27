@@ -33,7 +33,7 @@ const Header = () => {
       background={isDarkMode ? 'gray.800' : 'white'}
     >
       <Flex
-        maxWidth="960px"
+        maxWidth="5xl"
         margin="0 auto"
         alignItems="center"
         justifyContent="space-between"
@@ -46,10 +46,15 @@ const Header = () => {
           </Text>
         </Box>
 
-        <Grid gridAutoFlow="column" gridTemplateColumns="repeat(5, 32px)" alignItems="center">
+        <Grid
+          gridAutoFlow="column"
+          gridTemplateColumns="repeat(5, 32px)"
+          alignItems="center"
+          gap="1"
+        >
           <ChakraLink
             as={GatsbyLink}
-            to="/blog"
+            to="/posts"
             textAlign="center"
           >
             <Icon as={FiBook} />
