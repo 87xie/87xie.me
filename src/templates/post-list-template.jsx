@@ -11,6 +11,7 @@ import {
   Text,
   Flex,
   Button,
+  useColorModeValue,
 } from '@chakra-ui/react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 
@@ -36,12 +37,11 @@ export const query = graphql`
 `;
 
 const PostItem = ({ post }) => {
-  const {
-    tags = [],
-    date,
-    slug,
-  } = post.frontmatter;
-  const [title] = post.headings;
+  const title = post.frontmatter?.title || '';
+  const slug = post.frontmatter?.slug || '';
+  const date = post.frontmatter?.date || '';
+  const tags = post.frontmatter?.tags || [];
+  const titleColor = useColorModeValue('red.300', 'red.200');
 
   return (
     <Link to={`/post/${slug}`}>
@@ -52,8 +52,8 @@ const PostItem = ({ post }) => {
           </Badge>
         ))}
       </Stack>
-      <Heading as="h2" size="lg">
-        {title.value}
+      <Heading as="h2" size="lg" color={titleColor}>
+        {title}
       </Heading>
       <Text as="small" fontSize="sm" color="gray">
         {date}
