@@ -2,29 +2,20 @@
 import React from 'react';
 import {
   Box,
-  useColorMode,
+  useColorModeValue,
 } from '@chakra-ui/react';
 
 const Code = ({ children }) => {
-  const { colorMode } = useColorMode();
-  const styles = {
-    background: {
-      dark: 'rgb(54, 60, 72)',
-      light: 'rgba(220, 220, 220, 0.5)',
-    },
-    color: {
-      dark: 'rgb(251, 211, 141)',
-      light: 'rgb(61, 126, 154)',
-    },
-  };
+  const color = useColorModeValue('rgb(61, 126, 154)', 'rgb(251, 211, 141)');
+  const backgroundColor = useColorModeValue('rgba(220, 220, 220, 0.5)', 'rgb(54, 60, 72)');
 
   return (
     <Box
       as="code"
       padding="1"
       borderRadius="sm"
-      background={styles.background[colorMode]}
-      color={styles.color[colorMode]}
+      backgroundColor={backgroundColor}
+      color={color}
     >
       {children}
     </Box>

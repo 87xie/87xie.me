@@ -2,7 +2,7 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { useColorMode } from '@chakra-ui/react';
+import { useColorModeValue } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import duotoneLight from 'prism-react-renderer/themes/duotoneLight';
@@ -77,7 +77,7 @@ const LineContent = styled.span`
 `;
 
 const CodeBlock = ({ children }) => {
-  const { colorMode } = useColorMode();
+  const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
   const language = children.props.className.replace(/language-/, '') || '';
 
   return (
@@ -86,7 +86,7 @@ const CodeBlock = ({ children }) => {
         {...defaultProps}
         code={children.props.children.trim()}
         language={language}
-        theme={colorMode === 'dark' ? oceanicNext : duotoneLight}
+        theme={prismTheme}
       >
         {({
           className,
