@@ -31,6 +31,7 @@ const Header = () => {
       borderBottom="1px"
       borderColor="inherit"
       background={isDarkMode ? 'gray.800' : 'white'}
+      transition="border-color 0.2s, background-color 0.2s"
     >
       <Flex
         maxWidth="5xl"

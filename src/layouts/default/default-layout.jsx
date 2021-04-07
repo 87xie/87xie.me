@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Global } from '@emotion/react';
 import { Box } from '@chakra-ui/react';
 import Header from './header';
 import Footer from './footer';
@@ -14,7 +13,6 @@ const DefaultLayout = ({ children }) => (
     letterSpacing="wide"
   >
     <Header />
-    <Global />
     <Box
       as="main"
       minWidth="0"
