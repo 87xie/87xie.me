@@ -5,6 +5,7 @@ import React from 'react';
 import { useColorModeValue } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import Highlight, { defaultProps } from 'prism-react-renderer';
+import Mermaid from 'react-mermaid2';
 import duotoneLight from 'prism-react-renderer/themes/duotoneLight';
 import oceanicNext from 'prism-react-renderer/themes/oceanicNext';
 
@@ -79,12 +80,19 @@ const LineContent = styled.span`
 const CodeBlock = ({ children }) => {
   const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
   const language = children.props.className.replace(/language-/, '') || '';
+  const code = children.props.children.trim();
+
+  if (language === 'mermaid') {
+    return (
+      <Mermaid chart={code} />
+    );
+  }
 
   return (
     <StyledTagWrapper className={`is-${language || 'bash'}`} language={language}>
       <Highlight
         {...defaultProps}
-        code={children.props.children.trim()}
+        code={code}
         language={language}
         theme={prismTheme}
       >
