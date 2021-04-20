@@ -41,7 +41,7 @@ const PostItem = ({ post }) => {
   const slug = post.frontmatter?.slug || '';
   const date = post.frontmatter?.date || '';
   const tags = post.frontmatter?.tags || [];
-  const titleColor = useColorModeValue('red.300', 'red.200');
+  const titleColor = useColorModeValue('gray.600', 'white.900');
 
   return (
     <Link to={`/post/${slug}`}>

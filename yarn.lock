@@ -1356,7 +1356,7 @@
   dependencies:
     "@chakra-ui/utils" "^1.5.1"
 
-"@chakra-ui/react@^1.4.2":
+"@chakra-ui/react@^1.5.2":
   version "1.5.2"
   resolved "https://registry.yarnpkg.com/@chakra-ui/react/-/react-1.5.2.tgz#559312b16022ed2435631facf39500e76ea56a29"
   integrity sha512-/n4HVYiM+QCPjaApz/OmKmPXE4YakuY5dsVfcbXNZrHVGm83bjz1d9Uhg+yvvE061SEK17iNkz2T3PHEJEk96A==

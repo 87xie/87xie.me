@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Box } from '@chakra-ui/react';
 import mermaid from 'mermaid';
 
 const Mermaid = ({ code }) => {
@@ -11,9 +12,9 @@ const Mermaid = ({ code }) => {
   }, []);
 
   return (
-    <div className="mermaid">
+    <Box my="5" className="mermaid">
       {code}
-    </div>
+    </Box>
   );
 };
 
