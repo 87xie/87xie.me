@@ -7,6 +7,7 @@ import styled from '@emotion/styled';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import duotoneLight from 'prism-react-renderer/themes/duotoneLight';
 import oceanicNext from 'prism-react-renderer/themes/oceanicNext';
+import Mermaid from './mermaid';
 
 const StyledTagWrapper = styled.div`
   position: relative;
@@ -79,12 +80,17 @@ const LineContent = styled.span`
 const CodeBlock = ({ children }) => {
   const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
   const language = children.props.className.replace(/language-/, '') || '';
+  const code = children.props.children.trim();
+
+  if (language === 'mermaid') {
+    return <Mermaid code={code} />;
+  }
 
   return (
     <StyledTagWrapper className={`is-${language || 'bash'}`} language={language}>
       <Highlight
         {...defaultProps}
-        code={children.props.children.trim()}
+        code={code}
         language={language}
         theme={prismTheme}
       >
