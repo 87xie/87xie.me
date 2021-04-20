@@ -10,7 +10,7 @@ module.exports = {
     {
       resolve: '@chakra-ui/gatsby-plugin',
       options: {
-        isResettingCSS: true,
+        isResettingCSS: false,
         isUsingColorMode: true,
       },
     },
