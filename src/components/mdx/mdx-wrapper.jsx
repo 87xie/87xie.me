@@ -48,15 +48,18 @@ const MDXWrapper = ({ children }) => {
       font-size: ${theme.fontSizes.lg};
     }
     p {
-      margin: ${theme.space[3]} 0;
+      margin: ${theme.space[4]} 0;
       font-size: ${theme.fontSizes.md};
-      line-height: ${theme.lineHeights.tall};
+      line-height: 1.88;
     }
     ul, ol {
-      margin: ${theme.space[4]} 0;
+      margin: ${theme.space[5]} 0;
       padding-left: ${theme.space[6]};
       li {
         margin-top: ${theme.space[2]};
+        ul {
+          margin: ${theme.space[2]} 0;
+        }
       }
     }
   `;
