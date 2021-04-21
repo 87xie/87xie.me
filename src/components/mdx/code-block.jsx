@@ -26,9 +26,11 @@ const StyledTagWrapper = styled.div`
     letter-spacing: 0.025rem;
     line-height: 1.2rem;
   }
+  &.is-typescript::after,
   &.is-ts::after {
     background: rgb(0, 122, 204);
   }
+  &.is-javascript::after,
   &.is-js::after {
     background: rgb(247, 223, 30);
   }
