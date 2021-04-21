@@ -16,7 +16,14 @@ const Footer = () => (
     >
       &copy;
       {` ${new Date().getFullYear()} `}
-      oscar87xie build with Gatsbyjs and Chakra-UI. All Rights Reserved.
+      oscar87xie All Rights Reserved.
+    </Text>
+    <Text
+      as="p"
+      w="100%"
+      fontSize="12px"
+    >
+      Builded with Gatsbyjs and Chakra-UI.
     </Text>
   </Box>
 );

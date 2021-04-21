@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@chakra-ui/react';
 import LottieContainer from '@components/lottie-container';
-import dancingDog from '../assets/animations/dancing-dog.json';
+import dancingPallbearers from '../assets/animations/dancing-pallbearers.json';
 
 const Index = () => (
   <Box
@@ -11,8 +11,8 @@ const Index = () => (
     height="100%"
   >
     <LottieContainer
-      tip="Not Found"
-      animationData={dancingDog}
+      tip="Work In Progress"
+      animationData={dancingPallbearers}
     />
   </Box>
 );
