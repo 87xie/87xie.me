@@ -23,11 +23,13 @@ const PostHeader = ({
     borderBottom={isTopLevelHeading ? '1px solid' : 'none'}
     borderColor="inherit"
   >
-    <Stack direction="row">
+    <Stack direction="row" mb="2">
       {postTags.map((tag) => (
-        <Badge key={tag} colorScheme="red">
-          {tag}
-        </Badge>
+        <Link key={tag} to={`/tag/${tag}`}>
+          <Badge colorScheme="red">
+            {tag}
+          </Badge>
+        </Link>
       ))}
     </Stack>
     <Heading
