@@ -4,14 +4,15 @@ import { Helmet } from 'react-helmet';
 import { useLocation } from '@reach/router';
 import { useStaticQuery, graphql } from 'gatsby';
 import Facebook from './facebook';
+import Twitter from './twitter';
 
 const query = graphql`
   query {
     site {
       siteMetadata {
+        twitter,
         locale,
         siteLanguage,
-        titleTemplate,
         defaultTitle: title,
         defaultDescription: description,
         defaultImage: image,
@@ -26,25 +27,25 @@ const SEO = ({ title, description, image }) => {
   const { pathname } = useLocation();
 
   const {
-    titleTemplate,
     defaultTitle,
     defaultDescription,
     defaultImage,
     siteUrl,
     siteLanguage,
     locale,
+    twitter,
   } = data.site.siteMetadata;
 
   const seo = {
-    title: title || defaultTitle,
+    title: title ? `${title} | ${defaultTitle}` : defaultTitle,
     description: description || defaultDescription,
-    image: `${siteUrl}${image || defaultImage}`,
+    image: `${image || defaultImage}`,
     url: `${siteUrl}${pathname}`,
   };
 
   return (
     <>
-      <Helmet titleTemplate={titleTemplate}>
+      <Helmet>
         <html lang={siteLanguage} />
         <title>{seo.title}</title>
         <meta name="description" content={seo.description} />
@@ -56,6 +57,12 @@ const SEO = ({ title, description, image }) => {
         image={seo.image}
         url={seo.url}
         locale={locale}
+      />
+      <Twitter
+        username={twitter}
+        title={seo.title}
+        description={seo.description}
+        image={seo.image}
       />
     </>
   );
