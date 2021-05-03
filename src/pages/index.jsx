@@ -2,7 +2,7 @@ import React from 'react';
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo/seo';
 import LottieContainer from '@components/lottie-container';
-import underMaintenance from '../assets/animations/under-maintenance.json';
+import dancingPallbearers from '../assets/lottie-animations/dancing-pallbearers.json';
 
 const Index = () => (
   <>
@@ -15,7 +15,7 @@ const Index = () => (
     >
       <LottieContainer
         tip="Work In Progress"
-        animationData={underMaintenance}
+        animationData={dancingPallbearers}
       />
     </Box>
   </>

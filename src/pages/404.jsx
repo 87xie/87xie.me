@@ -2,7 +2,7 @@ import React from 'react';
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo/seo';
 import LottieContainer from '@components/lottie-container';
-import dancingDog from '../assets/animations/dancing-dog.json';
+import dancingDog from '../assets/lottie-animations/dancing-dog.json';
 
 const Index = () => (
   <>
