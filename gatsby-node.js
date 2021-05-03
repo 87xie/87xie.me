@@ -1,39 +1,56 @@
-const postsQuery = (graphql) => graphql(`{
-  allMdx(sort: {fields: frontmatter___date, order: DESC}) {
-    edges {
-      node {
-        id
-        frontmatter {
-          slug
-          date
-        }
+const allPostsQuery = (graphql) => graphql(`{
+  allMdx(sort: {order: DESC, fields: frontmatter___date}) {
+    nodes {
+      frontmatter {
+        date(formatString: "YYYY-MM-DD")
+        slug
+        tags
+        title
+      }
+      id
+    }
+  }
+}`);
+
+const tagsGroupQuery = (graphql) => graphql(`{
+  allMdx(sort: {order: DESC, fields: frontmatter___date}) {
+    group(field: frontmatter___tags) {
+      fieldValue
+    }
+    nodes {
+      frontmatter {
+        slug
       }
     }
   }
 }`);
 
 exports.createPages = async ({ actions, graphql, reporter }) => {
-  const result = await postsQuery(graphql);
+  const results = await Promise.all([
+    allPostsQuery(graphql),
+    tagsGroupQuery(graphql),
+  ]);
 
-  if (result.errors) {
+  if (results.some((result) => result.errors)) {
     reporter.panic('Error while running GraphQL query.');
     return;
   }
 
-  const posts = result.data.allMdx.edges;
-  posts.forEach(({ node }) => {
-    const { slug = '' } = node.frontmatter;
+  const [postsResult, tagsGroupResult] = results;
+
+  const posts = postsResult.data.allMdx.nodes;
+  posts.forEach(({ frontmatter, id }) => {
+    const { slug = '' } = frontmatter;
 
     if (!slug) {
       return;
     }
 
+    // post page
     actions.createPage({
       path: `/post/${slug}`,
       component: require.resolve('./src/templates/post-template.jsx'),
-      context: {
-        id: node.id,
-      },
+      context: { id },
     });
   });
 
@@ -50,6 +67,18 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
         skip: i * perPage,
         currentPage: i + 1,
         totalPages,
+      },
+    });
+  });
+
+  // tag page
+  const tagsGroup = tagsGroupResult.data.allMdx.group;
+  tagsGroup.forEach(({ nodes, fieldValue }) => {
+    actions.createPage({
+      path: `/tag/${fieldValue}`,
+      component: require.resolve('./src/templates/tag-template.jsx'),
+      context: {
+        posts: nodes,
       },
     });
   });
