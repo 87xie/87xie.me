@@ -14,13 +14,14 @@ import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 
 export const query = graphql`
   query ($skip: Int!, $limit: Int!) {
-    allMdx(limit: $limit, skip: $skip) {
+    allMdx(
+      limit: $limit
+      skip: $skip
+      sort: {order: DESC, fields: frontmatter___date}
+    ) {
       edges {
         node {
           id
-          headings(depth: h1) {
-            value
-          }
           frontmatter {
             title
             tags
@@ -46,7 +47,7 @@ const PostListTemplate = ({ data, pageContext }) => {
     <>
       <SEO title="posts" />
       <Box
-        maxWidth="3xl"
+        maxWidth="4xl"
         marginX="auto"
       >
         <Grid gap="8" mb="8">
