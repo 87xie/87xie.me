@@ -1,12 +1,10 @@
 exports.siteMetadata = {
   author: 'oscar87xie',
-  title: 'oscar87xie',
-  titleTemplate: '%s | oscar87xie',
-  // TODO:
+  title: '87xie',
   description: 'My personal blog',
-  url: 'https://oscar87xie.com',
-  // TODO:
-  image: '',
+  url: 'https://87xie.me',
+  image: 'https://87xie.me/images/patrick-star-in-love.jpg',
   siteLanguage: 'zh-Hant',
   locale: 'zh-TW',
+  twitter: '@oscar87ixe',
 };

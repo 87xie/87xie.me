@@ -4,15 +4,12 @@ import PropTypes from 'prop-types';
 import { graphql, Link } from 'gatsby';
 import {
   Box,
-  Stack,
-  Badge,
   Grid,
-  Heading,
-  Text,
   Flex,
   Button,
-  useColorModeValue,
 } from '@chakra-ui/react';
+import SEO from '@components/seo/seo';
+import PostHeader from '@components/post-header';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 
 export const query = graphql`
@@ -28,7 +25,7 @@ export const query = graphql`
             title
             tags
             slug
-            date(formatString: "yyyy-MM-DD")
+            date(formatString: "YYYY-MM-DD")
           }
         }
       }
@@ -36,38 +33,9 @@ export const query = graphql`
   }
 `;
 
-const PostItem = ({ post }) => {
-  const title = post.frontmatter?.title || '';
-  const slug = post.frontmatter?.slug || '';
-  const date = post.frontmatter?.date || '';
-  const tags = post.frontmatter?.tags || [];
-  const titleColor = useColorModeValue('gray.600', 'white.900');
-
-  return (
-    <Link to={`/post/${slug}`}>
-      <Stack direction="row">
-        {tags.map((tag) => (
-          <Badge key={tag} colorScheme="red">
-            {tag}
-          </Badge>
-        ))}
-      </Stack>
-      <Heading as="h2" size="lg" color={titleColor}>
-        {title}
-      </Heading>
-      <Text as="small" fontSize="sm" color="gray">
-        {date}
-      </Text>
-    </Link>
-  );
-};
-
 const PostListTemplate = ({ data, pageContext }) => {
   const posts = data.allMdx.edges;
-  const {
-    currentPage,
-    totalPages,
-  } = pageContext;
+  const { currentPage, totalPages } = pageContext;
 
   const isFirst = currentPage === 1;
   const isLast = currentPage === totalPages;
@@ -75,44 +43,52 @@ const PostListTemplate = ({ data, pageContext }) => {
   const nextPage = (currentPage + 1).toString();
 
   return (
-    <Box
-      maxWidth="3xl"
-      marginX="auto"
-    >
-      <Grid gap="8" mb="8">
-        {posts.map(({ node }) => (
-          <PostItem key={node.id} post={node} />
-        ))}
-      </Grid>
+    <>
+      <SEO title="posts" />
+      <Box
+        maxWidth="3xl"
+        marginX="auto"
+      >
+        <Grid gap="8" mb="8">
+          {posts.map(({ node }) => (
+            <PostHeader
+              key={node.id}
+              postSlug={node.frontmatter.slug}
+              postTitle={node.frontmatter.title}
+              postTags={node.frontmatter.tags}
+            />
+          ))}
+        </Grid>
 
-      <Flex>
-        {!isFirst && (
-          <Button
-            as={Link}
-            size="sm"
-            to={`/posts/${prevPage}`}
-            leftIcon={<FiArrowLeft />}
-            mr="auto"
-            colorScheme="pink"
-          >
-            Previous
-          </Button>
-        )}
+        <Flex>
+          {!isFirst && (
+            <Button
+              as={Link}
+              size="sm"
+              to={`/posts/${prevPage}`}
+              leftIcon={<FiArrowLeft />}
+              mr="auto"
+              colorScheme="pink"
+            >
+              Previous
+            </Button>
+          )}
 
-        {!isLast && (
-          <Button
-            as={Link}
-            size="sm"
-            to={`/posts/${nextPage}`}
-            rightIcon={<FiArrowRight />}
-            ml="auto"
-            colorScheme="pink"
-          >
-            Next
-          </Button>
-        )}
-      </Flex>
-    </Box>
+          {!isLast && (
+            <Button
+              as={Link}
+              size="sm"
+              to={`/posts/${nextPage}`}
+              rightIcon={<FiArrowRight />}
+              ml="auto"
+              colorScheme="pink"
+            >
+              Next
+            </Button>
+          )}
+        </Flex>
+      </Box>
+    </>
   );
 };
 
