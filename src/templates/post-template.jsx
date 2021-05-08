@@ -86,7 +86,7 @@ const PostTemplate = ({ data }) => {
           alignItems="center"
           marginBottom="4"
           cursor="pointer"
-          color={useColorModeValue('green.600', 'green.200')}
+          color={useColorModeValue('orange.400', 'orange.200')}
           onClick={() => navigate(-1)}
           letterSpacing="wider"
         >
@@ -101,7 +101,7 @@ const PostTemplate = ({ data }) => {
           </Box>
         </Box>
         <PostHeader
-          isTopLevelHeading
+          titleAs="h1"
           postTags={tags}
           postTitle={title}
           publishedAt={date}
