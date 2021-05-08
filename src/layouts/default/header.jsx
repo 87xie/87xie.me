@@ -10,6 +10,10 @@ import {
   useColorMode,
 } from '@chakra-ui/react';
 import {
+  css,
+  keyframes,
+} from '@emotion/react';
+import {
   FiMoon,
   FiSun,
   FiTag,
@@ -17,6 +21,54 @@ import {
   FiGithub,
   FiLinkedin,
 } from 'react-icons/fi';
+
+const wavy = keyframes`
+  0% {
+    transform: translateY(0px);
+  }
+  
+  20% {
+    transform: translateY(-5px);
+  }
+  
+  40%, 100% {
+    transform: translateY(0px);
+  }
+`;
+
+const bugsOnHover = css`  
+  .bug {
+    display: inline-block;
+  }
+
+  &:hover .bug {
+    animation: ${wavy} 1s ease-in-out infinite;
+    animation-delay: calc(0.2s * var(--bug-i))
+  }
+`;
+
+const links = [
+  {
+    to: '/posts',
+    icon: FiBook,
+    isExternal: false,
+  },
+  {
+    to: '/tags',
+    icon: FiTag,
+    isExternal: false,
+  },
+  {
+    to: 'https://www.linkedin.com/in/oscar-87-xie/',
+    icon: FiLinkedin,
+    isExternal: true,
+  },
+  {
+    to: 'https://github.com/Oscar87Xie',
+    icon: FiGithub,
+    isExternal: true,
+  },
+];
 
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -41,11 +93,27 @@ const Header = () => {
         height="65px"
         px="6"
       >
-        <Box>
-          <Text as={GatsbyLink} to="/" fontSize={['md', 'md', 'xl']}>
-            🐛🐛🐛🐛
-          </Text>
-        </Box>
+        <Text
+          to="/"
+          as={GatsbyLink}
+          display="flex"
+          fontSize={['md', 'md', 'xl']}
+          letterSpacing="wider"
+          css={bugsOnHover}
+        >
+          <span className="bug" style={{ '--bug-i': 1 }}>
+            🐛
+          </span>
+          <span className="bug" style={{ '--bug-i': 2 }}>
+            🐛
+          </span>
+          <span className="bug" style={{ '--bug-i': 3 }}>
+            🐛
+          </span>
+          <span className="bug" style={{ '--bug-i': 4 }}>
+            🐛
+          </span>
+        </Text>
 
         <Grid
           gridAutoFlow="column"
@@ -53,37 +121,34 @@ const Header = () => {
           alignItems="center"
           gap="1"
         >
-          <ChakraLink
-            as={GatsbyLink}
-            to="/posts"
-            textAlign="center"
-          >
-            <Icon as={FiBook} />
-          </ChakraLink>
-          <ChakraLink
-            as={GatsbyLink}
-            to="/tags"
-            textAlign="center"
-          >
-            <Icon as={FiTag} />
-          </ChakraLink>
-          <ChakraLink
-            isExternal
-            href="https://www.linkedin.com/in/oscar-87-xie/"
-            textAlign="center"
-          >
-            <Icon as={FiLinkedin} />
-          </ChakraLink>
-          <ChakraLink
-            isExternal
-            href="https://github.com/Oscar87Xie"
-            textAlign="center"
-          >
-            <Icon as={FiGithub} />
-          </ChakraLink>
+          {links.map(({
+            to,
+            icon,
+            isExternal,
+          }) => (
+            <ChakraLink
+              key={to}
+              {...(isExternal && { href: to, isExternal })}
+              {...(!isExternal && { as: GatsbyLink, to })}
+              display="inline-flex"
+              justifyContent="center"
+              alignItems="center"
+              height="32px"
+              borderRadius="4"
+              _hover={{
+                color: isDarkMode ? 'red.200' : 'red.800',
+                background: isDarkMode ? 'rgba(254, 178, 178, 0.16);' : 'red.100',
+              }}
+            >
+              <Icon as={icon} />
+            </ChakraLink>
+          ))}
 
           <ChakraLink
-            textAlign="center"
+            display="inline-flex"
+            justifyContent="center"
+            alignItems="center"
+            height="32px"
             color={isDarkMode ? 'orange.300' : 'gray.500'}
             onClick={toggleColorMode}
           >
