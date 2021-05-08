@@ -5,8 +5,6 @@ const Footer = () => (
   <Box
     as="footer"
     p="2"
-    borderTop="1px"
-    borderColor="inherit"
     textAlign={['left', 'left', 'center']}
   >
     <Text
