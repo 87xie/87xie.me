@@ -5,7 +5,6 @@ import { graphql, Link } from 'gatsby';
 import {
   Box,
   Grid,
-  Flex,
   Button,
 } from '@chakra-ui/react';
 import SEO from '@components/seo/seo';
@@ -50,26 +49,27 @@ const PostListTemplate = ({ data, pageContext }) => {
         maxWidth="4xl"
         marginX="auto"
       >
-        <Grid gap="8" mb="8">
+        <Grid gap="5" mb="5">
           {posts.map(({ node }) => (
             <PostHeader
               key={node.id}
               postSlug={node.frontmatter.slug}
               postTitle={node.frontmatter.title}
               postTags={node.frontmatter.tags}
+              publishedAt={node.frontmatter.date}
             />
           ))}
         </Grid>
 
-        <Flex>
+        <Box>
           {!isFirst && (
             <Button
               as={Link}
               size="sm"
               to={`/posts/${prevPage}`}
               leftIcon={<FiArrowLeft />}
-              mr="auto"
               colorScheme="pink"
+              mr="2"
             >
               Previous
             </Button>
@@ -81,13 +81,12 @@ const PostListTemplate = ({ data, pageContext }) => {
               size="sm"
               to={`/posts/${nextPage}`}
               rightIcon={<FiArrowRight />}
-              ml="auto"
               colorScheme="pink"
             >
               Next
             </Button>
           )}
-        </Flex>
+        </Box>
       </Box>
     </>
   );

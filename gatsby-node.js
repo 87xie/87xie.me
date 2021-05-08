@@ -16,10 +16,14 @@ const tagsGroupQuery = (graphql) => graphql(`{
   allMdx(sort: {order: DESC, fields: frontmatter___date}) {
     group(field: frontmatter___tags) {
       fieldValue
-    }
-    nodes {
-      frontmatter {
-        slug
+      nodes {
+        id
+        frontmatter {
+          slug
+          title
+          date(formatString: "YYYY-MM-DD")
+          tags
+        }
       }
     }
   }
@@ -55,7 +59,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   });
 
   // post list
-  const perPage = 6;
+  const perPage = 8;
   const totalPages = Math.ceil(posts.length / perPage);
 
   Array.from({ length: totalPages }).forEach((_, i) => {
@@ -79,6 +83,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       component: require.resolve('./src/templates/tag-template.jsx'),
       context: {
         posts: nodes,
+        tag: fieldValue,
       },
     });
   });

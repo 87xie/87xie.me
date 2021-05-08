@@ -1,7 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { graphql, Link } from 'gatsby';
-import { Badge, Stack } from '@chakra-ui/react';
+import {
+  graphql,
+  Link as GatsbyLink,
+} from 'gatsby';
+import {
+  Box,
+  Flex,
+  Badge,
+  Link as ChakraLink,
+} from '@chakra-ui/react';
 import SEO from '@components/seo/seo';
 
 const TagsPage = ({ data }) => {
@@ -10,25 +18,32 @@ const TagsPage = ({ data }) => {
   return (
     <>
       <SEO title="tags" />
-      <Stack
-        spacing="4"
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
+      <Box
+        maxWidth="4xl"
         height="100%"
+        margin="0 auto"
       >
-        {tags.map(({ fieldValue: tag }) => (
-          <Link key={tag} to={`/tag/${tag}`}>
-            <Badge
-              px="2"
-              fontSize="md"
-              colorScheme="red"
+        <Flex wrap="wrap" marginBottom="-4">
+          {tags.map(({ fieldValue: tag }) => (
+            <ChakraLink
+              key={tag}
+              as={GatsbyLink}
+              to={`/tag/${tag}`}
+              display="inline-block"
+              marginBottom="4"
+              marginRight="4"
             >
-              {tag}
-            </Badge>
-          </Link>
-        ))}
-      </Stack>
+              <Badge
+                px="2"
+                fontSize="md"
+                colorScheme="red"
+              >
+                {tag}
+              </Badge>
+            </ChakraLink>
+          ))}
+        </Flex>
+      </Box>
     </>
   );
 };

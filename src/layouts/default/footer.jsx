@@ -18,13 +18,6 @@ const Footer = () => (
       {` ${new Date().getFullYear()} `}
       oscar87xie All Rights Reserved.
     </Text>
-    <Text
-      as="p"
-      w="100%"
-      fontSize="12px"
-    >
-      Builded with Gatsbyjs and Chakra-UI.
-    </Text>
   </Box>
 );
 

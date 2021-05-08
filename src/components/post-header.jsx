@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'gatsby';
+import {
+  Link as GatsbyLink,
+} from 'gatsby';
 import {
   Box,
+  Flex,
   Text,
-  Stack,
   Badge,
   Heading,
   useColorModeValue,
@@ -23,25 +25,34 @@ const PostHeader = ({
     borderBottom={isTopLevelHeading ? '1px solid' : 'none'}
     borderColor="inherit"
   >
-    <Stack direction="row" mb="2">
+    <Flex wrap="wrap">
       {postTags.map((tag) => (
-        <Link key={tag} to={`/tag/${tag}`}>
-          <Badge colorScheme="red">
+        <GatsbyLink
+          as={GatsbyLink}
+          key={tag}
+          to={`/tag/${tag}`}
+        >
+          <Badge
+            colorScheme="red"
+            display="inline-block"
+            marginRight="2"
+            marginBottom="2"
+          >
             {tag}
           </Badge>
-        </Link>
+        </GatsbyLink>
       ))}
-    </Stack>
+    </Flex>
     <Heading
       as={isTopLevelHeading ? 'h1' : 'h2'}
-      size={isTopLevelHeading ? 'xl' : 'lg'}
       color={useColorModeValue('gray.600', 'white.900')}
+      fontSize={isTopLevelHeading ? '3xl' : ['xl', '2xl']}
     >
       {postSlug
         ? (
-          <Link to={`/post/${postSlug}`}>
+          <GatsbyLink to={`/post/${postSlug}`}>
             {postTitle}
-          </Link>
+          </GatsbyLink>
         )
         : postTitle}
     </Heading>
