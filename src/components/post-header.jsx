@@ -12,58 +12,73 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 
+const ConditionWrapper = ({ wrapper, condition, children }) => condition
+  ? wrapper(children)
+  : children;
+
 const PostHeader = ({
-  isTopLevelHeading = false,
+  titleAs = 'h2',
   postTitle = '',
   postSlug = '',
   postTags = [],
   publishedAt = '',
-}) => (
-  <Box
-    marginBottom={isTopLevelHeading ? '7' : '0'}
-    paddingBottom={isTopLevelHeading ? '2' : '0'}
-    borderBottom={isTopLevelHeading ? '1px solid' : 'none'}
-    borderColor="inherit"
-  >
-    <Flex wrap="wrap">
-      {postTags.map((tag) => (
-        <GatsbyLink
-          as={GatsbyLink}
-          key={tag}
-          to={`/tag/${tag}`}
-        >
-          <Badge
-            colorScheme="red"
-            display="inline-block"
-            marginRight="2"
-            marginBottom="2"
-          >
-            {tag}
-          </Badge>
-        </GatsbyLink>
-      ))}
-    </Flex>
-    <Heading
-      as={isTopLevelHeading ? 'h1' : 'h2'}
-      color={useColorModeValue('gray.600', 'white.900')}
-      fontSize={isTopLevelHeading ? '3xl' : ['xl', '2xl']}
+}) => {
+  const isTopLevelHeading = titleAs === 'h1';
+
+  return (
+    <Box
+      marginBottom={isTopLevelHeading ? '7' : '0'}
+      paddingBottom={isTopLevelHeading ? '2' : '0'}
+      borderBottom={isTopLevelHeading ? '1px solid' : 'none'}
+      borderColor="inherit"
     >
-      {postSlug
-        ? (
-          <GatsbyLink to={`/post/${postSlug}`}>
-            {postTitle}
+      <Flex wrap="wrap">
+        {postTags.map((tag) => (
+          <GatsbyLink
+            key={tag}
+            to={`/tag/${tag}`}
+          >
+            <Badge
+              colorScheme="red"
+              display="inline-block"
+              marginRight="2"
+              marginBottom="2"
+            >
+              {tag}
+            </Badge>
           </GatsbyLink>
-        )
-        : postTitle}
-    </Heading>
-    <Text as="small" fontSize="sm" color="gray">
-      {publishedAt}
-    </Text>
-  </Box>
-);
+        ))}
+      </Flex>
+
+      <ConditionWrapper
+        condition={!isTopLevelHeading}
+        wrapper={(children) => (
+          <Box
+            as={GatsbyLink}
+            to={`/post/${postSlug}`}
+            display="block"
+          >
+            {children}
+          </Box>
+        )}
+      >
+        <Heading
+          as={titleAs}
+          color={useColorModeValue('gray.600', 'white.900')}
+          fontSize={isTopLevelHeading ? '3xl' : ['xl', '2xl']}
+        >
+          {postTitle}
+        </Heading>
+        <Text as="small" fontSize="sm" color="gray">
+          {publishedAt}
+        </Text>
+      </ConditionWrapper>
+    </Box>
+  );
+};
 
 PostHeader.propTypes = {
-  isTopLevelHeading: PropTypes.bool,
+  titleAs: PropTypes.string,
   postSlug: PropTypes.string,
   postTitle: PropTypes.string.isRequired,
   postTags: PropTypes.arrayOf(PropTypes.string).isRequired,
