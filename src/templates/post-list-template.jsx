@@ -18,15 +18,13 @@ export const query = graphql`
       skip: $skip
       sort: {order: DESC, fields: frontmatter___date}
     ) {
-      edges {
-        node {
-          id
-          frontmatter {
-            title
-            tags
-            slug
-            date(formatString: "YYYY-MM-DD")
-          }
+      nodes {
+        id
+        frontmatter {
+          title
+          tags
+          slug
+          date(formatString: "YYYY-MM-DD")
         }
       }
     }
@@ -34,7 +32,7 @@ export const query = graphql`
 `;
 
 const PostListTemplate = ({ data, pageContext }) => {
-  const posts = data.allMdx.edges;
+  const posts = data.allMdx.nodes;
   const { currentPage, totalPages } = pageContext;
 
   const isFirst = currentPage === 1;
@@ -50,7 +48,7 @@ const PostListTemplate = ({ data, pageContext }) => {
         marginX="auto"
       >
         <Grid gap="5" mb="5">
-          {posts.map(({ node }) => (
+          {posts.map((node) => (
             <PostHeader
               key={node.id}
               postSlug={node.frontmatter.slug}

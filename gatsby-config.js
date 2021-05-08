@@ -10,8 +10,7 @@ module.exports = {
     {
       resolve: '@chakra-ui/gatsby-plugin',
       options: {
-        isResettingCSS: false,
-        isUsingColorMode: true,
+        resetCSS: true,
       },
     },
     {
@@ -30,6 +29,14 @@ module.exports = {
       options: {
         name: 'posts',
         path: `${__dirname}/posts`,
+      },
+    },
+    {
+      resolve: 'gatsby-plugin-react-svg',
+      options: {
+        rule: {
+          include: /assets\/svgs/,
+        },
       },
     },
   ],

@@ -5,7 +5,7 @@ module.exports = {
     'import/resolver': {
       alias: {
         map: [
-          ['@', 'src'],
+          ['@', './src'],
           ['@styles', './src/styles'],
           ['@layouts', './src/layouts'],
           ['@components', './src/components'],

@@ -73,6 +73,7 @@ const links = [
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const isDarkMode = colorMode === 'dark';
+  const linkHoverColor = isDarkMode ? 'red.200' : 'pink.500';
   return (
     <Box
       as="header"
@@ -80,7 +81,6 @@ const Header = () => {
       zIndex="sticky"
       position="sticky"
       top="0"
-      borderBottom="1px"
       borderColor="inherit"
       background={isDarkMode ? 'gray.800' : 'white'}
       transition="border-color 0.2s, background-color 0.2s"
@@ -129,14 +129,22 @@ const Header = () => {
             <ChakraLink
               key={to}
               {...(isExternal && { href: to, isExternal })}
-              {...(!isExternal && { as: GatsbyLink, to })}
+              {...(!isExternal && {
+                to,
+                as: GatsbyLink,
+                partiallyActive: true,
+                activeClassName: 'is-active',
+              })}
               display="inline-flex"
               justifyContent="center"
               alignItems="center"
               height="32px"
               borderRadius="4"
+              sx={{
+                '&.is-active': { color: linkHoverColor },
+              }}
               _hover={{
-                color: isDarkMode ? 'red.200' : 'red.800',
+                color: linkHoverColor,
                 background: isDarkMode ? 'rgba(254, 178, 178, 0.16);' : 'red.100',
               }}
             >
