@@ -36,6 +36,7 @@ const TagTemplate = ({ pageContext }) => {
               postSlug={frontmatter.slug}
               postTitle={frontmatter.title}
               postTags={frontmatter.tags}
+              publishedAt={frontmatter.date}
             />
           ))}
         </Grid>
