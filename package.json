@@ -16,7 +16,7 @@
     "analyze": "cross-env ANALYZE_BUNDLE_SIZE=true gatsby build"
   },
   "dependencies": {
-    "@chakra-ui/gatsby-plugin": "^2.0.0",
+    "@chakra-ui/gatsby-plugin": "^2.0.1",
     "@chakra-ui/react": "^1.6.1",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11",
