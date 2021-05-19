@@ -97,7 +97,7 @@ const Header = () => {
           to="/"
           as={GatsbyLink}
           display="flex"
-          fontSize={['md', 'md', 'xl']}
+          fontSize={['lg', 'xl']}
           letterSpacing="wider"
           css={bugsOnHover}
         >

@@ -17,7 +17,7 @@ import PostsSection from '@components/home/posts-section';
 export const query = graphql`
   query {
     allMdx(
-      limit: 4
+      limit: 6
       sort: {order: DESC, fields: frontmatter___date}
     ) {
       nodes {
@@ -48,9 +48,9 @@ const Index = ({ data }) => {
         height="100%"
       >
         <Box
-          flex={['auto', 'auto', '0 0 240px']}
+          flex={['auto', 'auto', '0 0 25%']}
           marginBottom={['6', '6', '0']}
-          marginRight={['0', '0', '10']}
+          marginRight={['0', '0', '12']}
         >
           <Text
             marginBottom="6"

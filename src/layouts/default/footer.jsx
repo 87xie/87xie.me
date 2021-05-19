@@ -4,8 +4,8 @@ import { Box, Text } from '@chakra-ui/react';
 const Footer = () => (
   <Box
     as="footer"
-    p="2"
-    textAlign={['left', 'left', 'center']}
+    py="2"
+    textAlign="center"
   >
     <Text
       as="small"
