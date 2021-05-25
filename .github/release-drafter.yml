@@ -23,9 +23,6 @@ categories:
   - title: '💄 Style'
     labels:
       - 'style'
-  - title: '📝 Writing'
-    labels:
-      - 'writing'
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 version-resolver:
   major:
