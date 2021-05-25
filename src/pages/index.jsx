@@ -16,6 +16,11 @@ import PostsSection from '@components/home/posts-section';
 
 export const query = graphql`
   query {
+    site {
+      siteMetadata {
+        description
+      }
+    }
     allMdx(
       limit: 6
       sort: {order: DESC, fields: frontmatter___date}
@@ -35,11 +40,12 @@ export const query = graphql`
 
 const Index = ({ data }) => {
   const [latestPost, ...recentPosts] = data.allMdx.nodes;
+  const description = data.site.siteMetadata?.description;
   const textOrange = useColorModeValue('orange.400', 'orange.200');
 
   return (
     <>
-      <SEO />
+      <SEO title="home" />
       <Box
         display="flex"
         flexDirection={['column', 'column', 'row']}
@@ -56,7 +62,7 @@ const Index = ({ data }) => {
             marginBottom="6"
             lineHeight="1.2"
           >
-            Personal writings for improving my memory.
+            {description}
           </Text>
           <BuiltWith />
         </Box>
