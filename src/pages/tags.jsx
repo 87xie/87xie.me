@@ -23,25 +23,27 @@ const TagsPage = ({ data }) => {
         height="100%"
         margin="0 auto"
       >
-        <Flex wrap="wrap" marginBottom="-4">
-          {tags.map(({ fieldValue: tag }) => (
-            <ChakraLink
-              key={tag}
-              as={GatsbyLink}
-              to={`/tag/${tag}`}
-              display="inline-block"
-              marginBottom="4"
-              marginRight="4"
-            >
-              <Badge
-                px="2"
-                fontSize="md"
-                colorScheme="red"
+        <Flex height="100%" alignItems="center">
+          <Flex wrap="wrap" marginBottom="-4">
+            {tags.map(({ fieldValue: tag }) => (
+              <ChakraLink
+                key={tag}
+                as={GatsbyLink}
+                to={`/tag/${tag}`}
+                display="inline-block"
+                marginBottom="4"
+                marginRight="4"
               >
-                {tag}
-              </Badge>
-            </ChakraLink>
-          ))}
+                <Badge
+                  px="2"
+                  fontSize="md"
+                  colorScheme="red"
+                >
+                  {tag}
+                </Badge>
+              </ChakraLink>
+            ))}
+          </Flex>
         </Flex>
       </Box>
     </>
