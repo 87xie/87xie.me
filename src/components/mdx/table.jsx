@@ -24,7 +24,7 @@ const Table = ({ children }) => {
   const thBackground = useColorModeValue('#F7FAFC', 'rgba(255, 255, 255, 0.06)');
 
   return (
-    <Box overflowX="scroll" marginY="2xl">
+    <Box overflowX="scroll" marginBottom="7">
       <StyledTable thBackground={thBackground}>
         {children}
       </StyledTable>
