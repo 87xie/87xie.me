@@ -7,10 +7,9 @@ style: ['style/*']
 revert: ['revert/*']
 remove: ['remove/*']
 skip-changelog: [
-  'develop',
-  'dev',
   'dev/*',
   'testing',
   'test/*',
-  'doc/*'
+  'doc/*',
+  'post/*'
 ]
