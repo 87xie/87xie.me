@@ -13,13 +13,14 @@ const StyledTagWrapper = styled.div`
   position: relative;
   margin: 1em 0;
   &::after {
-    content: "${(props) => props.language}";
+    content: ${(props) => props.language && `"${props.language}"`};
     display: inline-block;
     position: absolute;
     top: 0rem;
     right: 1rem;
     padding: 0.1rem 0.5rem;
     border-radius: 0px 0px 0.25rem 0.25rem;
+    background: #D9D7E0;
     color: rgb(35, 33, 41);
     text-transform: uppercase;
     font-size: 0.7rem;
@@ -81,7 +82,8 @@ const LineContent = styled.span`
 
 const CodeBlock = ({ children }) => {
   const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
-  const language = children.props.className.replace(/language-/, '') || '';
+  const languageClassName = children.props.className || '';
+  const language = languageClassName.replace(/language-/, '');
   const code = children.props.children.trim();
 
   if (language === 'mermaid') {
