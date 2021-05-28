@@ -1,0 +1,53 @@
+---
+title: Macrotasks and Microtasks
+slug: macrotasks-and-microtasks
+tags:
+  - javascript
+  - event-loop
+  - microtasks
+  - macrotasks
+date: 2021-05-28
+---
+
+客家版 event loop processing model 流程如下，當 call stack 為空時
+
+1. 從 macrotask queue 取出最早的 macrotask 執行
+1. 依照先進先出原則，執行所有 microtask 直到 microtask queue 為空
+1. 如果 macrotask queue 為空，等待下個 macrotask 被放置 macrotask queue
+1. 重複步驟 1
+
+macrotask enqueued by:
+- `setTimeout` or `setInterval`
+-  user interaction event callback
+- ui rendering
+- a new js program or subprogram is executed
+  - from a console
+  -  by running the code in a `<script>` element directly.
+
+microtask enqueued by:
+- `MutationObserver`
+- `process.nextTick`
+- `queueMicrotasks`
+- promise handlers `then` / `catch` / `finally`
+
+## Others
+
+- 每個 macrotask 執行完畢後，會優先處理 microtask queue 內的所有任務，直到 microtask queue 為空
+- 執行完 microtask queue 內的任務，有可能會觸發 rendering
+- 每一輪的 event loop 不一定會觸發 rendering
+  - 1fps 內的多次 dom 更新不會馬上反應
+  - 60fps equals 60 frams per second (1 fram = 1/60s)
+
+## Reference
+
+[stackoverflow - Difference between microtask and macrotask within an event loop context](https://stackoverflow.com/questions/25915634/difference-between-microtask-and-macrotask-within-an-event-loop-context)
+
+[Event loop: microtasks and macrotasks](https://javascript.info/event-loop)
+
+[Microtask and Macrotask: A Hands-on Approach](https://blog.bitsrc.io/microtask-and-macrotask-a-hands-on-approach-5d77050e2168)
+
+[Using microtasks in JavaScript with queueMicrotask()](https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide)
+
+[Event Loop 運行機制解析 - 瀏覽器篇](https://yu-jack.github.io/2020/02/03/javascript-runtime-event-loop-browser/)
+
+[WHATWG - Event Loop](https://html.spec.whatwg.org/multipage/webappapis.html#event-loops)
