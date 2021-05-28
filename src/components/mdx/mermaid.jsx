@@ -4,7 +4,7 @@ import { Box } from '@chakra-ui/react';
 import mermaid from 'mermaid';
 
 const Mermaid = ({ code, theme }) => {
-  if (!window) {
+  if (!typeof window === undefined) {
     return null;
   }
 
