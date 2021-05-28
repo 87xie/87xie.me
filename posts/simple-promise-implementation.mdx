@@ -7,6 +7,20 @@ tags:
 date: 2021-05-16
 ---
 
+```mermaid
+flowchart LR
+  subgraph pending
+  promise[Promise]
+  end
+  promise --> then_catch["then()<br/>catch()"]
+  subgraph settled
+  onFuliflled["onFulfilled"]
+  onRejected["onRejected"]
+  end
+  then_catch -- resolve/reject --> settled
+  then_catch -- return --> new_promise[Promise]
+```
+
 - `settled` 用來表示一個 promise 已被實現 (resolve) 或拒絕 (reject)，且其狀態不處於 `pending`。
 
 - `_consumers` 用來存放調用 `then(onFulfilled, onRejected)` 或 `catch(onRejected)` 後產生的 promise，當 producer promise 狀態為 `settled` 則會向其所有 consumer 通知，並觸發在 consumer 中註冊的 `onFulfilled` 或 `onRejected` callback。
