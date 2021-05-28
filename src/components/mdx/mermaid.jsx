@@ -1,12 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@chakra-ui/react';
 import mermaid from 'mermaid';
 
-const Mermaid = ({ code }) => {
-  const config = { startOnLoad: true, theme: 'neutral' };
+const Mermaid = ({ code, theme }) => {
+  if (!window) {
+    return null;
+  }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const config = { theme, startOnLoad: true };
     mermaid.initialize(config);
     mermaid.contentLoaded();
   }, []);
@@ -20,6 +23,7 @@ const Mermaid = ({ code }) => {
 
 Mermaid.propTypes = {
   code: PropTypes.string.isRequired,
+  theme: PropTypes.string.isRequired,
 };
 
 export default Mermaid;

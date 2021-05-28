@@ -82,12 +82,13 @@ const LineContent = styled.span`
 
 const CodeBlock = ({ children }) => {
   const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
+  const mermaidTheme = useColorModeValue('default', 'dark');
   const languageClassName = children.props.className || '';
   const language = languageClassName.replace(/language-/, '');
   const code = children.props.children.trim();
 
   if (language === 'mermaid') {
-    return <Mermaid code={code} />;
+    return <Mermaid key={mermaidTheme} theme={mermaidTheme} code={code} />;
   }
 
   return (
