@@ -47,7 +47,9 @@ const getNextTick = () => {
     return (callback) => Promise.resolve().then(callback);
   }
   
-  if (!window && process && typeof process.nextTick === 'function') {
+  if (typeof process !== 'undefined'
+    && typeof process.nextTick === 'function'
+  ) {
     return process.nextTick;
   }
   

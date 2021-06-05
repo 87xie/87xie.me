@@ -1,0 +1,137 @@
+---
+title: Linux - Processes and Variables
+slug: linux-processes-and-variables
+date: 2021-06-01
+tags:
+  - linux
+  - bash
+---
+
+- process
+  - foreground
+  - background
+- variables
+  - 自訂變數
+  - 環境變數
+  - `.bashrc`
+  - `.bash_profile`
+
+## Processes
+
+- process 為被存放在記憶體中且正在運作的程式 (program)，例如啟動一個 bash shell，每個 process 會被賦予一個識別碼 (PID)。這裡會以「程序」作為代稱
+- process 間存在關聯性，例如透過 bash shell 執行一個指令後，衍生出來的 process 稱作子程序 (subprocess)，子程序會繼承父程序的環境變數，透過 PPID 可以判斷 process 父子程序關係
+
+與當前使用者相關的 process
+
+```bash
+ps -l
+```
+
+系統所有 process
+
+```bash
+ps aux
+```
+
+- a: show processes for all users
+- u: display the process's user/owner
+- x: also show processes not attached to a terminal
+
+### Foreground and Background
+
+- foreground, background 是來自於 shell 的子程序
+- foreground: 可以控制與下達指令的環境
+  - `CRTL` + `Z` 暫停目前工作，並返回 interactive shell
+  - `CRTL` + `C` 終止工作
+- background: 可以自行運作的工作，不需等待 terminal/shell input
+- 指令加上 `&`，表示將指令移至背景 (background) 執行
+- `jobs` 列出目前背景工作狀態 (含暫停中的工作)
+- `bg` 將工作在背景下運行 (resume in background)
+- `fg` 將工作移至前景處理 (reattch to the process)
+
+```bash
+sleep 1000 &
+jobs
+# reattch to the process
+# 1 means the first item in the list, the number refers to that
+fg 1
+# hit CRTL + Z
+# notice process is stopped
+jobs
+bg 1
+```
+
+## Variables
+
+- 自訂變數只在當前 session 作用
+- 透過 export 後的變數可在 subprocess 中使用
+
+定義變數 / 修改變數 / 取消變數
+
+```bash
+# assign value to variable
+greeting="hello world"
+echo $greeting
+# change the value of variable
+greeting="hi there"
+echo $greeting
+# remove an environment variable
+unset greeting
+echo $greeting
+```
+
+### Subcommand
+
+run the command and put its output.
+
+
+```bash
+echo "Today is $(date)."
+```
+
+- Difference between `${}` and `$()` in bash
+  - `$()` means: "first evaluate this, and then evaluate the rest of the line".
+  - `${}` means: expands a variable.
+
+## Permanent Variables
+
+列出所有環境變數
+
+```bash
+printenv
+env
+```
+
+在 `.bashrc` 中設定
+
+```bash
+export VARIABLE=value
+```
+
+- `.bashrc`: non-login shell 讀取
+- `.bash_profile`:  login shell 讀取 (leave alone)
+
+### Supplement: [What does “rc” mean in dot files](https://stackoverflow.com/questions/11030552/what-does-rc-mean-in-dot-files)
+
+It looks like one of the following:
+
+- run commands
+- resource control
+- run control
+- runtime 
+
+Also I've found a citation:
+
+>The ‘rc’ suffix goes back to Unix's grandparent, CTSS. It had a command-script feature called "runcom". Early Unixes used ‘rc’ for the name of the operating system's boot script, as a tribute to CTSS runcom.
+
+## Reference
+
+[Complete Intro to Linux and the CLI](https://btholt.github.io/complete-intro-to-linux-and-the-cli/)
+
+[鳥哥的 Linux 私房菜 - 程序管理與 SELinux 初探](http://linux.vbird.org/linux_basic/0440processcontrol.php#)
+
+[鳥哥的 Linux 私房菜 - Shell 的變數功能](http://linux.vbird.org/linux_basic/0320bash.php#variable)
+
+[Difference between ${} and $() in Bash](https://stackoverflow.com/questions/27472540/difference-between-and-in-bash/27472808)
+
+[What does “rc” mean in dot files](https://stackoverflow.com/questions/11030552/what-does-rc-mean-in-dot-files)
