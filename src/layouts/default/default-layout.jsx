@@ -18,6 +18,7 @@ const DefaultLayout = ({ children }) => (
       minWidth="0"
       px="6"
       pt="8"
+      py="4"
     >
       {children}
     </Box>
