@@ -1,0 +1,160 @@
+---
+title: Curl Basic
+slug: curl-basic
+tags:
+  - linux
+  - curl
+date: 2021-06-06
+---
+
+[curl](https://curl.se/)
+
+- command-line tool
+- 基於網路協定，對指定 URL 執行網路資源傳輸
+- chrome / firefox 的 network panel 可以複製 curl 指令
+- 支援 stdin, stdout，意即可以和其他 programs 一起搭配，例如 [nvm](https://github.com/nvm-sh/nvm) 官方提供的安裝指令
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+```
+
+## Output
+
+```bash
+# equivalent
+curl https://raw.githubusercontent.com/btholt/bash2048/master/bash2048.sh > 2048.sh
+curl -o 2048.sh https://raw.githubusercontent.com/btholt/bash2048/master/bash2048.sh
+```
+
+named by the same file name
+
+```bash
+curl -O https://raw.githubusercontent.com/btholt/bash2048/master/bash2048.sh
+```
+
+## Post Form Data
+
+```bash
+curl -X POST \
+-F 'name=foo' \
+-F 'password=bar' \
+<url>
+```
+
+upload file
+
+```bash
+curl -X POST \
+-F 'file=@./file.txt' \
+<url>
+```
+
+- `@`: prefix the file name with an @ sign. To just get the content part from a file.
+
+## Post JSON Data
+
+```bash
+curl -X POST \
+-H "Content-Type: application/json" \
+-d '{"name": "foo", "password": "bar"}' \
+<url>
+```
+
+## Send cookies
+
+```bash
+curl -b "cookie_1=1;cookie_2=2;cookie_3=3" http://localhost:8000
+```
+
+## Custom Http Headers
+
+```bash
+curl -H 'Accept-Language: zh-TW' \
+-H 'Authorization: Bearer 3345678' \
+-H 'Cache-Control: no-cache' \
+<url>
+```
+
+## Redirect
+
+by default curl won't follow redirects.
+
+```bash
+# redirecting http to https
+curl -L http://tw.voicetube.com  
+```
+
+## Common Options
+
+| options                    | description                         |
+|----------------------------|-------------------------------------|
+| -X, --request [method]     | HTTP Method                         |
+| -F, --form [name=content]  | multipart/form-data                 |
+| -d, --data                 | HTTP data (default using POST Method) |
+| -H, --header               | pass custom header(s) to server     |
+| -v, --verbose              | get more information                |
+| -i, --include              | include protocol response headers in the output |
+| -b, --cookie               | send cookies with your request      |
+| -L, --location             | Follow redirects.                   |
+
+## jq
+
+[jq](https://stedolan.github.io/jq/) 是一個幫助你處理 JSON 資料的 command-line tool
+
+```bash
+curl \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/users/gaearon | jq
+```
+
+json output
+
+```json
+{
+  "login": "gaearon",
+  "type": "User",
+  "site_admin": false,
+  "name": "Dan Abramov",
+  "company": "@facebook ",
+  "twitter_username": "dan_abramov",
+  "public_repos": 249,
+  "public_gists": 72,
+  "followers": 66346,
+  "following": 171,
+  "created_at": "2011-05-25T18:18:31Z",
+  "updated_at": "2021-06-04T20:46:34Z"
+}
+```
+
+extracting data and reformatting from JSON
+
+```bash
+curl -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/users/gaearon \
+  | jq '. | {user_type: .type, user_name: .name, company}'
+```
+
+output
+
+```json
+{
+  "user_type": "User",
+  "user_name": "Dan Abramov",
+  "company": "@facebook "
+}
+```
+
+get the first element of the array
+
+```bash
+echo "[1, 2, 3]" | jq '.[0]'
+# 1
+```
+
+## Reference
+
+[Complete Intro to Linux and the CLI - curl](https://btholt.github.io/complete-intro-to-linux-and-the-cli/ssh)
+
+[Everything curl](https://everything.curl.dev/)
+
+[jq](https://stedolan.github.io/jq/)
