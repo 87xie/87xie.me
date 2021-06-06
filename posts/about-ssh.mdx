@@ -58,7 +58,7 @@ sequenceDiagram
 
 ## Public Key Authentication
 
-create ssh keys (for client identify)
+generating ssh keys
 
 ```bash
 ssh-keygen -t rsa
@@ -67,7 +67,7 @@ ssh-keygen -t rsa
 # hit enter again to confirm
 ```
 
-connecting to server
+add the public key to server machine
 
 ```bash
 mkdir ~/.ssh
@@ -76,6 +76,11 @@ chmod 700 ~/.ssh
 chmod 600 ~/.ssh/authorized_keys
 ```
 
+connecting to server
+
+```bash
+ssh <username>@<remote_host>
+```
 
 ```mermaid
 sequenceDiagram
@@ -90,6 +95,8 @@ sequenceDiagram
 ```
 
 ## Reference
+
+[Complete Intro to Linux and the CLI - SSH](https://btholt.github.io/complete-intro-to-linux-and-the-cli/ssh)
 
 [SSH (Secure Shell)](https://www.ssh.com/academy/ssh#the-ssh-protocol)
 
