@@ -1,0 +1,129 @@
+---
+title: Linux Cron
+slug: linux-cron
+date: 2021-06-11
+tags: 
+  - linux
+  - cron
+---
+
+time-based job scheduler in unix-like computer operating systems
+
+## Crontab
+
+- `crontab -e`: 編輯 crontab file
+- `crontab -l`: 查看 crontab 工作內容
+- `crontab -u <username> -e`: 編輯指定使用者的 crontab file
+
+### Syntax
+
+```bash
+* * * * * <command>
+# * * * * * execute on every minutes
+```
+
+crontab 語法共有六個欄位，以空白分界，前五項用來表示執行頻率，其意義依序為
+
+| field            | allowed value   |
+|------------------|-----------------|
+| minutes          | 0-59            |
+| hours            | 0-23            |
+| day of the month | 1-31            |
+| month            | 1-12 or jan-dec |
+| day of the week  | 0-6 or sun-sat  |
+
+表示頻率的字元 (參考自 [crontab guru](https://crontab.guru/))
+
+| syntax | description            |
+|--------|------------------------|
+| *      | any value              |
+| ,      | define multiple values |
+| -      | range of values        |
+| /      | step values            |
+
+Special Strings
+
+```bash
+@daily <command>
+@reboot <command>
+@weekly <command>
+@yearly <command>
+@monthly <command>
+@annually <command>
+```
+
+### Examples
+
+每個小時的 05 分執行
+
+```
+5 * * * *
+```
+
+每天 4:00am 執行
+
+```
+0 4 * * *
+```
+
+每天 4:00am, 4:00pm 各執行一次
+
+```
+0 4,16 * * *
+```
+
+每週日、一的 4:00am, 4:00pm 各執行一次
+
+```
+0 4,16 * * sun,mon
+```
+
+每周日 4:00pm 執行
+
+```
+0 16 * * sun
+0 16 * * 0
+```
+
+每 10 分鐘
+
+```
+*/10 * * * *
+```
+
+每 4 小時
+
+```
+0 */4 * * *
+```
+
+每個一月、五月執行
+
+```
+* * * jan,may
+```
+
+## Cron Folders
+
+在以下路徑的 script 會被定期執行
+
+- `/etc/cron.daily`
+- `/etc/cron.hourly`
+- `/etc/cron.monthly`
+- `/etc/cron.weekly`
+
+確切執行時間可參考 [What decides when cron.hourly runs?](https://unix.stackexchange.com/questions/371354/what-decides-when-cron-hourly-runs)
+
+## Reference
+
+[Linux 設定 crontab 例行性工作排程教學與範例](https://blog.gtwang.org/linux/linux-crontab-cron-job-tutorial-and-examples/)
+
+[Complete Intro to Linux and the CLI!](https://btholt.github.io/complete-intro-to-linux-and-the-cli/cron)
+
+[crontab guru](https://crontab.guru/)
+
+[Crontab in Linux with 20 Useful Examples to Schedule Jobs](https://tecadmin.net/crontab-in-linux-with-20-examples-of-cron-schedule/)
+
+[wiki cron](https://en.wikipedia.org/wiki/Cron)
+
+[What decides when cron.hourly runs?](https://unix.stackexchange.com/questions/371354/what-decides-when-cron-hourly-runs)
