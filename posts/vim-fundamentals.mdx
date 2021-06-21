@@ -1,0 +1,228 @@
+---
+title: VIM Fundamentals
+slug: vim-fundamentals
+date: 2021-06-15
+tags: 
+  - vim
+  - linux
+---
+
+why vim
+
+- edit files on a remote server over ssh
+- work without graphical desktop environment
+- git bash default editor
+
+## Modes
+
+- normal mode
+- visual mode: for highlighting a block of text and apply an operation
+  - `v`: character-wise visual mode
+  - `V`: line-wise visual mode
+- insert mode
+  - `i`: left side of cursor
+  - `I`: first non-blank character in a line.
+  - `a`: right side of cursor
+  - `A`: end of line
+  - `o`: insert new line below and go into insert mode
+  - `O`: insert new line above and go into insert mode
+- etc
+  
+## Navigations
+
+### Line Navigation
+
+| command          | description                                       |
+|------------------|---------------------------------------------------|
+| h / ←            | move cursor left                                  |
+| j / ↓            | move cursor down                                  |
+| k / ↑            | move cursor up                                    |
+| l / →            | move cursor right                                 |
+| n + (h, j, k, l) | n is a number, 4j moves down 4 lines              |
+| 0                | jump to the start of the line                     |
+| ^                | jump to the first non-blank character of the line |
+| $                | jump to the end of the line                       |
+| gg               | go to the first line of the document              |
+| G                | go to the last line of the document               |
+
+### Word Navigation
+
+| command | description                                               |
+|---------|-----------------------------------------------------------|
+| w       | move to start of next word (punctuation considered words) |
+| W       | move to start of next WORD (spaces separate words)        |
+| e       | move to end of next word                                  |
+| E       | move to end of next WORD                                  |
+| b       | move to start of previous word                            |
+| B       | move to start of previous WORD                            |
+
+## Editing
+
+| command  | description            |
+|----------|------------------------|
+| x        | delete (cut) character |
+| dd       | delete (cut) a line    |
+| yy       | yank (copy) a line     |
+| p        | paste below            |
+| P        | paste above            |
+| u        | undo                   |
+| CTRL + r | redo                   |
+| :%d      | delete all line        |
+
+## Exit Command
+
+| command | description                               |
+|---------|-------------------------------------------|
+| :w      | save the file but don't exit              |
+| :q      | quit (fails if there are unsaved changes) |
+| :q!     | quit and throw away unsaved changes       |
+| :wq     | save and quit                             |
+
+## Search and Replace
+
+- `/pattern`: search forward, e.g. `/\d`
+- `?patttern`: search backward
+- `:'<,'>/{pattern}`: basic search and only in visual region
+  - press `n` jump to the next one
+  - `:set hls`: highlighting search matches
+  - `:nohls`: to disable the highlighting
+
+search and replace
+
+- `:s`: for single line
+- `:'<,'>s`: for visual region
+- `:%s`: for whole file
+
+examples
+
+```
+foo foo foo
+foo foo foo
+foo foo foo
+```
+
+- `:s/foo/bar`: replace one of foo to bar in current line
+
+```
+bar foo foo
+foo foo foo
+foo foo foo
+```
+
+- `:s/foo/bar/g`: replace all foo to bar in current line
+
+```
+bar bar bar
+foo foo foo
+foo foo foo
+```
+
+- `:%s/foo/bar`: replace the first foo to bar in each single lines
+
+```
+bar foo foo
+bar foo foo
+bar foo foo
+```
+
+- `:%s/foo/bar/g`: replace foo to bar for whole file
+
+```
+bar bar bar
+bar bar bar
+bar bar bar
+```
+
+## Spliting Screen
+
+- `CTRL` + `w` go into window mode
+  - press `v` for a vertical split
+  - press `s` for a horizontal split
+
+navigate between the splits
+
+- `CTRL` + `w` go into window mode
+  - press `h` or `j`, `k`, `l` switch to adjacent window
+  
+close one
+
+- `:q`
+- `CTRL` + `w` go into window mode
+  - press `Q`
+
+## NetRW
+
+the default browsing of the filesystem plugin.
+
+open netrw window
+
+```bash
+vim .
+```
+
+or using vim command
+
+- `:Ex`: open netrw in the current window
+- `:Sex`: open netrw in a horizontal split
+- `:Vex`: open netrw in vertical split
+
+## Grep and QuickFix
+
+The quickfix list is a list of entries containing position, file, and message. It often used for searches like `:vimgrep` and `:grep`
+
+- `:cp`: move to the previous match
+- `:cn`: move to the next match
+- `:clast`: move to last match
+- `:cfirst`: move to the first match
+- `:copen`: open the quickfix list in the current window
+
+an example of find the match word "vim" in the all mdx files
+
+```
+:grep vim **/*.mdx
+```
+
+## Plugins and Customization
+
+[vim-plug](https://github.com/junegunn/vim-plug): one of vim plugin manager
+
+[fzf.vim](https://github.com/junegunn/fzf.vim): fuzzy finding
+
+[vim-polyglot](https://github.com/sheerun/vim-polyglot): A collection of language packs for Vim.
+
+
+```bash
+cat ~/.vimrc
+```
+
+```vimrc
+syntax enable
+set number
+set relativenumber
+set scrolloff=8
+set tabstop=2
+set softtabstop=2
+colorscheme desert
+
+call plug#begin('~/.vim/plugged')
+
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'sheerun/vim-polyglot'
+
+call plug#end()
+```
+
+- setting `Tab` to 2 spaces
+  - `set expandtab`: allows to replace the tabs by white spaces characters
+  - `set tabstop=2`: show existing tab with 2 spaces
+  - `set softtabstop=2`: 2 spaces when you press `Tab`
+  - `set smartindent`: do smart autoindenting when starting a new line. works for C-like programs, but can also be used for other languages.
+
+## Reference
+
+[VIM Fundamentals](https://theprimeagen.github.io/vim-fundamentals/)
+
+[Vim Cheat Sheet](https://vim.rtorr.com/)
+
+[Vim 101: QuickFix and Grep](https://medium.com/usevim/vim-101-quickfix-and-grep-c782cb65e524)
