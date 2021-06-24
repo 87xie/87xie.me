@@ -36,11 +36,18 @@ const SEO = ({ title, description, image }) => {
     twitter,
   } = data.site.siteMetadata;
 
+  /**
+   * use template literals in seo object cause eslint linting
+   * "TypeError: Cannot read property 'value' of null"
+   * https://github.com/eslint/eslint/issues/13542
+   */
+  const seoTitle = title ? `${title} | ${defaultTitle}` : defaultTitle;
+  const url = `${siteUrl}${pathname}`;
   const seo = {
-    title: title ? `${title} | ${defaultTitle}` : defaultTitle,
+    title: seoTitle,
     description: description || defaultDescription,
-    image: `${image || defaultImage}`,
-    url: `${siteUrl}${pathname}`,
+    image: image || defaultImage,
+    url,
   };
 
   return (
