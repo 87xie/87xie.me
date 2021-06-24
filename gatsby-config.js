@@ -4,7 +4,6 @@ module.exports = {
   siteMetadata,
   plugins: [
     'gatsby-plugin-emotion',
-    'gatsby-plugin-eslint',
     'gatsby-plugin-react-helmet',
     'gatsby-plugin-mdx',
     {
@@ -37,6 +36,14 @@ module.exports = {
         rule: {
           include: /assets\/svgs/,
         },
+      },
+    },
+    {
+      resolve: 'gatsby-plugin-eslint',
+      options: {
+        stages: ['develop'],
+        extensions: ['js', 'jsx'],
+        exclude: ['node_modules', '.cache', 'public'],
       },
     },
   ],
