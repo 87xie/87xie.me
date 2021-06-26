@@ -1,15 +1,13 @@
-/* eslint-disable indent */
 /* eslint-disable react/no-array-index-key */
-/* eslint-disable react/prop-types */
 import React from 'react';
-import { useColorModeValue } from '@chakra-ui/react';
+import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import Highlight, { defaultProps } from 'prism-react-renderer';
+import { useColorModeValue } from '@chakra-ui/react';
 import duotoneLight from 'prism-react-renderer/themes/duotoneLight';
 import oceanicNext from 'prism-react-renderer/themes/oceanicNext';
-import Mermaid from './mermaid';
 
-const StyledTagWrapper = styled.div`
+const StyledWrapper = styled.div`
   position: relative;
   margin: 1em 0;
   &::after {
@@ -80,19 +78,11 @@ const LineContent = styled.span`
   padding-right: 1.5em;
 `;
 
-const CodeBlock = ({ children }) => {
+const PrismHighlighter = ({ code, language }) => {
   const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
-  const mermaidTheme = useColorModeValue('default', 'dark');
-  const languageClassName = children.props.className || '';
-  const language = languageClassName.replace(/language-/, '');
-  const code = children.props.children.trim();
-
-  if (language === 'mermaid') {
-    return <Mermaid key={mermaidTheme} theme={mermaidTheme} code={code} />;
-  }
 
   return (
-    <StyledTagWrapper className={`is-${language || 'bash'}`} language={language}>
+    <StyledWrapper>
       <Highlight
         {...defaultProps}
         code={code}
@@ -107,12 +97,18 @@ const CodeBlock = ({ children }) => {
           getTokenProps,
         }) => (
           <StyledPre className={className} style={style}>
-            {tokens.map((line, i) => (
-              <Line key={`line-${i}`} {...getLineProps({ line, key: i })}>
-                <LineNo>{i + 1}</LineNo>
+            {tokens.map((line, lineIndex) => (
+              <Line
+                key={`line-${lineIndex}`}
+                {...getLineProps({ line, key: lineIndex })}
+              >
+                <LineNo>{lineIndex + 1}</LineNo>
                 <LineContent>
-                  {line.map((token, key) => (
-                    <span key={key} {...getTokenProps({ token, key })} />
+                  {line.map((token, lineContentIndex) => (
+                    <span
+                      key={lineContentIndex}
+                      {...getTokenProps({ token, key: lineContentIndex })}
+                    />
                   ))}
                 </LineContent>
               </Line>
@@ -120,8 +116,13 @@ const CodeBlock = ({ children }) => {
           </StyledPre>
         )}
       </Highlight>
-    </StyledTagWrapper>
+    </StyledWrapper>
   );
 };
 
-export default CodeBlock;
+PrismHighlighter.propTypes = {
+  language: PropTypes.string.isRequired,
+  code: PropTypes.string.isRequired,
+};
+
+export default PrismHighlighter;

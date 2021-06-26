@@ -1,21 +1,23 @@
 import React, { useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Box } from '@chakra-ui/react';
+import { Box, useColorModeValue } from '@chakra-ui/react';
 import mermaid from 'mermaid';
 
-const Mermaid = ({ code, theme }) => {
+const Mermaid = ({ code }) => {
   if (!typeof window === undefined) {
     return null;
   }
+
+  const theme = useColorModeValue('default', 'dark');
 
   useLayoutEffect(() => {
     const config = { theme, startOnLoad: true };
     mermaid.initialize(config);
     mermaid.contentLoaded();
-  }, []);
+  }, [theme]);
 
   return (
-    <Box my="5" className="mermaid">
+    <Box key={theme} my="5" className="mermaid">
       {code}
     </Box>
   );
@@ -23,7 +25,6 @@ const Mermaid = ({ code, theme }) => {
 
 Mermaid.propTypes = {
   code: PropTypes.string.isRequired,
-  theme: PropTypes.string.isRequired,
 };
 
 export default Mermaid;

@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Box, useColorModeValue } from '@chakra-ui/react';
-import styled from '@emotion/styled';
+import { Box, useColorMode } from '@chakra-ui/react';
+import { css } from '@emotion/react';
 
-const StyledTable = styled.table`
+const tableCSS = css`
   width: 100%;
   border: 1px solid;
   border-color: inherit;
@@ -16,18 +16,25 @@ const StyledTable = styled.table`
     text-align: left;
     white-space: nowrap;
     font-weight: 600;
-    background: ${(props) => props.thBackground};
+  }
+  
+  &.is-dark th {
+    background: rgba(255, 255, 255, 0.06);
+  }
+  
+  &.is-light th {
+    background: #F7FAFC;
   }
 `;
 
 const Table = ({ children }) => {
-  const thBackground = useColorModeValue('#F7FAFC', 'rgba(255, 255, 255, 0.06)');
+  const { colorMode } = useColorMode();
 
   return (
     <Box overflowX="scroll" marginBottom="7">
-      <StyledTable thBackground={thBackground}>
+      <table css={tableCSS} className={`is-${colorMode}`}>
         {children}
-      </StyledTable>
+      </table>
     </Box>
   );
 };
