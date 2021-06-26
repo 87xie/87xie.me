@@ -3,19 +3,23 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from '@emotion/styled';
 import Highlight, { defaultProps } from 'prism-react-renderer';
-import { useColorModeValue } from '@chakra-ui/react';
+import {
+  Button,
+  useClipboard,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import duotoneLight from 'prism-react-renderer/themes/duotoneLight';
 import oceanicNext from 'prism-react-renderer/themes/oceanicNext';
 
 const StyledWrapper = styled.div`
   position: relative;
   margin: 1em 0;
-  &::after {
-    content: ${(props) => props.language && `"${props.language}"`};
+  &[data-language]::after {
+    content: attr(data-language);
     display: inline-block;
     position: absolute;
     top: 0rem;
-    right: 1rem;
+    left: 1.25rem;
     padding: 0.1rem 0.5rem;
     border-radius: 0px 0px 0.25rem 0.25rem;
     background: #D9D7E0;
@@ -25,38 +29,45 @@ const StyledWrapper = styled.div`
     letter-spacing: 0.025rem;
     line-height: 1.2rem;
   }
-  &.is-typescript::after,
-  &.is-ts::after {
+
+  &[data-language="typescript"]::after,
+  &[data-language="ts"]::after {
     background: rgb(0, 122, 204);
   }
-  &.is-javascript::after,
-  &.is-js::after {
+  
+  &[data-language="javascript"]::after,
+  &[data-language="js"]::after {
     background: rgb(247, 223, 30);
   }
-  &.is-jsx::after {
+  &[data-language="jsx"]::after {
     background: rgb(97, 218, 251);
   }
-  &.is-css::after {
+  
+  &[data-language="css"]::after {
     background: #2965f1;
   }
-  &.is-scss::after {
+  
+  &[data-language="sass"]::after,
+  &[data-language="scss"]::after {
     background: rgb(207, 100, 154);
   }
-  &.is-html::after {
+  
+  &[data-language="html"]::after {
     background: rgb(255, 87, 51);
   }
   
-  &.is-html::after,
-  &.is-scss::after,
-  &.is-css::after,
-  &.is-ts::after {
+  &[data-language="html"]::after
+  &[data-language="sass"]::after
+  &[data-language="scss"]::after
+  &[data-language="ts"]::after
+  &[data-language="typescript"]::after {
     color: #fff;
   }
 `;
 
 const StyledPre = styled.pre`
   border-radius: .3em;
-  padding: 1.5em;
+  padding: 2.25em 1.5em 1.5em;
   text-align: left;
   overflow: scroll;
 `;
@@ -80,9 +91,20 @@ const LineContent = styled.span`
 
 const PrismHighlighter = ({ code, language }) => {
   const prismTheme = useColorModeValue(duotoneLight, oceanicNext);
+  const { hasCopied, onCopy } = useClipboard(code);
 
   return (
-    <StyledWrapper>
+    <StyledWrapper data-language={language || undefined}>
+      <Button
+        size="xs"
+        colorScheme="blue"
+        position="absolute"
+        top=".75em"
+        right=".75em"
+        onClick={onCopy}
+      >
+        {hasCopied ? 'copied' : 'copy'}
+      </Button>
       <Highlight
         {...defaultProps}
         code={code}
