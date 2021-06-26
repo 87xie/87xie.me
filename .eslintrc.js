@@ -18,6 +18,7 @@ module.exports = {
     },
   },
   env: {
+    jest: true,
     browser: true,
     node: true, // defines things like process.env when generating through node
   },
