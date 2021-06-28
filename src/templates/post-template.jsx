@@ -12,7 +12,7 @@ import {
   navigate,
 } from 'gatsby';
 import { css } from '@emotion/react';
-import SEO from '@components/seo/seo';
+import SEO from '@components/seo';
 import PostHeader from '@components/post-header';
 import MDXContainer from '@components/mdx/mdx-container';
 

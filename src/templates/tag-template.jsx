@@ -5,7 +5,7 @@ import {
   Grid,
   useColorModeValue,
 } from '@chakra-ui/react';
-import SEO from '@components/seo/seo';
+import SEO from '@components/seo';
 import PostHeader from '@components/post-header';
 
 const TagTemplate = ({ pageContext }) => {

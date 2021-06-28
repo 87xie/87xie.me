@@ -10,7 +10,7 @@ import {
   graphql,
   Link as GatsbyLink,
 } from 'gatsby';
-import SEO from '@components/seo/seo';
+import SEO from '@components/seo';
 import BuiltWith from '@components/home/built-with';
 import PostsSection from '@components/home/posts-section';
 

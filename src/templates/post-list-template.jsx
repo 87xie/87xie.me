@@ -7,7 +7,7 @@ import {
   Grid,
   Button,
 } from '@chakra-ui/react';
-import SEO from '@components/seo/seo';
+import SEO from '@components/seo';
 import PostHeader from '@components/post-header';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 

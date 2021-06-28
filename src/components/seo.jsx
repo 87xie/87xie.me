@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { useLocation } from '@reach/router';
 import { useStaticQuery, graphql } from 'gatsby';
-import Facebook from './facebook';
-import Twitter from './twitter';
 
 const query = graphql`
   query {
@@ -36,18 +34,11 @@ const SEO = ({ title, description, image }) => {
     twitter,
   } = data.site.siteMetadata;
 
-  /**
-   * use template literals in seo object cause eslint linting
-   * "TypeError: Cannot read property 'value' of null"
-   * https://github.com/eslint/eslint/issues/13542
-   */
-  const seoTitle = title ? `${title} | ${defaultTitle}` : defaultTitle;
-  const url = `${siteUrl}${pathname}`;
   const seo = {
-    title: seoTitle,
+    title: title ? `${title} | ${defaultTitle}` : defaultTitle,
     description: description || defaultDescription,
     image: image || defaultImage,
-    url,
+    url: `${siteUrl}${pathname}`,
   };
 
   return (
@@ -57,20 +48,24 @@ const SEO = ({ title, description, image }) => {
         <title>{seo.title}</title>
         <meta name="description" content={seo.description} />
         <meta name="image" content={seo.image} />
+        {/* og property */}
+        <meta property="og:type" content="webiste" />
+        <meta property="og:locale" content={locale} />
+        <meta property="og:url" content={seo.url} />
+        <meta property="og:title" content={seo.title} />
+        <meta property="og:image" content={seo.image} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={seo.description} />
+        <meta property="og:description" content={seo.description} />
+        {/* twitter card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seo.title} />
+        <meta name="twitter:description" content={seo.description} />
+        <meta name="twitter:image" content={seo.image} />
+        <meta name="twitter:image:alt" content={seo.description} />
+        <meta name="twitter:creator" content={twitter} />
       </Helmet>
-      <Facebook
-        title={seo.title}
-        description={seo.description}
-        image={seo.image}
-        url={seo.url}
-        locale={locale}
-      />
-      <Twitter
-        username={twitter}
-        title={seo.title}
-        description={seo.description}
-        image={seo.image}
-      />
     </>
   );
 };
