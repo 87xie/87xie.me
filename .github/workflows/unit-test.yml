@@ -18,6 +18,5 @@ jobs:
       - uses: mattallty/jest-github-action@v1
         with:
           test-command: yarn test
-          coverage-comment: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
