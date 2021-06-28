@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box } from '@chakra-ui/react';
-import SEO from '@components/seo/seo';
+import SEO from '@components/seo';
 import LottieContainer from '@components/lottie-container';
 import dancingPallbearers from '../assets/lottie-animations/dancing-pallbearers.json';
 
-const Index = () => (
+const NotFound = () => (
   <>
     <SEO title="404" />
     <Box
@@ -21,4 +21,4 @@ const Index = () => (
   </>
 );
 
-export default Index;
+export default NotFound;

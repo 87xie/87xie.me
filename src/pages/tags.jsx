@@ -10,7 +10,7 @@ import {
   Badge,
   Link as ChakraLink,
 } from '@chakra-ui/react';
-import SEO from '@components/seo/seo';
+import SEO from '@components/seo';
 
 const TagsPage = ({ data }) => {
   const tags = data?.allMdx?.group || [];
