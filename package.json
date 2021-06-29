@@ -1,9 +1,8 @@
 {
-  "name": "87-site",
+  "name": "87xie.me",
   "version": "1.0.0",
-  "private": true,
-  "description": "87-posts",
-  "author": "oscar.xie",
+  "description": "my personal writing",
+  "author": "oscar.xie <oscar87xie@gmail.com>",
   "keywords": [
     "gatsby"
   ],
