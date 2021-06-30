@@ -3,7 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import lottie from 'lottie-web';
 
-const UnderMaintance = ({ animationData, tip }) => {
+const LottieContainer = ({ animationData, tip }) => {
   const animationContainer = useRef();
   useEffect(() => {
     const animation = lottie.loadAnimation({
@@ -33,4 +33,4 @@ const UnderMaintance = ({ animationData, tip }) => {
   );
 };
 
-export default UnderMaintance;
+export default LottieContainer;
