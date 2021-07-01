@@ -22,9 +22,10 @@ const query = graphql`
 `;
 
 const usePostsSearch = () => {
-  // get posts init js-search
+  // get posts
   const data = useStaticQuery(query);
   const posts = data.allMdx.nodes.map(({ frontmatter }) => ({ ...frontmatter }));
+  // init js-search
   const jsSearch = new JsSearch.Search('title');
   jsSearch.addIndex('tags');
   jsSearch.addDocuments(posts);
@@ -46,7 +47,7 @@ const usePostsSearch = () => {
     if (trimmedValue.length < 2 && searchResult.length) {
       setSearchResult([]);
     }
-  });
+  }, 250);
 
   const onSelectedItemChange = ({ selectedItem: post }) => {
     if (post) {
@@ -56,7 +57,7 @@ const usePostsSearch = () => {
 
   return {
     posts,
-    downshiftOptions: {
+    downshiftProps: {
       onSelectedItemChange,
       items: searchResult,
       onInputValueChange: onInputValueChangeWithDebounce,

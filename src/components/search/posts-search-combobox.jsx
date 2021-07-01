@@ -17,7 +17,7 @@ import { useCombobox } from 'downshift';
 import usePostsSearch from './use-posts-search';
 
 const PostsSearchCombobox = () => {
-  const { downshiftOptions } = usePostsSearch();
+  const { downshiftProps } = usePostsSearch();
   const {
     isOpen,
     getMenuProps,
@@ -25,7 +25,7 @@ const PostsSearchCombobox = () => {
     getInputProps,
     getComboboxProps,
     highlightedIndex,
-  } = useCombobox(downshiftOptions);
+  } = useCombobox(downshiftProps);
 
   const listBackground = useColorModeValue('gray.100', 'gray.600');
   const itemActiveBackground = useColorModeValue('pink.300', 'red.200');
@@ -43,7 +43,7 @@ const PostsSearchCombobox = () => {
         background={listBackground}
         shadow="lg"
       >
-        {isOpen && downshiftOptions.items.map((item, index) => (
+        {isOpen && downshiftProps.items.map((item, index) => (
           <ListItem
             {...getItemProps({ item, index })}
             key={item.slug}
@@ -61,7 +61,7 @@ const PostsSearchCombobox = () => {
                 <Text fontWeight="bold">
                   {item.title}
                 </Text>
-                <Text fontSize="14px" lineHeight="1">
+                <Text fontSize="sm" lineHeight="1">
                   {item.tags.join(', ')}
                 </Text>
               </Box>
