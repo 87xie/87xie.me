@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Flex,
@@ -31,17 +31,9 @@ const PostsSearchCombobox = () => {
   const itemActiveBackground = useColorModeValue('pink.300', 'red.200');
   const itemActiveColor = useColorModeValue('white', 'gray.600');
 
-  const inputRef = useRef(null);
-  useEffect(() => {
-    const inputElement = inputRef.current;
-    if (inputElement) {
-      inputElement.focus();
-    }
-  }, []);
-
   return (
     <Box {...getComboboxProps()}>
-      <Input {...getInputProps({ ref: inputRef })} />
+      <Input {...getInputProps({ autoFocus: true })} />
       <List
         {...getMenuProps()}
         maxHeight="384px"
