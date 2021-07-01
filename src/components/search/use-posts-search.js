@@ -1,14 +1,11 @@
 import { useState } from 'react';
-import { graphql, navigate, useStaticQuery } from 'gatsby';
+import {
+  graphql,
+  navigate,
+  useStaticQuery,
+} from 'gatsby';
+import { useDebouncedCallback } from 'use-debounce';
 import * as JsSearch from 'js-search';
-
-function debounce(func, timeout = 300) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
-  };
-}
 
 const query = graphql`
   query {
@@ -25,22 +22,29 @@ const query = graphql`
 `;
 
 const usePostsSearch = () => {
+  // get posts init js-search
   const data = useStaticQuery(query);
-  const [searchResult, setSearchResult] = useState([]);
   const posts = data.allMdx.nodes.map(({ frontmatter }) => ({ ...frontmatter }));
-
   const jsSearch = new JsSearch.Search('title');
   jsSearch.addIndex('tags');
   jsSearch.addDocuments(posts);
 
-  const itemToString = (selectedPost) => selectedPost?.title || '';
-  const onInputValueChange = debounce(({ inputValue }) => {
-    const value = inputValue.trim();
+  // downshift
+  const [searchResult, setSearchResult] = useState([]);
+  const onInputValueChangeWithDebounce = useDebouncedCallback(({ inputValue, isOpen }) => {
+    if (!isOpen) {
+      return;
+    }
 
-    if (value.length < 2) {
+    const trimmedValue = inputValue.trim();
+
+    if (trimmedValue.length > 2) {
+      setSearchResult(jsSearch.search(trimmedValue));
+      return;
+    }
+
+    if (trimmedValue.length < 2 && searchResult.length) {
       setSearchResult([]);
-    } else {
-      setSearchResult(jsSearch.search(value));
     }
   });
 
@@ -51,11 +55,12 @@ const usePostsSearch = () => {
   };
 
   return {
+    posts,
     downshiftOptions: {
-      items: searchResult,
-      itemToString,
-      onInputValueChange,
       onSelectedItemChange,
+      items: searchResult,
+      onInputValueChange: onInputValueChangeWithDebounce,
+      itemToString: (item) => item?.title || '',
     },
   };
 };
