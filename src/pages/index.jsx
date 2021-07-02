@@ -45,7 +45,7 @@ const Index = ({ data }) => {
 
   return (
     <>
-      <SEO title="home" />
+      <SEO />
       <Box
         display="flex"
         flexDirection={['column', 'column', 'row']}

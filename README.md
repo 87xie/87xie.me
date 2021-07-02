@@ -4,10 +4,10 @@
 
 ## Markdown Frontmatter Attributes
 
-- title
-- slug
-- date
-- tags
+- title: string
+- slug: string
+- date: yyyy-MM-dd
+- tags: array of string
 
 ## Types of Commit Message
 
@@ -15,8 +15,9 @@
 - 🐛 bug fix
 - 💄 ui style
 - 🔥 remove files
-- ♻️ refactor
+- 💅 refactor （♻️ deprecated)
 - ✅ tests
 - 📝 post or documentation
 - 🍱 static files
 - 🏡 changes to the build process or auxiliary tools and libraries
+- 🚧 work in progress

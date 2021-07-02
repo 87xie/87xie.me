@@ -12,6 +12,7 @@ import {
   FiSun,
   FiTag,
   FiBook,
+  FiSearch,
   FiGithub,
   FiLinkedin,
 } from 'react-icons/fi';
@@ -19,6 +20,11 @@ import HeaderBugs from './header-bugs';
 import HeaderIconLink from './header-icon-link';
 
 const links = [
+  {
+    to: '/search',
+    icon: FiSearch,
+    isExternal: false,
+  },
   {
     to: '/posts',
     icon: FiBook,
@@ -28,7 +34,7 @@ const links = [
   {
     to: '/tags',
     icon: FiTag,
-    airaLabel: 'To tags page',
+    ariaLabel: 'To tags page',
     isExternal: false,
   },
   {
@@ -72,14 +78,13 @@ const Header = () => {
         {/* header-right */}
         <Grid
           gridAutoFlow="column"
-          gridTemplateColumns="repeat(5, 32px)"
           alignItems="center"
-          gap="1"
+          gap={[0, 1]}
         >
           {links.map(({ ariaLabel, ...linkProps }) => (
             <HeaderIconLink
               {...linkProps}
-              key={ariaLabel}
+              key={linkProps.to}
               aria-label={ariaLabel}
             />
           ))}
