@@ -39,7 +39,7 @@ const usePostsSearch = () => {
 
     const trimmedValue = inputValue.trim();
 
-    if (trimmedValue.length > 2) {
+    if (trimmedValue.length >= 2) {
       setSearchResult(jsSearch.search(trimmedValue));
       return;
     }

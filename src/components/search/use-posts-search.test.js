@@ -42,7 +42,7 @@ jest.mock('js-search', () => ({
   })),
 }));
 
-jest.afterAll(() => {
+afterAll(() => {
   jest.clearAllMocks();
 });
 
@@ -78,20 +78,23 @@ describe('use posts search hook', () => {
       });
     });
     expect(mockSearch).not.toHaveBeenCalled();
-  });
 
-  it('programmatically navigate when an item on selected', () => {
-    const { result } = renderHook(() => usePostsSearch());
+    // should programmatically navigate when an item selected
+    const [post] = result.current.posts;
+    act(() => {
+      result.current.downshiftProps.onSelectedItemChange({ selectedItem: post });
+    });
+    expect(navigate).toHaveBeenCalledWith(`/post/${post.slug}`);
+    navigate.mockClear();
 
+    // should ignore navigate
     act(() => {
       result.current.downshiftProps.onSelectedItemChange({ selectedItem: null });
     });
     expect(navigate).not.toHaveBeenCalled();
 
-    const [item] = mockSearchResult;
-    act(() => {
-      result.current.downshiftProps.onSelectedItemChange({ selectedItem: item });
-    });
-    expect(navigate).toHaveBeenCalledWith(`/post/${item.slug}`);
+    // should display post title
+    expect(result.current.downshiftProps.itemToString(post)).toBe(post.title);
+    expect(result.current.downshiftProps.itemToString(null)).toBe('');
   });
 });
