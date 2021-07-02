@@ -42,7 +42,7 @@ jest.mock('js-search', () => ({
   })),
 }));
 
-jest.afterAll(() => {
+afterAll(() => {
   jest.clearAllMocks();
 });
 
