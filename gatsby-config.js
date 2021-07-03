@@ -17,8 +17,6 @@ module.exports = {
       options: {
         aliases: {
           '@': 'src',
-          '@styles': 'src/styles',
-          '@layouts': 'src/layouts',
           '@components': 'src/components',
         },
       },
@@ -43,7 +41,7 @@ module.exports = {
       options: {
         stages: ['develop'],
         extensions: ['js', 'jsx'],
-        exclude: ['node_modules', '.cache', 'public'],
+        exclude: ['node_modules', '.cache', 'public', 'static'],
       },
     },
   ],

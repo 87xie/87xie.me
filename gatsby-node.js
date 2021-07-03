@@ -1,4 +1,4 @@
-const allPostsQuery = (graphql) => graphql(`{
+const allMdxQuery = (graphql) => graphql(`{
   allMdx(sort: {order: DESC, fields: frontmatter___date}) {
     nodes {
       frontmatter {
@@ -12,7 +12,7 @@ const allPostsQuery = (graphql) => graphql(`{
   }
 }`);
 
-const tagsGroupQuery = (graphql) => graphql(`{
+const tagGroupQuery = (graphql) => graphql(`{
   allMdx(sort: {order: DESC, fields: frontmatter___date}) {
     group(field: frontmatter___tags) {
       fieldValue
@@ -31,8 +31,8 @@ const tagsGroupQuery = (graphql) => graphql(`{
 
 exports.createPages = async ({ actions, graphql, reporter }) => {
   const results = await Promise.all([
-    allPostsQuery(graphql),
-    tagsGroupQuery(graphql),
+    allMdxQuery(graphql),
+    tagGroupQuery(graphql),
   ]);
 
   if (results.some((result) => result.errors)) {
@@ -40,44 +40,38 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
     return;
   }
 
-  const [postsResult, tagsGroupResult] = results;
-
-  const posts = postsResult.data.allMdx.nodes;
-  posts.forEach(({ frontmatter, id }) => {
-    const { slug = '' } = frontmatter;
-
-    if (!slug) {
-      return;
+  const [allMdxResult, tagsGroupResult] = results;
+  const posts = allMdxResult.data.allMdx.nodes;
+  posts.forEach(({ frontmatter: { slug = '' }, id }) => {
+    if (slug) {
+      actions.createPage({
+        path: `/post/${slug}`,
+        component: require.resolve('./src/templates/post-template.jsx'),
+        context: { id },
+      });
     }
-
-    // post page
-    actions.createPage({
-      path: `/post/${slug}`,
-      component: require.resolve('./src/templates/post-template.jsx'),
-      context: { id },
-    });
   });
 
   // post list
   const perPage = 8;
   const totalPages = Math.ceil(posts.length / perPage);
 
-  Array.from({ length: totalPages }).forEach((_, i) => {
+  for (let i = 1; i <= totalPages; i += 1) {
     actions.createPage({
-      path: i === 0 ? '/posts' : `/posts/${i + 1}`,
+      path: i === 1 ? '/posts' : `/posts/${i}`,
       component: require.resolve('./src/templates/post-list-template.jsx'),
       context: {
         limit: perPage,
-        skip: i * perPage,
-        currentPage: i + 1,
+        skip: (i - 1) * perPage,
+        currentPage: i,
         totalPages,
       },
     });
-  });
+  }
 
   // tag page
-  const tagsGroup = tagsGroupResult.data.allMdx.group;
-  tagsGroup.forEach(({ nodes, fieldValue }) => {
+  const tagGroup = tagsGroupResult.data.allMdx.group;
+  tagGroup.forEach(({ nodes, fieldValue }) => {
     actions.createPage({
       path: `/tag/${fieldValue}`,
       component: require.resolve('./src/templates/tag-template.jsx'),
