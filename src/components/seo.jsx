@@ -14,7 +14,7 @@ const query = graphql`
         defaultTitle: title,
         defaultDescription: description,
         defaultImage: image,
-        siteUrl: url,
+        siteUrl,
       }
     }
   }
