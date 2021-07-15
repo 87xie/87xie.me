@@ -1,0 +1,182 @@
+---
+title: Linked List in JavaScript
+slug: linked-list-in-javascript
+date: 2021-07-10
+tags:
+  - linked list
+  - data structures
+  - javascript
+---
+
+- node 為 linked list 中的節點，每個 node 會紀錄對應的資料及指向下一個 node 的指標。下方程式碼中分別以 `data`、`next` 屬性表示
+- linked list 紀錄起始的 node，藉此透過 node 的指標，將記憶體中不連續的空間給串連起來
+  - 在 linked list 中當 node 下一個指標為 `null` 時，該 node 即為 tail node
+  - 新增 / 刪除起始節點的時間複雜度為 `O(1)`
+  - index 相關操作，例如搜尋特定位置對應的 node ，或是在最後一個節點新增 node，時間複雜度為 `O(n)`
+  - 實作指定 index 的插入 / 刪除，記得要考慮
+    - index 對應的 node 是否為 head node / tail node
+    - index 是否超出 linked list size
+    - 是否存在 cycle
+
+```js
+class Node {
+  constructor(data, next = null) {
+    this.data = data;
+    this.next = next;
+  }
+}
+
+class LinkedList {
+  constructor(head) {
+    this.head = head;
+  }
+  
+  addToHead(data) {
+    this.head = new Node(data, this.head);
+  }
+  
+  addToTail(data) {
+    if (!this.head) {
+      this.head = new Node(data, null);
+      return;
+    }
+
+     let node = this.head;
+
+    while(node.next !== null) {
+      node = node.next;
+    }
+    
+    node.next = new Node(data, node);
+  }
+}
+
+const node_1 = new Node('foo');
+const node_2 = new Node('bar', node_1);
+const list = new LinkedList(node_1);
+```
+
+```mermaid
+graph LR
+  node_1[data: bar<br>next: node_1] --> node_2[data: foo<br>next: null]
+```
+
+## The Middle Point of the Linked List
+
+1. 藉由 `slow`、`fast` 兩個指標
+1. `slow` 每次前進一個節點，`fast` 每次前進兩個節點
+1. 當 `fast` 為最後節點，或無法前進兩個節點時，`slow` 即為中間的 node 
+
+```js
+function midpoint(list) {
+  let slow = list.head;
+  let fast = list.head;
+  
+  while (fast.next && fast.next.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  
+  return slow;
+}
+```
+
+## Check is a Circular Linked List
+
+1. 藉由 `slow`、`fast` 兩個指標
+1. `slow` 每次前進一個節點，`fast` 每次前進兩個節點
+1. 若 linked list 存在 cycle，`fast` 最終會追上 `slow`
+
+```js
+function circular(list) {
+  if (!list.head) {
+    return false;
+  }
+
+  let slow = list.head;
+  let fast = list.head;
+  let result = false;
+  
+  while (fast.next && fast.next.next) {
+    slow = slow.next;
+    fast = fast.next.next;
+    
+    if (slow === fast) {
+      result = true;
+      break;
+    }
+  }
+  
+  return result;
+}
+```
+
+## Get n’th node from the end of a Linked List
+
+```mermaid
+graph LR
+  a --> b
+  b --> c
+  c --> d
+```
+
+```
+Assume that n will always be less than the length of the list.
+fromLast(list, 0).data d
+fromLast(list, 2).data b
+```
+
+1. 先將 `fast` 位移 n 個節點
+1. `fast` 為 tail node 時，`slow` 即為從 linked list 結尾開始，從 0 算起第 n 個 node
+
+```js
+function fromLast(list, n) {
+  let slow = list.head;
+  let fast = list.head;
+  
+  while (n > 0) {
+    fast = fast.next;
+    n--;
+  }
+  
+  while (fast.next) {
+    slow = slow.next;
+    fast = fast.next;
+  }
+  
+  return slow;
+}
+```
+
+## Reverse a Linked List
+
+1. node size `<= 1` 則不需要反轉
+1. `temporary = current` 用來暫存當前的 node
+1. `current = current.next`，將下一個指標存放至 `current`， 當 `current = null` 則滿足停止 while 迴圈的條件
+1. `temporary.next = previous` 改變當前 node 的指標，`previous` 初始值為 `null` 即為把 head node 反轉為 tail node
+1. `previous = tempoaray` 當前 node 存放至 `previous` 提供下一次迴圈引用
+
+```js
+function reverseList(head) {
+  if (!head || !head.next) {
+    return head;
+  }
+  
+  let current = head;
+  let previous = null;
+  let temporary;
+  
+  while (current !== null) {
+    temporary = current;
+    current = current.next;
+    temporary.next = previous;
+    previous = temporary;
+  }
+  
+  return previous;
+};
+```
+
+## Reference
+
+[The Coding Interview Bootcamp: Algorithms + Data Structures](https://www.udemy.com/course/coding-interview-bootcamp-algorithms-and-data-structure/)
