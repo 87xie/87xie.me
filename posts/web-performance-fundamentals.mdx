@@ -189,7 +189,16 @@ The browser time delay between the user's first click and execution of applicati
 
 ## Get Performance Information Programmatically
 
+下方為如何在 client side 收集真實的 web vitals，並向指定 api 端點發送資料的示意程式碼
+
 [code resource](https://github.com/toddhgardner/perf-training-website/blob/perf-complete/public/assets/js/util/perf.js)
+
+- `new PerformanceObserver().observe({ buffered: true })`
+  - `buffered` it means give the events event if they already happended
+
+- The `navigator.sendBeacon()` method asynchronously sends a small amount of data over HTTP to a web server.
+  - not supported for all browser
+  - will sending a POST request
 
 ```javascript
 (function (ready) {
@@ -263,14 +272,6 @@ The browser time delay between the user's first click and execution of applicati
   });
 });
 ```
-
-- `new PerformanceObserver().observe({ buffered: true })`
-    - `buffered` it means give the events event if they already happended
-
-- The `navigator.sendBeacon()` method asynchronously sends a small amount of data over HTTP to a web server.
-    - not supported for all browser
-    - will sending a POST request
-
 
 ## Rendering Performance
 
