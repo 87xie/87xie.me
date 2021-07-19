@@ -22,7 +22,7 @@ export const query = graphql`
       }
     }
     allMdx(
-      limit: 6
+      limit: 7
       sort: {order: DESC, fields: frontmatter___date}
     ) {
       nodes {
@@ -39,7 +39,7 @@ export const query = graphql`
 `;
 
 const Index = ({ data }) => {
-  const [latestPost, ...recentPosts] = data.allMdx.nodes;
+  const posts = data.allMdx.nodes;
   const description = data.site.siteMetadata?.description;
   const textOrange = useColorModeValue('orange.400', 'orange.200');
 
@@ -68,18 +68,9 @@ const Index = ({ data }) => {
         </Box>
 
         <Box flex="auto">
-          <PostsSection
-            posts={[latestPost]}
-            titleColor={textOrange}
-            title="Latest Post"
-            borderBottom="1px solid"
-            borderColor="inherit"
-            paddingBottom="5"
-            marginBottom="6"
-          />
 
           <PostsSection
-            posts={recentPosts}
+            posts={posts}
             titleColor={textOrange}
             title="Recent Posts"
             marginBottom="8"
