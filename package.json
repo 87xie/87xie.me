@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@chakra-ui/gatsby-plugin": "^2.0.1",
-    "@chakra-ui/react": "^1.6.4",
+    "@chakra-ui/react": "^1.6.5",
     "@emotion/react": "^11.4.0",
     "@emotion/styled": "^11",
     "@mdx-js/mdx": "^1.6.22",
@@ -36,7 +36,7 @@
     "gatsby-plugin-sitemap": "^4.5.0",
     "gatsby-source-filesystem": "^3.8.0",
     "js-search": "^2.0.0",
-    "lottie-web": "^5.7.11",
+    "lottie-web": "^5.7.12",
     "mermaid": "^8.11.0",
     "prism-react-renderer": "^1.2.1",
     "prop-types": "^15.7.2",
@@ -50,7 +50,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^12.0.0",
     "@testing-library/react-hooks": "^7.0.1",
-    "@testing-library/user-event": "^13.1.9",
+    "@testing-library/user-event": "^13.2.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^27.0.6",
     "babel-preset-gatsby": "^1.8.0",
@@ -66,8 +66,8 @@
     "eslint-webpack-plugin": "^2.5.2",
     "gatsby-plugin-eslint": "^3.0.0",
     "gatsby-plugin-webpack-bundle-analyzer": "^1.0.5",
-    "husky": "^7.0.0",
+    "husky": "^7.0.1",
     "jest": "^27.0.6",
-    "lint-staged": "^11.0.0"
+    "lint-staged": "^11.0.1"
   }
 }
