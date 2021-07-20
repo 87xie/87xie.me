@@ -1,48 +1,27 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import {
-  Box,
-  Grid,
-  useColorModeValue,
-} from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';
-import PostHeader from '@components/post-header';
+import PostsSection from '@components/post/posts-section';
 
-const TagTemplate = ({ pageContext }) => {
-  const { tag } = pageContext;
+// TODO: archives page
+const IndividualTagTemplate = ({ pageContext }) => {
+  const { tag = '' } = pageContext;
   const posts = pageContext?.posts || [];
 
   return (
     <>
       <SEO title={tag} />
-      <Box
-        maxWidth="4xl"
-        marginX="auto"
-      >
-        <Box
-          as="h1"
-          marginBottom="5"
-          color={useColorModeValue('orange.400', 'orange.200')}
-          fontSize={['2xl', '3xl']}
-          fontWeight="bold"
-          textTransform="uppercase"
-        >
-          {tag}
-        </Box>
-        <Grid gap="5" mb="8">
-          {posts.map(({ frontmatter, id }) => (
-            <PostHeader
-              key={id}
-              postSlug={frontmatter.slug}
-              postTitle={frontmatter.title}
-              postTags={frontmatter.tags}
-              publishedAt={frontmatter.date}
-            />
-          ))}
-        </Grid>
+      <Box maxWidth="4xl" marginX="auto">
+        <PostsSection>
+          <PostsSection.Heading textTransform="uppercase">
+            {tag}
+          </PostsSection.Heading>
+          <PostsSection.List posts={posts} />
+        </PostsSection>
       </Box>
     </>
   );
 };
 
-export default TagTemplate;
+export default IndividualTagTemplate;
