@@ -53,13 +53,13 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   });
 
   // post list
-  const perPage = 8;
+  const perPage = 7;
   const totalPages = Math.ceil(posts.length / perPage);
 
   for (let i = 1; i <= totalPages; i += 1) {
     actions.createPage({
       path: i === 1 ? '/posts' : `/posts/${i}`,
-      component: require.resolve('./src/templates/post-list-template.jsx'),
+      component: require.resolve('./src/templates/post-pagination-template.jsx'),
       context: {
         limit: perPage,
         skip: (i - 1) * perPage,
