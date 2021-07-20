@@ -74,7 +74,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   tagGroup.forEach(({ nodes, fieldValue }) => {
     actions.createPage({
       path: `/tag/${fieldValue}`,
-      component: require.resolve('./src/templates/tag-template.jsx'),
+      component: require.resolve('./src/templates/individual-tag-template.jsx'),
       context: {
         posts: nodes,
         tag: fieldValue,
