@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 import { graphql, Link } from 'gatsby';
 import {
   Box,
-  Grid,
+  Text,
   Button,
 } from '@chakra-ui/react';
 import SEO from '@components/seo';
-import PostHeader from '@components/post-header';
+import PostsSection from '@components/post/posts-section';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 
 export const query = graphql`
@@ -31,7 +31,7 @@ export const query = graphql`
   }
 `;
 
-const PostListTemplate = ({ data, pageContext }) => {
+const PostsPaginationTemplate = ({ data, pageContext }) => {
   const posts = data.allMdx.nodes;
   const { currentPage, totalPages } = pageContext;
 
@@ -43,33 +43,28 @@ const PostListTemplate = ({ data, pageContext }) => {
   return (
     <>
       <SEO title="posts" />
-      <Box
-        maxWidth="4xl"
-        marginX="auto"
-      >
-        <Grid gap="5" mb="5">
-          {posts.map((node) => (
-            <PostHeader
-              key={node.id}
-              postSlug={node.frontmatter.slug}
-              postTitle={node.frontmatter.title}
-              postTags={node.frontmatter.tags}
-              publishedAt={node.frontmatter.date}
-            />
-          ))}
-        </Grid>
+      <Box maxWidth="4xl" marginX="auto">
+        <PostsSection>
+          <PostsSection.Heading>
+            Posts
+            <Text color="gray" fontSize="md">
+              {`page ${currentPage} of ${totalPages}`}
+            </Text>
+          </PostsSection.Heading>
+          <PostsSection.List posts={posts} />
+        </PostsSection>
 
-        <Box>
+        <Box marginTop="5">
           {!isFirst && (
             <Button
               as={Link}
               size="sm"
               to={`/posts/${prevPage}`}
               leftIcon={<FiArrowLeft />}
-              colorScheme="pink"
-              mr="2"
+              colorScheme="orange"
+              mr="5"
             >
-              Previous
+              Prev
             </Button>
           )}
 
@@ -79,7 +74,7 @@ const PostListTemplate = ({ data, pageContext }) => {
               size="sm"
               to={`/posts/${nextPage}`}
               rightIcon={<FiArrowRight />}
-              colorScheme="pink"
+              colorScheme="orange"
             >
               Next
             </Button>
@@ -90,7 +85,7 @@ const PostListTemplate = ({ data, pageContext }) => {
   );
 };
 
-PostListTemplate.propTypes = {
+PostsPaginationTemplate.propTypes = {
   pageContext: PropTypes.shape({
     skip: PropTypes.number.isRequired,
     limit: PropTypes.number.isRequired,
@@ -99,4 +94,4 @@ PostListTemplate.propTypes = {
   }),
 };
 
-export default PostListTemplate;
+export default PostsPaginationTemplate;

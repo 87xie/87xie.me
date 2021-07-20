@@ -11,8 +11,8 @@ import {
   Link as GatsbyLink,
 } from 'gatsby';
 import SEO from '@components/seo';
-import BuiltWith from '@components/home/built-with';
-import PostsSection from '@components/home/posts-section';
+import BuiltWith from '@components/built-with';
+import PostsSection from '@components/post/posts-section';
 
 export const query = graphql`
   query {
@@ -69,12 +69,12 @@ const Index = ({ data }) => {
 
         <Box flex="auto">
 
-          <PostsSection
-            posts={posts}
-            titleColor={textOrange}
-            title="Recent Posts"
-            marginBottom="8"
-          />
+          <PostsSection marginBottom="8">
+            <PostsSection.Heading>
+              Recent Posts
+            </PostsSection.Heading>
+            <PostsSection.List posts={posts} />
+          </PostsSection>
 
           <Box textAlign="right">
             <ChakraLink

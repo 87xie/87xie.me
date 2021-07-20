@@ -13,7 +13,7 @@ import oceanicNext from 'prism-react-renderer/themes/oceanicNext';
 
 const StyledWrapper = styled.div`
   position: relative;
-  margin: 1em 0;
+  margin: var(--chakra-space-7) 0;
   &[data-language]::after {
     content: attr(data-language);
     display: inline-block;

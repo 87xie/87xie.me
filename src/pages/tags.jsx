@@ -1,16 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {
-  graphql,
-  Link as GatsbyLink,
-} from 'gatsby';
-import {
-  Box,
-  Flex,
-  Badge,
-  Link as ChakraLink,
-} from '@chakra-ui/react';
+import { graphql } from 'gatsby';
+import { Box, Flex } from '@chakra-ui/react';
 import SEO from '@components/seo';
+import PostTag from '@components/post/post-tag';
 
 const TagsPage = ({ data }) => {
   const tags = data?.allMdx?.group || [];
@@ -26,22 +19,16 @@ const TagsPage = ({ data }) => {
         <Flex height="100%" alignItems="center">
           <Flex wrap="wrap" marginBottom="-4">
             {tags.map(({ fieldValue: tag }) => (
-              <ChakraLink
+              <PostTag
                 key={tag}
-                as={GatsbyLink}
                 to={`/tag/${tag}`}
+                size="lg"
                 display="inline-block"
                 marginBottom="4"
                 marginRight="4"
               >
-                <Badge
-                  px="2"
-                  fontSize="md"
-                  colorScheme="red"
-                >
-                  {tag}
-                </Badge>
-              </ChakraLink>
+                {tag}
+              </PostTag>
             ))}
           </Flex>
         </Flex>

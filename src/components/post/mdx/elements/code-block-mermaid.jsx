@@ -17,7 +17,7 @@ const Mermaid = ({ code }) => {
   }, [theme]);
 
   return (
-    <Box key={theme} my="5" className="mermaid">
+    <Box key={theme} my="7" className="mermaid">
       {code}
     </Box>
   );
