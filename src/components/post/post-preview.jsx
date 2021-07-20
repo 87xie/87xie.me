@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
-import { Link as GatsbyLink } from 'gatsby';
+import { Box, Flex } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import PostPreviewHeading from './post-preview-heading';
 import PostPreviewDateText from './post-preview-date-text';
@@ -8,11 +7,18 @@ import PostTag from './post-tag';
 
 const PostPreview = ({ to, children, ...props }) => (
   <Box as="article" {...props}>
-    {to ? <GatsbyLink to={to}>{children}</GatsbyLink> : children}
+    {children}
   </Box>
 );
 
-PostPreview.Tag = PostTag;
+const TagGroup = (props) => (
+  <Flex wrap="wrap" marginX="-1.5" {...props} />
+);
+
+const Tag = (props) => <PostTag margin="1.5" {...props} />;
+
+PostPreview.Tag = Tag;
+PostPreview.TagGroup = TagGroup;
 PostPreview.DateText = PostPreviewDateText;
 PostPreview.Heading = PostPreviewHeading;
 
