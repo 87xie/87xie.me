@@ -37,7 +37,7 @@ const PostList = ({ posts }) => (
         <Box
           role="link"
           as={GatsbyLink}
-          to={`post/${frontmatter.slug}`}
+          to={`/post/${frontmatter.slug}`}
           display="block"
         >
           <PostPreview.Heading fontSize="2xl">
