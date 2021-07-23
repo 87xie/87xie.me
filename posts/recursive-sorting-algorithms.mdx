@@ -115,7 +115,9 @@ flowchart TB
 1. 建立兩個陣列分別為 `left`、`right`，比較陣列剩餘元素，比 `pivot` 小則放至 `left`，反之放至 `right`
 1. 將 `left`、`right` 重複 1、2 步驟，直到無法再劃分。
 
-其原理像是 binary search tree 中的 inorder traversal，先從左邊的子節點開始取值，可以確保順序是由小到大。根據判斷基準點 `pivot` 的實作方式，會影響 quick sort 的時間複雜度，如同 binary search tree 不同樹高對搜尋結果的影響，下方範例最差情況為 `O(n²)`，最佳情況為 `O(n log n)`
+其原理像是 binary search tree 中的 inorder traversal，先從左子樹到根節點再往右子樹，順序是由小到大。
+
+根據判斷基準點 `pivot` 的實作方式，會影響 quick sort 的時間複雜度，如同 binary search tree 不同樹高對搜尋結果的影響，下方範例最差情況為 `O(n²)`，最佳情況為 `O(n log n)`
 
 ```js
 function quickSort(nums) {
