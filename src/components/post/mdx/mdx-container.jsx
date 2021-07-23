@@ -39,11 +39,11 @@ const mdxCSS = css`
   }
   ul, ol {
     margin: var(--chakra-space-5) 0;
-    padding-left: var(--chakra-space-5);
+    padding-left: var(--chakra-space-6);
     li {
-      margin-top: var(--chakra-space-5);
+      margin-top: var(--chakra-space-2);
       ul {
-        margin: var(--chakra-space-5) 0;
+        margin: var(--chakra-space-2) 0;
       }
     }
   }
