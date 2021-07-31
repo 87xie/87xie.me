@@ -23,11 +23,31 @@ const StyledLogoGroup = styled.div`
 `;
 
 const items = [
-  { svg: NetlifySvg, href: 'https://www.netlify.com/' },
-  { svg: GatsbySvg, href: 'https://github.com/gatsbyjs/gatsby' },
-  { svg: ChakraSvg, href: 'https://github.com/chakra-ui/chakra-ui' },
-  { svg: MermaidSvg, href: 'https://github.com/mermaid-js/mermaid' },
-  { svg: MdxSvg, href: 'https://github.com/mdx-js/mdx' },
+  {
+    svg: NetlifySvg,
+    href: 'https://www.netlify.com/',
+    ariaLabel: 'Go to netlify.com',
+  },
+  {
+    svg: GatsbySvg,
+    href: 'https://github.com/gatsbyjs/gatsby',
+    ariaLabel: 'Go to Gatsby GitHub page',
+  },
+  {
+    svg: ChakraSvg,
+    href: 'https://github.com/chakra-ui/chakra-ui',
+    ariaLabel: 'Go to Chakra UI GitHub page',
+  },
+  {
+    svg: MermaidSvg,
+    href: 'https://github.com/mermaid-js/mermaid',
+    ariaLabel: 'Go to mermaid GitHub page',
+  },
+  {
+    svg: MdxSvg,
+    href: 'https://github.com/mdx-js/mdx',
+    ariaLabel: 'Go to mdx-js GitHub page',
+  },
 ];
 
 const BuildWith = () => (
@@ -41,10 +61,11 @@ const BuildWith = () => (
       Built With
     </Heading>
     <StyledLogoGroup>
-      {items.map(({ href, svg: SvgComponent }) => (
+      {items.map(({ href, svg: SvgComponent, ariaLabel }) => (
         <Link
           key={href}
           href={href}
+          aria-label={ariaLabel}
           isExternal
           className="logo-group__logo"
         >

@@ -47,38 +47,38 @@ const PostsPaginationTemplate = ({ data, pageContext }) => {
         <PostsSection>
           <PostsSection.Heading>
             Posts
-            <Text color="gray" fontSize="md">
-              {`page ${currentPage} of ${totalPages}`}
+            <Text fontSize="sm" lineHeight="tall">
+              {`(page ${currentPage} of ${totalPages})`}
             </Text>
           </PostsSection.Heading>
           <PostsSection.List posts={posts} />
         </PostsSection>
 
         <Box marginTop="5">
-          {!isFirst && (
-            <Button
-              as={Link}
-              size="sm"
-              to={`/posts/${prevPage}`}
-              leftIcon={<FiArrowLeft />}
-              colorScheme="orange"
-              mr="5"
-            >
-              Prev
-            </Button>
-          )}
+          <Button
+            as={Link}
+            disabled={isFirst}
+            pointerEvents={isFirst ? 'none' : 'auto'}
+            size="sm"
+            to={`/posts/${prevPage}`}
+            leftIcon={<FiArrowLeft />}
+            colorScheme="red"
+            mr="7"
+          >
+            Prev
+          </Button>
 
-          {!isLast && (
-            <Button
-              as={Link}
-              size="sm"
-              to={`/posts/${nextPage}`}
-              rightIcon={<FiArrowRight />}
-              colorScheme="orange"
-            >
-              Next
-            </Button>
-          )}
+          <Button
+            as={Link}
+            disabled={isLast}
+            pointerEvents={isLast ? 'none' : 'auto'}
+            size="sm"
+            to={`/posts/${nextPage}`}
+            rightIcon={<FiArrowRight />}
+            colorScheme="red"
+          >
+            Next
+          </Button>
         </Box>
       </Box>
     </>

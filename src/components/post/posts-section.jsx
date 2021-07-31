@@ -14,13 +14,13 @@ const SectionHeading = (props) => (
     as="h2"
     fontSize={['2xl', '3xl']}
     marginBottom="5"
-    color={useColorModeValue('orange.400', 'orange.200')}
+    color={useColorModeValue('orange.500', 'orange.200')}
     {...props}
   />
 );
 
 const PostList = ({ posts }) => (
-  <Grid gap="5">
+  <Grid gap="6">
     {posts.map(({ frontmatter }) => (
       <PostPreview key={frontmatter.slug}>
         <PostPreview.TagGroup>

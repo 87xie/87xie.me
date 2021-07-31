@@ -29,7 +29,6 @@ const PostTemplate = ({ data }) => {
   const {
     title,
     date,
-    tags,
   } = data.mdx.frontmatter;
 
   return (
@@ -42,7 +41,7 @@ const PostTemplate = ({ data }) => {
           alignItems="center"
           marginBottom="2"
           cursor="pointer"
-          color={useColorModeValue('orange.400', 'orange.200')}
+          color={useColorModeValue('orange.500', 'orange.200')}
           letterSpacing="wider"
           onClick={() => navigate(-1)}
         >
@@ -67,23 +66,10 @@ const PostTemplate = ({ data }) => {
           >
             <PostPreview.Heading
               as="h1"
-              marginBottom="1"
               fontSize="3xl"
             >
               {title}
             </PostPreview.Heading>
-
-            <PostPreview.TagGroup>
-              {(tags).map((tag, index) => (
-                <PostPreview.Tag
-                  key={index}
-                  to={`/tag/${tag}`}
-                >
-                  {tag}
-                </PostPreview.Tag>
-              ))}
-            </PostPreview.TagGroup>
-
             <PostPreview.DateText>
               {date}
             </PostPreview.DateText>
