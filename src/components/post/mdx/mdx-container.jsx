@@ -35,15 +35,18 @@ const mdxCSS = css`
   p {
     margin: var(--chakra-space-4) 0;
     font-size: var(--chakra-fontSizes-md);
-    line-height: 1.88;
   }
+
+  p, li {
+    line-height: var(--chakra-lineHeights-taller);
+  }
+
   ul, ol {
     margin: var(--chakra-space-5) 0;
     padding-left: var(--chakra-space-6);
     li {
-      margin-top: var(--chakra-space-2);
       ul {
-        margin: var(--chakra-space-2) 0;
+        margin: var(--chakra-space-1) 0;
       }
     }
   }
