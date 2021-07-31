@@ -23,6 +23,7 @@ const links = [
   {
     to: '/search',
     icon: FiSearch,
+    ariaLabel: 'To search page',
     isExternal: false,
   },
   {
@@ -47,7 +48,7 @@ const links = [
     to: 'https://github.com/Oscar87Xie',
     icon: FiGithub,
     isExternal: true,
-    ariaLabel: 'To oscar87xie Github page',
+    ariaLabel: 'To oscar87xie GitHub page',
   },
 ];
 
