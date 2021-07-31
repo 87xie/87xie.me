@@ -1,11 +1,11 @@
 import React from 'react';
-import { Text } from '@chakra-ui/react';
+import { Text, useColorModeValue } from '@chakra-ui/react';
 
 const PostPreviewDate = (props) => (
   <Text
     as="small"
     fontSize="sm"
-    color="gray"
+    color={useColorModeValue('gary.600', 'gray.300')}
     {...props}
   />
 );
