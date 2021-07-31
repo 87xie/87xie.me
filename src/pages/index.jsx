@@ -41,7 +41,7 @@ export const query = graphql`
 const Index = ({ data }) => {
   const posts = data.allMdx.nodes;
   const description = data.site.siteMetadata?.description;
-  const textOrange = useColorModeValue('orange.400', 'orange.200');
+  const textOrange = useColorModeValue('orange.500', 'orange.200');
 
   return (
     <>
@@ -81,6 +81,7 @@ const Index = ({ data }) => {
               as={GatsbyLink}
               to="/posts"
               color={textOrange}
+              fontWeight="bold"
             >
               to=&quot;/posts&quot;
             </ChakraLink>
