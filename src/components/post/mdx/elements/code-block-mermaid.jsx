@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, useColorModeValue } from '@chakra-ui/react';
 import mermaid from 'mermaid';
@@ -10,7 +10,7 @@ const Mermaid = ({ code }) => {
 
   const theme = useColorModeValue('default', 'dark');
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const config = { theme, startOnLoad: true };
     mermaid.initialize(config);
     mermaid.contentLoaded();
