@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { Box, useColorMode } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { MDXProvider } from '@mdx-js/react';
 import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { css } from '@emotion/react';
@@ -11,40 +11,36 @@ import ExternalLink from './elements/external-link';
 import Blockquote from './elements/blockquote';
 
 const mdxCSS = css`
-  h2, h3, h4, h5, h6 {
-    font-weight: var(--chakra-fontWeights-bold);
-    line-height: var(--chakra-lineHeights-tall);
+  h2, h3, h4, h5, h6, p, li {
+    line-height: 1.75;
   }
-
-  h2 {
-    border-bottom: 1px solid;
-    border-color: inherit;
+  h2, h3, h4, h5, h6, strong {
+    font-weight: var(--chakra-fontWeights-bold);
+  }
+  h3, h4, h5, h6, p {
+    margin-bottom: var(--chakra-space-6);
   }
   h2 {
     margin: var(--chakra-space-7) 0;
+    border-bottom: 1px solid;
+    border-color: inherit;
+    padding-bottom: var(--chakra-space-1);
     font-size: var(--chakra-fontSizes-2xl);
   }
   h3 {
-    margin: var(--chakra-space-5) 0;
     font-size: var(--chakra-fontSizes-xl);
   }
   h4 {
-    margin: var(--chakra-space-4) 0;
     font-size: var(--chakra-fontSizes-lg);
   }
   p {
-    margin: var(--chakra-space-4) 0;
     font-size: var(--chakra-fontSizes-md);
   }
-
-  p, li {
-    line-height: var(--chakra-lineHeights-taller);
-  }
-
   ul, ol {
-    margin: var(--chakra-space-5) 0;
-    padding-left: var(--chakra-space-6);
+    margin-bottom: var(--chakra-space-6);
+    padding-left: var(--chakra-space-7);
     li {
+      margin-top: var(--chakra-space-2);
       ul {
         margin: var(--chakra-space-1) 0;
       }
@@ -60,10 +56,9 @@ const MDXContainer = ({ children }) => {
     inlineCode: InlineCode,
     blockquote: Blockquote,
   };
-  const { colorMode } = useColorMode();
 
   return (
-    <Box css={mdxCSS} className={`is-${colorMode}-mode`}>
+    <Box css={mdxCSS}>
       <MDXProvider components={components}>
         <MDXRenderer>
           {children}
