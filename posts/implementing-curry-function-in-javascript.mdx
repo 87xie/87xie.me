@@ -1,0 +1,112 @@
+---
+title: Implementing Curry Function in JavaScript
+slug: implementing-curry-function-in-javescript
+date: 2019-08-01
+tags:
+  - functional
+  - javascript
+---
+
+curry function 為一個 higher order function，透過閉包的方式，預先儲存目標 function 需要的參數，當參數滿足預期數量時直接執行，否則回傳一個 function 處理剩餘參數
+
+這樣好處將 function 拆成更小的單位方便複用，亦或是統一不同 function 中的參數形式，利於 function composition 並實現 point-free 風格，`g(x) f(x)` ==> `f(g(x))`
+
+從 [Ramda.js](https://ramdajs.com/) 這類的 functional library，官方範例就可以看到各式 curring、point-free、composition 的應用
+
+```js
+const gt10 = R.gt(R.__, 10)
+const lt20 = R.lt(R.__, 20)
+const f = R.both(gt10, lt20);
+
+f(15); //=> true
+f(30); //=> false
+```
+
+## Implementing Curry Function
+
+### Syntax
+
+`curry(fn, arity)`
+
+- `fn` 為一個接收 n 個參數的 function
+- `arity` 為 `fn` 預期的參數數量，預設為 n
+
+```js
+const add = curry((x, y) => x + y);
+add(1)(2); // 3
+add(1, 2); // 3
+```
+
+下方範例參考自 [Functional-Light JavaScript](https://github.com/getify/Functional-Light-JS/blob/master/manuscript/ch3.md/#chapter-3-managing-function-inputs)
+
+- `Function.prototype.length` 表示該 function 的參數數量
+
+curry 的流程大致如下
+
+1. `const curriedAdd = curry(add);`
+    - `fn = add`
+    - `arity = 2`
+    - 透過 IIFE 調用 `nextCurried([])`，初始 `prevArgs` 為空陣列，回傳 `curried`，利用閉包特性 `curried` 可以引用前一次 `prevArgs` 參照。
+1. `curriedAdd(1);`，即為調用 `curried(1)`
+    - 透過閉包保存執行環境的參照，前次執行環境為 `nextCurried([])` 故 `prevArgs = []`
+    - `nextArgs = [1]`
+    - `args = [1]`
+    - `args.length` 小於 `arity`，回傳 `nextCurried([1])` 的執行結果，得到新的 `curried`
+1. `curriedAdd(2);`
+    - 前次執行環境為 `nextCurried([1])`，`prevArgs = [1]`
+    - `nextArgs = [2]`
+    - `args = [1, 2]`
+    - 滿足 `args.length >= arity` 條件，執行 `add(1, 2)`
+    
+
+```js
+const curry = (fn, arity = fn.length) => {
+  return (function nextCurried(prevArgs) {
+    return function curried(...nextArgs) {
+      const args = [...prevArgs, ...nextArgs];
+
+      if (args.length >= arity) {
+        return fn(...args);
+      }
+
+      return nextCurried(args);
+    };
+  })([]);
+};
+
+const add = (x, y) => x + y;
+const curriedAdd = curry(add);
+
+curriedAdd(1);
+curriedAdd(2);
+// 3
+curriedAdd(1, 2);
+// 3
+```
+
+另一種方式是則利用 [Function.prototype.bind](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Parameters) prepend arguments 的特性
+
+```js
+const curry = (fn, arity = fn.length) => (...args) => {
+  if (args.length === arity) {
+    return fn(...args);
+  }
+
+  return curry(fn.bind(null, ...args));
+}
+
+const add = curry((x, y) => x + y);
+
+add(1)(2);
+// 3
+add(1, 2);
+// 3
+```
+
+## Reference
+
+[Functional-Light JavaScript](https://github.com/getify/Functional-Light-JS/blob/master/manuscript/ch3.md/#chapter-3-managing-function-inputs)
+
+[MDN - Function.length](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/length)
+
+[MDN - Function.prototype.bind()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Parameters)
