@@ -8,18 +8,12 @@ const CodeBlock = ({ children }) => {
   const language = languageClassName.replace(/language-/, '');
   const code = children.props.children.trim();
 
-  if (language === 'mermaid') {
-    return (
-      <Mermaid code={code} />
-    );
+  switch (language) {
+    case 'mermaid':
+      return <Mermaid code={code} />;
+    default:
+      return <Prism code={code} language={language} />;
   }
-
-  return (
-    <Prism
-      code={code}
-      language={language}
-    />
-  );
 };
 
 export default CodeBlock;
