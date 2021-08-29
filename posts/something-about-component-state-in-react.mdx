@@ -1,0 +1,267 @@
+---
+title: Something About Component State in React
+slug: something-about-component-state-in-react
+date: 2021-08-29
+tags:
+  - react
+---
+
+## Don't Over Use Managed State
+
+- **managed state**：state that you need to explicitly manage，這裡指的是需要手動管理的狀態，例如 useState 或 class component state
+- **derived state:** ：state that you can compute via other states or props，可以藉由其他狀態 (state) 或屬性 (props) 所計算出，不需要手動更新的狀態（除了 `getDerivedStateFromProps` [fully uncontrolled component](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html#recommendation-fully-uncontrolled-component-with-a-key)）
+
+透過更新 managed state 觸發的 re-render 重新計算 derived state，維持狀態的單一來源，盡可能避免手動同步狀態，降低程式碼的複雜性
+
+以官方教學的井字遊戲為例 [Completing the Game](https://reactjs.org/tutorial/tutorial.html#completing-the-game)
+
+```jsx
+function Board() {
+  const [squares, setSquares] = React.useState(Array(9).fill(null));
+  const nextValue = calculateNextValue(squares);
+  const winner = calculateWinner(squares);
+  const status = calculateStatus(winner, squares, nextValue);
+  
+  const selectSquare = (square) => {
+    // const newSquares = ...
+    // skip
+    setSquares(newSquares);
+  }
+  
+  const reset = () => {
+    setSquares(squares.map(() => null));
+  }
+  
+  return (
+    // skip
+  );
+}
+```
+
+- `squares` 為紀錄遊戲狀態的 managed state
+
+```
+[
+  null, null, null,
+  null, null, null,
+  null, null, null,
+]
+```
+
+如果 derived state 為 managed state，容易因為需要手動同步狀態，導致程式碼複雜度上升，產生不必要的開銷或 bug
+
+```jsx
+function Board() {
+  const [squares, setSquares] = React.useState(Array(9).fill(null));
+  const [nextValue, setNextValue] = React.useState(calculateNextValue(squares));
+  const [winner, setWinner] = React.useState(calculateWinner(squares));
+  const [status, setStatus] = React.useState(calculateStatus(winner, squares, nextValue));
+  
+  const selectSquare = (square) => {
+    // skip
+    setSquares(newSquares);
+    setNextValue(newNextValue);
+    setWinner(newWinner);
+    setStatus(newStatus);
+  }
+  
+  const reset = () => {
+    // skip
+    setSquares(squares.map(() => null));
+    setNextValue(newNextValue);
+    setWinner(newWinner);
+    setStatus(newStatus);
+  }
+  
+  return (
+    // skip
+  );
+}
+```
+
+官方 Blog 的文章 [You Probably Don't Need Derived State](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html) 指的 derived state，主要為 class component 中，透過 `getDerivedStateFromProps` lifecycle 產生的 managed state
+
+`getDerivedStateFromProps` 可以依據 props 更新，無條件轉換成對應的 class component state，如果 props 沒有異動，則維持 component internal state。因為 `this.setState()` 搭配其他 lifecycle，e.g. `componentWillReceiveProps`, etc...，忽略或覆蓋 props 更新，所導致 controlled component、uncontrolled component 間的資料流混亂，與此處提到的 derived state 有些許差異，不過只要是 state 在使用上還是盡量遵守
+
+- avoid unconditionally creating managed state
+- the derived state is computed from other states or props
+- always have a clear data flow
+
+## Lazy Initial State
+
+`useState` 可以接收一個 function 作為 initial state，只有在 component 初次渲染時會調用該 function，藉此可以避免後續 re-render 有高開銷的運算（雖然不常用到）
+
+```js
+const [state, setState] = useState(() => {
+  const initialState = someExpensiveComputation(props);
+  return initialState;
+});
+```
+
+## Colocating State
+
+盡可能把 state 放在最相關的地方
+
+在官方範例 [Lifting State Up](https://reactjs.org/docs/lifting-state-up.html) 中，因為 sibling component 之間需要共享狀態，所以將 state 提升至 parent component
+
+```jsx
+class Calculator extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { temperature: '', scale: 'c' };
+  }
+
+  handleCelsiusChange = (temperature) => {
+    this.setState({scale: 'c', temperature});
+  }
+
+  handleFahrenheitChange = (temperature) => {
+    this.setState({scale: 'f', temperature});
+  }
+
+  render() {
+    const { scale, temperature } = this.state;
+    const celsius = scale === 'f' ? tryConvert(temperature, toCelsius) : temperature;
+    const fahrenheit = scale === 'c' ? tryConvert(temperature, toFahrenheit) : temperature;
+
+    return (
+      <div>
+        <TemperatureInput
+          scale="c"
+          temperature={celsius}
+          onTemperatureChange={this.handleCelsiusChange}
+        />
+        <TemperatureInput
+          scale="f"
+          temperature={fahrenheit}
+          onTemperatureChange={this.handleFahrenheitChange}
+        />
+        <BoilingVerdict celsius={parseFloat(celsius)} />
+      </div>
+    );
+  }
+}
+```
+
+如果不需要共享 state，將 state 移至對應的 component 內，可以避免不必要的 re-redner
+
+範例取自 [Overreacted - Before You memo()](https://overreacted.io/before-you-memo/#solution-1-move-state-down)
+
+```jsx
+function App() {
+  let [color, setColor] = useState('red');
+  return (
+    <div>
+      <input value={color} onChange={(e) => setColor(e.target.value)} />
+      <p style={{ color }}>Hello, world!</p>
+      <ExpensiveTree />
+    </div>
+  );
+}
+```
+
+move state down, if the color changes, only the `<Form />` re-renders.
+
+```jsx
+function Form() {
+  let [color, setColor] = useState('red');
+  return (
+    <>
+      <input value={color} onChange={(e) => setColor(e.target.value)} />
+      <p style={{ color }}>Hello, world!</p>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <Form />
+      <ExpensiveTree />
+    </div>
+  );
+}
+```
+
+同樣的概念也適用於 react context，[Preventing rerenders with React.memo and useContext hook.](https://github.com/facebook/react/issues/15156#issuecomment-474590693)
+
+## Lifting Component to Parent
+
+範例取自 [Kent C. Dodds - One simple trick to optimize React re-renders](https://kentcdodds.com/blog/optimize-react-re-renders)
+
+每次 react component render，jsx 會被轉譯成 `React.createElement(type, [props], [...children])`，並得到新的 react element (plain object)，如下方示意，react-dom 會根據新的 react element ，並與前次的結果比對決定需要更新範圍
+
+```js
+// some things removed for clarity
+const counterElement = {
+  type: 'div',
+  props: {
+    children: [
+      {
+        type: 'button',
+        props: {
+          onClick: increment, // this is the click handler function
+          children: 'The count is 0',
+        },
+      },
+      {
+        type: Logger, // this is our logger component function
+        props: {
+          label: 'counter',
+        },
+      },
+    ],
+  },
+}
+```
+
+`<Logger />` 是在 parent 層級轉譯 jsx 後得到的 react element，並以 children prop 的方式傳入 `Counter`
+
+當 `count` 更新後觸發 `<Counter />` re-render，此時以 `props.logger` 傳入的 `<Logger />`，因為 react 比對前次的 children prop 仍為同一個 react element，故不會對 `<Logger />` 進行 re-render
+
+```jsx
+function Logger(props) {
+  console.log(`${props.label} rendered`)
+  return null // what is returned here is irrelevant...
+}
+
+function Counter(props) {
+  const [count, setCount] = React.useState(0)
+  const increment = () => setCount(c => c + 1)
+  return (
+    <div>
+      <button onClick={increment}>The count is {count}</button>
+      {props.logger}
+    </div>
+  )
+}
+
+ReactDOM.render(
+  <Counter logger={<Logger label="counter" />} />,
+  document.getElementById('root'),
+)
+```
+
+雖然透過 react memo 也可以避免 re-render 的問題，但 memo 的比對也是需要額外的開銷。如果情境許可，社群上知名的大神，還是建議利用 react composition 從本質上解決問題，最後沿用 [One simple trick to optimize React re-renders](https://kentcdodds.com/blog/optimize-react-re-renders) 中的結論
+
+In summary, if you're experiencing performance issues, try this:
+
+1. "Lift" the expensive component to a parent where it will be rendered less often.
+1. Then pass the expensive component down as a prop.
+1. You may find doing so solves your performance problem without needing to spread React.memo all over you codebase like a giant intrusive band-aid 🤕😉
+
+## Reference
+
+[Kent C. Dodds - Don't Sync State. Derive It!](https://kentcdodds.com/blog/dont-sync-state-derive-it)
+
+[Kent C. Dodds - useState lazy initialization and function updates](https://kentcdodds.com/blog/use-state-lazy-initialization-and-function-updates)
+
+[Kent C. Dodds - State Colocation will make your React app faster](https://kentcdodds.com/blog/state-colocation-will-make-your-react-app-faster)
+
+[Kent C. Dodds - One simple trick to optimize React re-renders](https://kentcdodds.com/blog/optimize-react-re-renders)
+
+[Overreacted - Before You memo()](https://overreacted.io/before-you-memo/)
+
+[You Probably Don't Need Derived State](https://reactjs.org/blog/2018/06/07/you-probably-dont-need-derived-state.html)
+
+[Lazy initial state](https://reactjs.org/docs/hooks-reference.html#lazy-initial-state)
