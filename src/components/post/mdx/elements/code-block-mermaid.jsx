@@ -18,26 +18,32 @@ const Mermaid = ({ code }) => {
   const isSSR = typeof window === 'undefined';
   const theme = useColorModeValue('default', 'dark');
   const id = `mermaid-${getUuid()}`;
-  const ref = useRef();
+  const graphContainerElementRef = useRef();
+  const graphElementRef = useRef();
   const [opacity, setOpacity] = useState(0);
 
   useEffect(() => {
-    mermaid.initialize({ theme, startOnLoad: false });
-    mermaid.render(id, code, (graphSvg) => {
-      ref.current.innerHTML = graphSvg;
-      setOpacity(1);
+    mermaid.initialize({
+      theme,
+      startOnLoad: false,
     });
+
+    mermaid.render(id, code, (graphSvg) => {
+      graphContainerElementRef.current.innerHTML = graphSvg;
+      setOpacity(1);
+    }, graphElementRef.current);
   }, [theme]);
 
   return isSSR ? null : (
-    <Box
-      key="mermaid-container"
-      ref={ref}
-      opacity={opacity}
-      my="7"
-      minHeight="200px"
-      transition="opacity .3s"
-    />
+    <>
+      <div ref={graphElementRef} />
+      <Box
+        key="mermaid-container"
+        ref={graphContainerElementRef}
+        opacity={opacity}
+        transition="opacity .3s"
+      />
+    </>
   );
 };
 
