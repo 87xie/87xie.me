@@ -1,0 +1,144 @@
+---
+title: Accessible Hiding
+slug: accessible-hiding
+tags:
+  - aria-hidden
+  - visually-hidden
+  - a11y
+date: 2022-01-20
+---
+
+## Hidden CSS Rules
+
+```css
+.opacity-zero {
+  opacity: 0;
+}
+
+.display-none {
+  display: none;
+}
+
+.visibility-hidden {
+  visibility: hidden;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  position: absolute;
+  white-pace: nowrap;
+}
+```
+
+- `opacity: 0`
+  - animatable
+  - focusable with the keyboard
+  - reserving space on the page
+  - still in the accessibility tree
+- `visibility: hidden`
+  - visibility is a animatable property, but hidden/visible is a binary setting, so once the transition duration elapses, the property simply switches state, you see this as a delay - but it can actually be seen as the final keyframe of the transition animation, with the intermediary keyframes not having been calculated what constitutes the values between hidden/visible? Opacity? Dimension? As it is not explicit, they are not calculated. `(會等待 transition 的過渡時間，但瀏覽器無法計算出 visible/hidden 過渡期間的幀數，所以在過渡時間結束後，會感受到元素突然消失／出現)`
+  - unfocusable
+  - reserving space on the page
+  - no accessibility information
+- `display: none`
+  - unanimatable
+  - unfocusable
+  - do not take up any space
+  - no accessibility information
+- `visually-hidden`
+  - kind of like `display: none` but remain accessible to screen readers
+  
+### Example
+
+- button's loading state
+  - show a spinner
+  - provides loading text for screen readers that is visually hidden
+  - leaves the button's width unchanged
+  - keeps the content in the accessibility tree
+  
+```html
+<button type="button">
+  <div class="loading-spinner">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <span class="opacity-zero">Email</span>
+</button>
+``` 
+
+
+## aria-hidden
+
+The aria-hidden state indicates whether the element is exposed to an accessibility API.
+
+It is the logical opposite of the `visually-hidden`
+
+### Example
+
+- custom toggle switch
+  - hide the input element but keep the information in the accessibility tree
+  - `<span class="switch-slider">` is a purely decorative content, adding `aria-hidden="true"` for removing from accessibility tree
+
+```html
+<label class="switch">
+  <input type="checkbox" class="visually-hidden">
+  <span class="switch-slider" aria-hidden="true"></span>
+</label>
+```
+
+- dialog(modal) overlay
+  - applying the `aria-modal` property to the dialog element replaces the technique of using `aria-hidden` on the background for informing assistive technologies that content outside a dialog is inert.
+  - In legacy dialog implementations where aria-hidden is used to make content outside a dialog inert for assistive technology users, it is important that:
+    1. `aria-hidden` is set to true on each element containing a portion of the inert layer.
+    1. The dialog element is not a descendant of any element that has `aria-hidden` set to true.
+
+可以以 `aria-modal` 屬性取代傳統做法，dialog 也可以為 dialog overlay 的子元素，當 dialog 元素有 `aria-modal="true"` 屬性時，會將其外層元素標記為惰性
+
+以 [Reach UI Dialog](https://reach.tech/dialog) 渲染出的 DOM 結構為例
+
+```html
+<div data-reach-dialog-overlay="">
+  <div
+    role="dialog"
+    tabindex="-1"
+    aria-modal="true"
+    data-reach-dialog-content=""
+  >
+    <p>Hello there. I am a dialog</p>
+  </div>
+</div>
+```
+
+過去為了 accessibility 可能的作法
+
+```html
+<div class="dialog">
+  <div aria-hidden="true" class="dialog-overlay"></div>
+  <div
+    role="dialog"
+    tabindex="-1"
+    class="dialog-content"
+  >
+    <p>Hello there. I am a dialog</p>
+  </div>
+</div>
+```
+
+## Reference
+
+[stackoverflow - CSS transition with visibility not working](https://stackoverflow.com/questions/27900053/css-transition-with-visibility-not-working)
+
+[MDN - Animatable CSS properties](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animated_properties)
+
+[MDN - aria-hidden](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-hidden)
+
+[Reach UI - Visually Hidden](https://reach.tech/visually-hidden/)
+
+[Modal Dialog Example | WAI-ARIA Authoring Practices 1.2](https://w3c.github.io/aria-practices/examples/dialog-modal/dialog.html)
+
+[MDN - HTMLElement.inert](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/inert)
