@@ -55,11 +55,12 @@ const StyledWrapper = styled.div`
   &[data-language="html"]::after {
     background: rgb(255, 87, 51);
   }
-  
-  &[data-language="html"]::after
-  &[data-language="sass"]::after
-  &[data-language="scss"]::after
-  &[data-language="ts"]::after
+
+  &[data-language="html"]::after,
+  &[data-language="sass"]::after,
+  &[data-language="scss"]::after,
+  &[data-language="css"]::after,
+  &[data-language="ts"]::after,
   &[data-language="typescript"]::after {
     color: #fff;
   }
