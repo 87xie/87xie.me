@@ -2,8 +2,8 @@ import React from 'react';
 import {
   Box,
   Flex,
-  Heading,
   Text,
+  Heading,
   useColorModeValue,
 } from '@chakra-ui/react';
 import PropTypes from 'prop-types';

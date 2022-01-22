@@ -9,23 +9,17 @@ import InlineCode from './elements/inline-code';
 import Table from './elements/table';
 import ExternalLink from './elements/external-link';
 import Blockquote from './elements/blockquote';
+import HeadingWithHashLink from './elements/heading-with-hash-link';
 
 const mdxCSS = css`
-  h2, h3, h4, h5, h6, p, li {
+  h3, h4, h5, h6, p, li {
     line-height: 1.75;
   }
-  h2, h3, h4, h5, h6, strong {
+  h3, h4, h5, h6, strong {
     font-weight: var(--chakra-fontWeights-bold);
   }
   h3, h4, h5, h6, p {
     margin-bottom: var(--chakra-space-6);
-  }
-  h2 {
-    margin: var(--chakra-space-7) 0;
-    border-bottom: 1px solid;
-    border-color: inherit;
-    padding-bottom: var(--chakra-space-1);
-    font-size: var(--chakra-fontSizes-2xl);
   }
   h3 {
     font-size: var(--chakra-fontSizes-xl);
@@ -55,6 +49,7 @@ const MDXContainer = ({ children }) => {
     a: ExternalLink,
     inlineCode: InlineCode,
     blockquote: Blockquote,
+    h2: HeadingWithHashLink,
   };
 
   return (
