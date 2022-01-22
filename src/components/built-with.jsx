@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Box,
   Link,
@@ -6,11 +5,6 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import styled from '@emotion/styled';
-import GatsbySvg from '@/assets/svgs/gatsby.svg';
-import ChakraSvg from '@/assets/svgs/chakra-ui.svg';
-import MermaidSvg from '@/assets/svgs/mermaid.svg';
-import NetlifySvg from '@/assets/svgs/netlify.svg';
-import MdxSvg from '@/assets/svgs/mdx.svg';
 
 const StyledLogoGroup = styled.div`
   display: flex;
@@ -21,30 +15,49 @@ const StyledLogoGroup = styled.div`
     margin: 0 1em 1em 0;
   }
 `;
-
 const items = [
   {
-    svg: NetlifySvg,
+    imgProps: {
+      src: '/images/netlify.svg',
+      width: 40,
+      height: 40,
+    },
     href: 'https://www.netlify.com/',
     ariaLabel: 'Go to netlify.com',
   },
   {
-    svg: GatsbySvg,
+    imgProps: {
+      src: '/images/gatsby.svg',
+      width: 40,
+      height: 40,
+    },
     href: 'https://github.com/gatsbyjs/gatsby',
     ariaLabel: 'Go to Gatsby GitHub page',
   },
   {
-    svg: ChakraSvg,
+    imgProps: {
+      src: '/images/chakra-ui.svg',
+      width: 40,
+      height: 40,
+    },
     href: 'https://github.com/chakra-ui/chakra-ui',
     ariaLabel: 'Go to Chakra UI GitHub page',
   },
   {
-    svg: MermaidSvg,
+    imgProps: {
+      src: '/images/mermaid.svg',
+      width: 40,
+      height: 40,
+    },
     href: 'https://github.com/mermaid-js/mermaid',
     ariaLabel: 'Go to mermaid GitHub page',
   },
   {
-    svg: MdxSvg,
+    imgProps: {
+      src: '/images/mdx.svg',
+      width: 96.6,
+      height: 40,
+    },
     href: 'https://github.com/mdx-js/mdx',
     ariaLabel: 'Go to mdx-js GitHub page',
   },
@@ -61,15 +74,15 @@ const BuildWith = () => (
       Built With
     </Heading>
     <StyledLogoGroup>
-      {items.map(({ href, svg: SvgComponent, ariaLabel }) => (
+      {items.map(({ href, imgProps, ariaLabel }) => (
         <Link
+          isExternal
           key={href}
           href={href}
           aria-label={ariaLabel}
-          isExternal
           className="logo-group__logo"
         >
-          <SvgComponent />
+          <img {...imgProps} alt={ariaLabel} />
         </Link>
       ))}
     </StyledLogoGroup>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Heading } from '@chakra-ui/react';
 import SEO from '@components/seo';
 import LottieContainer from '@components/lottie-container';
 import dancingPallbearers from '../assets/lottie-animations/dancing-pallbearers.json';
@@ -13,10 +13,22 @@ const NotFound = () => (
       alignItems="center"
       height="100%"
     >
-      <LottieContainer
-        tip="Not Found"
-        animationData={dancingPallbearers}
-      />
+      <Box role="alert" maxWidth={['280px', '400px']}>
+        <LottieContainer
+          role="alert"
+          tip="Page Not Found"
+          animationData={dancingPallbearers}
+        />
+        <Heading
+          as="h1"
+          mt="5"
+          fontSize="lg"
+          fontWeight="bold"
+          textAlign="center"
+        >
+          Page Not Found
+        </Heading>
+      </Box>
     </Box>
   </>
 );
