@@ -4,6 +4,7 @@ import {
   Box,
   Grid,
   Heading,
+  Link as ChakraLink,
   useColorModeValue,
 } from '@chakra-ui/react';
 import { Link as GatsbyLink } from 'gatsby';
@@ -34,11 +35,15 @@ const PostList = ({ posts }) => (
           ))}
         </PostPreview.TagGroup>
 
-        <Box
-          role="link"
+        <ChakraLink
+          display="block"
           as={GatsbyLink}
           to={`/post/${frontmatter.slug}`}
-          display="block"
+          sx={{
+            '&:hover': {
+              textDecoration: 'none',
+            },
+          }}
         >
           <PostPreview.Heading fontSize="2xl">
             {frontmatter.title}
@@ -47,7 +52,7 @@ const PostList = ({ posts }) => (
           <PostPreview.DateText>
             {frontmatter.date}
           </PostPreview.DateText>
-        </Box>
+        </ChakraLink>
       </PostPreview>
     ))}
   </Grid>

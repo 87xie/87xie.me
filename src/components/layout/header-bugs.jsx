@@ -1,5 +1,7 @@
 import React from 'react';
-import { Text } from '@chakra-ui/react';
+import {
+  Link as ChakraLink,
+} from '@chakra-ui/react';
 import { Link as GatsbyLink } from 'gatsby';
 import {
   css,
@@ -21,14 +23,17 @@ const wavy = keyframes`
 `;
 
 const bugsOnHover = css`  
-  &:hover span {
-    animation: ${wavy} 1s ease-in-out infinite;
-    animation-delay: calc(0.2s * var(--bug-i))
+  &:hover {
+    text-decoration: none;
+    span {
+      animation: ${wavy} 1s ease-in-out infinite;
+      animation-delay: calc(0.2s * var(--bug-i));
+    }
   }
 `;
 
 const HeaderBugs = () => (
-  <Text
+  <ChakraLink
     as={GatsbyLink}
     css={bugsOnHover}
     to="/"
@@ -45,7 +50,7 @@ const HeaderBugs = () => (
         🐛
       </span>
     ))}
-  </Text>
+  </ChakraLink>
 );
 
 export default HeaderBugs;

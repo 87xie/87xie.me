@@ -45,7 +45,7 @@ const items = [
   },
   {
     imgProps: {
-      src: '/images/mermaid.svg',
+      src: '/images/mermaid.png',
       width: 40,
       height: 40,
     },
