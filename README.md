@@ -1,5 +1,8 @@
 # 87xie.me
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/cda878c2-d3a9-4edd-b46e-55ccbaeb1617/deploy-status)](https://app.netlify.com/sites/87xie/deploys)
+![Unit Test Status](https://github.com/87xie/87xie.me/actions/workflows/unit-test.yml/badge.svg)
+
 📖
 
 ## Markdown Frontmatter Attributes
@@ -15,7 +18,8 @@
 - 🐛 bug fix
 - 💄 ui style
 - 🔥 remove files
-- 💅 refactor （♻️ deprecated)
+- 💅 refactor
+- ♻️ refactor (deprecated)
 - ✅ tests
 - 📝 post or documentation
 - 🍱 static files
