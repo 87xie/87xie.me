@@ -1,5 +1,8 @@
 module.exports = {
   parser: '@babel/eslint-parser',
+  parserOptions: {
+    requireConfigFile: false,
+  },
   settings: {
     'import/core-modules': ['@reach/router'],
     'import/resolver': {
