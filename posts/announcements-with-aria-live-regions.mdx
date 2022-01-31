@@ -1,0 +1,98 @@
+---
+title: Announcements with Aria Live Regions
+slug: announcements-with-aria-live-regions
+tags:
+  - aria-live
+  - a11y
+date: 2022-01-24
+---
+
+notify assistive technologies users without moving focus
+
+> Using JavaScript, it is possible to dynamically change parts of a page without requiring the entire page to reload — for instance, to update a list of search results on the fly, or to display a discreet alert or notification which does not require user interaction. While these changes are usually visually apparent to users who can see the page, they may not be obvious to users of assistive technologies. ARIA live regions fill this gap and provide a way to programmatically expose dynamic content changes in a way that can be announced by assistive technologies.
+
+使用 javascript 動態改變頁面內容，對於可以看到該頁面的用戶是顯而易見的，但對於使用輔助技術的用戶來說 (e.g. screen reader)，可能並不明顯，aria live regions 為一種提示輔助技術，當前內容有改變的一種方式。
+
+## aria-live
+
+- `aria-live="assertive"`: indicates that updates to the region have the highest priority and should be presented the user immediately. `(立即提示此區塊的更新)`
+- `aria-live="polite"`: indicates that updates to the region should be presented at the next graceful opportunity, such as at the end of speaking the current sentence or when the user pauses typing. `(通常會在用戶結束當前行為後，提示此區塊的更新)`
+- `aria-live="off"`: (default value) indicates that updates to the region should not be presented to the user unless the user is currently focused on that region
+
+### roles with implicit live region attributes
+
+- `role="alert"`: the aria live region role of alert has an implicit aria-live value of assertive
+- `role="status"` the aria live region role of status has an implicit aria-live value of polite
+
+## Examples
+
+### Toast
+
+不管是 [React Toastify](https://fkhadra.github.io/react-toastify/accessibility) 或是 [Chakra UI](https://chakra-ui.com/docs/feedback/toast)，toast component 最終渲染結果，都可以發現預設帶有 `role="alert"` 的屬性
+
+```html
+<div role="alert" class="chakra-alert">
+  <div class="chakra-alert__title">
+    Account created.
+  </div>
+  <div class="chakra-alert__desc">
+    We've created your account for you.
+  </div>
+</div>
+```
+
+### Error Boundary
+
+[react-error-boundary](https://github.com/bvaughn/react-error-boundary) 的範例上，可以看到 `<ErrorFallback />` 帶有 `role="alert"`，對於 client-side routing，不管是 error(404) page，能夠直接輔助技術，當前頁面狀況會是一個相對友善的小細節
+
+```jsx
+function ErrorFallback({error, resetErrorBoundary}) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  );
+}
+```
+
+### Form Field Error Message
+
+下方範例參考自 [Chakra UI - Form Control](https://chakra-ui.com/docs/form/form-control)，在 [Reakit Form](https://reakit.io/docs/form/) 也有針對 error message 加上 `aria-live` 屬性
+
+```html
+<div role="group" class="chakra-form-control">
+  <label
+    for="email"
+    class="chakra-form__label"
+  >
+    Email
+  </label>
+  <input
+    type="email"
+    id="email"
+    aria-invalid="true"
+    aria-describedby="email-error-message"
+  >
+  <p
+    id="email-error-message"
+    aria-live="polite"
+    class="chakra-form__error-message"
+  >
+    Email is required.
+  </p>
+</div>
+```
+
+## Reference
+
+[MDN - ARIA live regions](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/ARIA_Live_Regions)
+
+[MDN - aria-live](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-live)
+
+[Chakra UI](https://chakra-ui.com/)
+
+[React-Toastify - Accessibility](https://fkhadra.github.io/react-toastify/accessibility)
+
+[react-error-boundary](https://github.com/bvaughn/react-error-boundary)
