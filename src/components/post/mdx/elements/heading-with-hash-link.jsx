@@ -18,7 +18,7 @@ const HeadingWithHashLink = ({ children }) => {
     <ChakraHeading
       display="flex"
       alignItems="center"
-      marginTop="7"
+      marginY="7"
       borderBottom="1px solid"
       borderColor="inherit"
       paddingBottom="2"
