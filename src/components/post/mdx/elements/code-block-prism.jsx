@@ -102,6 +102,8 @@ const PrismHighlighter = ({ code, language }) => {
         position="absolute"
         top=".75em"
         right=".75em"
+        userSelect="none"
+        appearance="none"
         onClick={onCopy}
       >
         {hasCopied ? 'copied' : 'copy'}

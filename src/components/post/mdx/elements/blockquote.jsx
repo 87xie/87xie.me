@@ -19,7 +19,7 @@ const Blockquote = ({ children }) => {
       borderColor={borderColor}
       borderRadius="sm"
       backgroundColor={backgroundColor}
-      sx={{ '& p': { margin: 0 } }}
+      sx={{ 'p': { margin: 0 } }}
     >
       {children}
     </Box>

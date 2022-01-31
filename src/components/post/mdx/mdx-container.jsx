@@ -24,9 +24,6 @@ const mdxCSS = css`
   h3 {
     font-size: var(--chakra-fontSizes-xl);
   }
-  h4 {
-    font-size: var(--chakra-fontSizes-lg);
-  }
   p {
     font-size: var(--chakra-fontSizes-md);
   }
@@ -39,6 +36,9 @@ const mdxCSS = css`
         margin: var(--chakra-space-1) 0;
       }
     }
+  }
+  hr {
+    margin: var(--chakra-space-8) 0;
   }
 `;
 
