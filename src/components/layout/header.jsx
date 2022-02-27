@@ -1,9 +1,11 @@
 /* eslint-disable object-curly-newline */
 import React from 'react';
+import { Link as GatsbyLink } from 'gatsby';
 import {
   Box,
   Flex,
   Grid,
+  Icon,
   IconButton,
   useColorMode,
 } from '@chakra-ui/react';
@@ -21,31 +23,7 @@ import HeaderIconLink from './header-icon-link';
 
 const links = [
   {
-    to: '/search',
-    icon: FiSearch,
-    ariaLabel: 'To search page',
-    isExternal: false,
-  },
-  {
-    to: '/posts',
-    icon: FiBook,
-    ariaLabel: 'To posts page',
-    isExternal: false,
-  },
-  {
-    to: '/tags',
-    icon: FiTag,
-    ariaLabel: 'To tags page',
-    isExternal: false,
-  },
-  {
-    to: 'https://www.linkedin.com/in/oscar-87-xie/',
-    icon: FiLinkedin,
-    isExternal: true,
-    ariaLabel: 'To oscar-87-xie Linkedin page',
-  },
-  {
-    to: 'https://github.com/Oscar87Xie',
+    to: 'https://github.com/87xie/',
     icon: FiGithub,
     isExternal: true,
     ariaLabel: 'To oscar87xie GitHub page',
@@ -82,14 +60,45 @@ const Header = () => {
           alignItems="center"
           gap={[0, 1]}
         >
-          {links.map(({ ariaLabel, ...linkProps }) => (
-            <HeaderIconLink
-              {...linkProps}
-              key={linkProps.to}
-              aria-label={ariaLabel}
-            />
-          ))}
-          {/* color mode button */}
+          <HeaderIconLink
+            as={GatsbyLink}
+            to="/search"
+            aria-label="To search page"
+          >
+            <Icon as={FiSearch} />
+          </HeaderIconLink>
+
+          <HeaderIconLink
+            as={GatsbyLink}
+            to="/posts"
+            aria-label="To posts page"
+          >
+            <Icon as={FiBook} />
+          </HeaderIconLink>
+
+          <HeaderIconLink
+            as={GatsbyLink}
+            to="/tags"
+            aria-label="To tags page"
+          >
+            <Icon as={FiTag} />
+          </HeaderIconLink>
+
+          <HeaderIconLink
+            isExternal
+            href="https://www.linkedin.com/in/87xie/"
+            aria-label="To 87xie Linkedin page"
+          >
+            <Icon as={FiLinkedin} />
+          </HeaderIconLink>
+
+          <HeaderIconLink
+            isExternal
+            href="https://github.com/87xie/"
+            aria-label="To 87xie GitHub page"
+          >
+            <Icon as={FiGithub} />
+          </HeaderIconLink>
           <IconButton
             aria-label={`Switch to ${colorMode} mode`}
             size="sm"
