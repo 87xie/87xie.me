@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { graphql } from 'gatsby';
 import { Box, Flex } from '@chakra-ui/react';

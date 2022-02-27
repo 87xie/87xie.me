@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
 import { Box, useColorMode } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 
