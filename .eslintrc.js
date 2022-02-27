@@ -19,6 +19,7 @@ module.exports = {
           ['@', './src'],
           ['@styles', './src/styles'],
           ['@layouts', './src/layouts'],
+          ['@features', './src/features'],
           ['@components', './src/components'],
         ],
         extensions: ['.js', '.jsx'],

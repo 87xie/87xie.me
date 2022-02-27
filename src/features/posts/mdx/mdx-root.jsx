@@ -2,14 +2,14 @@ import { Box } from '@chakra-ui/react';
 import { MDXProvider } from '@mdx-js/react';
 import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { css } from '@emotion/react';
-import CodeBlock from './elements/code-block';
-import InlineCode from './elements/inline-code';
-import Table from './elements/table';
-import ExternalLink from './elements/external-link';
-import Blockquote from './elements/blockquote';
-import HeadingWithHashLink from './elements/heading-with-hash-link';
+import CodeBlock from './code-block';
+import InlineCode from './inline-code';
+import Table from './table';
+import ExternalLink from './external-link';
+import Blockquote from './blockquote';
+import HeadingWithHashLink from './heading-with-hash-link';
 
-const mdxCSS = css`
+const mdxCss = css`
   h3, h4, h5, h6, p, li {
     line-height: 1.75;
   }
@@ -40,7 +40,7 @@ const mdxCSS = css`
   }
 `;
 
-const MDXContainer = ({ children }) => {
+const MdxRoot = ({ children }) => {
   const components = {
     table: Table,
     pre: CodeBlock,
@@ -51,7 +51,7 @@ const MDXContainer = ({ children }) => {
   };
 
   return (
-    <Box css={mdxCSS}>
+    <Box css={mdxCss}>
       <MDXProvider components={components}>
         <MDXRenderer>
           {children}
@@ -61,4 +61,4 @@ const MDXContainer = ({ children }) => {
   );
 };
 
-export default MDXContainer;
+export default MdxRoot;
