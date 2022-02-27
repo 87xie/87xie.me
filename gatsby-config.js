@@ -17,6 +17,8 @@ module.exports = {
       options: {
         aliases: {
           '@': 'src',
+          '@layouts': 'src/layouts',
+          '@features': 'src/features',
           '@components': 'src/components',
         },
       },
