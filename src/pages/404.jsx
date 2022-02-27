@@ -3,10 +3,12 @@ import { Box, Heading } from '@chakra-ui/react';
 import SEO from '@components/seo';
 import LottieContainer from '@components/lottie-container';
 import dancingPallbearers from '../assets/lottie-animations/dancing-pallbearers.json';
+import { SkipNavContent } from '@components/skip-nav';
 
 const NotFound = () => (
   <>
     <SEO title="404" />
+    <SkipNavContent />
     <Box
       display="flex"
       justifyContent="center"

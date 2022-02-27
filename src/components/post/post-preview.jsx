@@ -15,7 +15,7 @@ const PostPreview = ({ to, children, ...props }) => (
   </Box>
 );
 
-const TagGroup = (props) => <Flex wrap="wrap" marginX="-1.5" {...props} />;
+const TagGroup = (props) => <Flex wrap="wrap" mx="-1.5" mb="-1.5" {...props} />;
 const Tag = (props) => <PostTag margin="1.5" {...props} />;
 
 const PostPreviewHeading = (props) => <Heading as="h2" {...props} />;

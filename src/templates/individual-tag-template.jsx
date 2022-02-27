@@ -3,8 +3,8 @@ import React from 'react';
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';
 import PostsSection from '@components/post/posts-section';
+import { SkipNavContent } from '@components/skip-nav';
 
-// TODO: archives page
 const IndividualTagTemplate = ({ pageContext }) => {
   const { tag = '' } = pageContext;
   const posts = pageContext?.posts || [];
@@ -13,6 +13,7 @@ const IndividualTagTemplate = ({ pageContext }) => {
     <>
       <SEO title={tag} />
       <Box maxWidth="4xl" marginX="auto">
+        <SkipNavContent />
         <PostsSection>
           <PostsSection.Heading textTransform="uppercase">
             {tag}

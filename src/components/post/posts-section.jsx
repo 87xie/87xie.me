@@ -24,16 +24,6 @@ const PostList = ({ posts }) => (
   <Grid gap="6">
     {posts.map(({ frontmatter }) => (
       <PostPreview key={frontmatter.slug}>
-        <PostPreview.TagGroup>
-          {frontmatter.tags.map((tag, index) => (
-            <PostPreview.Tag
-              key={index}
-              to={`/tag/${tag}`}
-            >
-              {tag}
-            </PostPreview.Tag>
-          ))}
-        </PostPreview.TagGroup>
 
         <ChakraLink
           display="block"
@@ -48,11 +38,22 @@ const PostList = ({ posts }) => (
           <PostPreview.Heading fontSize="2xl">
             {frontmatter.title}
           </PostPreview.Heading>
-
-          <PostPreview.DateText>
-            {frontmatter.date}
-          </PostPreview.DateText>
         </ChakraLink>
+        
+        <PostPreview.DateText>
+          {frontmatter.date}
+        </PostPreview.DateText>
+        
+        <PostPreview.TagGroup>
+          {frontmatter.tags.map((tag, index) => (
+            <PostPreview.Tag
+              key={index}
+              to={`/tag/${tag}`}
+            >
+              {tag}
+            </PostPreview.Tag>
+          ))}
+        </PostPreview.TagGroup>
       </PostPreview>
     ))}
   </Grid>
