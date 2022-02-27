@@ -2,9 +2,9 @@ import { graphql } from 'gatsby';
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';
 import HistoryBack from '@components/history-back';
-import MDXContainer from '@components/post/mdx/mdx-container';
-import PostPreview from '@components/post/post-preview';
 import { SkipNavContent } from '@components/skip-nav';
+import MdxRoot from '@features/posts/mdx/mdx-root';
+import * as PostMetadata from '@features/posts/post-metadata';
 
 export const query = graphql`
   query ($id: String!) {
@@ -33,24 +33,23 @@ const PostTemplate = ({ data }) => {
       <Box maxW="4xl" marginX="auto">
         <HistoryBack />
         <Box as="article">
-          <PostPreview
-            as="div"
+          <Box
             marginBottom="7"
             borderBottom="1px solid"
             borderColor="inherit"
             paddingBottom="2"
           >
-            <PostPreview.Heading as="h1" fontSize="3xl">
+            <PostMetadata.Heading as="h1" fontSize="3xl">
               {title}
-            </PostPreview.Heading>
-            <PostPreview.DateText>
+            </PostMetadata.Heading>
+            <PostMetadata.Date mb="1.5">
               {date}
-            </PostPreview.DateText>
-          </PostPreview>
+            </PostMetadata.Date>
+          </Box>
 
-          <MDXContainer>
+          <MdxRoot>
             {data.mdx.body}
-          </MDXContainer>
+          </MdxRoot>
         </Box>
       </Box>
     </>

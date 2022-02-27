@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { graphql, Link } from 'gatsby';
 import {
   Box,
@@ -7,9 +6,8 @@ import {
 } from '@chakra-ui/react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import SEO from '@components/seo';
-import PostsSection from '@components/post/posts-section';
 import { SkipNavContent } from '@components/skip-nav';
-
+import * as PostsSection from '@features/posts/posts-section';
 
 export const query = graphql`
   query ($skip: Int!, $limit: Int!) {
@@ -45,15 +43,15 @@ const PostsPaginationTemplate = ({ data, pageContext }) => {
       <SEO title="posts" />
       <SkipNavContent />
       <Box maxWidth="4xl" marginX="auto">
-        <PostsSection>
+        <PostsSection.Section>
           <PostsSection.Heading>
             Posts
             <Text fontSize="sm" lineHeight="tall">
               {`(page ${currentPage} of ${totalPages})`}
             </Text>
           </PostsSection.Heading>
-          <PostsSection.List posts={posts} />
-        </PostsSection>
+          <PostsSection.Previews posts={posts} />
+        </PostsSection.Section>
 
         <Box marginTop="5">
           <Button
@@ -84,15 +82,6 @@ const PostsPaginationTemplate = ({ data, pageContext }) => {
       </Box>
     </>
   );
-};
-
-PostsPaginationTemplate.propTypes = {
-  pageContext: PropTypes.shape({
-    skip: PropTypes.number.isRequired,
-    limit: PropTypes.number.isRequired,
-    totalPages: PropTypes.number.isRequired,
-    currentPage: PropTypes.number.isRequired,
-  }),
 };
 
 export default PostsPaginationTemplate;

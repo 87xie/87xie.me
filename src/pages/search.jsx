@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';
-import PostsSearchCombobox from '@components/search/posts-search-combobox';
+import PostsSearchCombobox from '@features/posts/posts-combobox';
 import { SkipNavContent } from '@components/skip-nav';
 
 const SearchPage = () => (

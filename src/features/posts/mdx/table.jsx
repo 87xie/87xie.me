@@ -1,7 +1,7 @@
 import { Box, useColorMode } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 
-const tableCSS = css`
+const tableCss = css`
   width: 100%;
   border: 1px solid;
   border-color: inherit;
@@ -30,7 +30,7 @@ const Table = ({ children }) => {
 
   return (
     <Box overflowX="scroll" marginBottom="7">
-      <table css={tableCSS} className={`is-${colorMode}`}>
+      <table css={tableCss} className={`is-${colorMode}`}>
         {children}
       </table>
     </Box>

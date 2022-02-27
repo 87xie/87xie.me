@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import { graphql } from 'gatsby';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box, Flex, VisuallyHidden } from '@chakra-ui/react';
 import SEO from '@components/seo';
-import PostTag from '@components/post/post-tag';
+import * as PostMetadata from '@features/posts/post-metadata';
 import { SkipNavContent } from '@components/skip-nav';
 
 const TagsPage = ({ data }) => {
@@ -12,26 +12,25 @@ const TagsPage = ({ data }) => {
     <>
       <SEO title="tags" />
       <SkipNavContent />
+      <VisuallyHidden as="h1">
+        All the tags
+      </VisuallyHidden>
       <Box
         maxWidth="4xl"
         height="100%"
         margin="0 auto"
       >
         <Flex height="100%" alignItems="center">
-          <Flex wrap="wrap" marginBottom="-4">
+          <PostMetadata.TagGroup size="lg" gap="2">
             {tags.map(({ fieldValue: tag }) => (
-              <PostTag
-                key={tag}
+              <PostMetadata.Tag
                 to={`/tag/${tag}`}
-                size="lg"
-                display="inline-block"
-                marginBottom="4"
-                marginRight="4"
+                key={tag}
               >
                 {tag}
-              </PostTag>
+              </PostMetadata.Tag>
             ))}
-          </Flex>
+          </PostMetadata.TagGroup>
         </Flex>
       </Box>
     </>

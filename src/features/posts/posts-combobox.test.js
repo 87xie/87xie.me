@@ -3,7 +3,7 @@ import {
   render,
   screen,
 } from '@testing-library/react';
-import PostSearchCombobox from './posts-search-combobox';
+import PostsCombobox from './posts-combobox';
 
 // TODO: maybe mock gatsby static query instead of hook
 jest.mock('./use-posts-search', () => jest.fn(() => {
@@ -22,7 +22,7 @@ afterAll(() => {
 
 describe('post-search-combobox', () => {
   it('allows input autofocus', () => {
-    render(<PostSearchCombobox />);
+    render(<PostsCombobox />);
 
     const input = screen.getByRole('textbox');
     expect(input).toHaveFocus();

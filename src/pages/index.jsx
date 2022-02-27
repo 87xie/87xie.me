@@ -9,9 +9,9 @@ import {
   Link as ChakraLink,
   useColorModeValue,
 } from '@chakra-ui/react';
-import SEO from '@components/seo';
-import PostsSection from '@components/post/posts-section';
 import { SkipNavContent } from '@components/skip-nav';
+import SEO from '@components/seo';
+import * as PostsSection from '@features/posts/posts-section';
 
 export const query = graphql`
   query {
@@ -148,12 +148,12 @@ const Index = ({ data }) => {
 
         <Box flex="auto">
           <SkipNavContent />
-          <PostsSection marginBottom="8">
+          <PostsSection.Section marginBottom="8">
             <PostsSection.Heading>
               Recent Posts
             </PostsSection.Heading>
-            <PostsSection.List posts={posts} />
-          </PostsSection>
+            <PostsSection.Previews posts={posts} />
+          </PostsSection.Section>
 
           <Box textAlign="right">
             <ChakraLink
