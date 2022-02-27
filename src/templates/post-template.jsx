@@ -1,16 +1,12 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { graphql } from 'gatsby';
-import {
-  Box,
-  Icon,
-  Link as ChakraLink,
-  useColorModeValue,
-} from '@chakra-ui/react';
-import { FiChevronLeft } from 'react-icons/fi';
+import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';
+import HistoryBack from '@components/history-back';
 import MDXContainer from '@components/post/mdx/mdx-container';
 import PostPreview from '@components/post/post-preview';
+import { SkipNavContent } from '@components/skip-nav';
 
 export const query = graphql`
   query ($id: String!) {
@@ -26,48 +22,6 @@ export const query = graphql`
   }
 `;
 
-const HistoryBack = ({
-  autoFocus = false,
-  children = 'window.history.back()',
-}) => {
-  const linkRef = useRef();
-  useEffect(() => {
-    if (!autoFocus) {
-      return;
-    }
-
-    if (window?.location?.hash) {
-      return;
-    }
-
-    linkRef.current.focus();
-  }, []);
-
-  return (
-    <ChakraLink
-      href="#"
-      aria-label="Back to referrer"
-      display="inline-flex"
-      alignItems="center"
-      marginBottom="2"
-      color={useColorModeValue('orange.500', 'orange.200')}
-      letterSpacing="wider"
-      ref={linkRef}
-      onClick={() => window.history.back()}
-    >
-      <Icon as={FiChevronLeft} w={4} h={4} marginRight="1" />
-      <Box
-        as="span"
-        display="inline-block"
-        fontSize="md"
-        textDecoration="underline"
-      >
-        {children}
-      </Box>
-    </ChakraLink>
-  );
-};
-
 const PostTemplate = ({ data }) => {
   const {
     date,
@@ -77,8 +31,9 @@ const PostTemplate = ({ data }) => {
   return (
     <>
       <SEO title={data.mdx.frontmatter.title} />
+      <SkipNavContent />
       <Box maxW="4xl" marginX="auto">
-        <HistoryBack autoFocus />
+        <HistoryBack />
         <Box as="article">
           <PostPreview
             as="div"

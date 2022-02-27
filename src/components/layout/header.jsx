@@ -21,15 +21,6 @@ import {
 import HeaderBugs from './header-bugs';
 import HeaderIconLink from './header-icon-link';
 
-const links = [
-  {
-    to: 'https://github.com/87xie/',
-    icon: FiGithub,
-    isExternal: true,
-    ariaLabel: 'To oscar87xie GitHub page',
-  },
-];
-
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const isDarkMode = colorMode === 'dark';

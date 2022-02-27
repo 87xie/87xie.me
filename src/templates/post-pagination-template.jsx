@@ -7,9 +7,11 @@ import {
   Text,
   Button,
 } from '@chakra-ui/react';
+import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import SEO from '@components/seo';
 import PostsSection from '@components/post/posts-section';
-import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { SkipNavContent } from '@components/skip-nav';
+
 
 export const query = graphql`
   query ($skip: Int!, $limit: Int!) {
@@ -43,6 +45,7 @@ const PostsPaginationTemplate = ({ data, pageContext }) => {
   return (
     <>
       <SEO title="posts" />
+      <SkipNavContent />
       <Box maxWidth="4xl" marginX="auto">
         <PostsSection>
           <PostsSection.Heading>

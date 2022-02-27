@@ -1,18 +1,19 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import {
+  graphql,
+  Link as GatsbyLink,
+} from 'gatsby';
+import {
   Box,
   Text,
   Link as ChakraLink,
   useColorModeValue,
 } from '@chakra-ui/react';
-import {
-  graphql,
-  Link as GatsbyLink,
-} from 'gatsby';
 import SEO from '@components/seo';
 import BuiltWith from '@components/built-with';
 import PostsSection from '@components/post/posts-section';
+import { SkipNavContent } from '@components/skip-nav';
 
 export const query = graphql`
   query {
@@ -69,6 +70,7 @@ const Index = ({ data }) => {
 
         <Box flex="auto">
 
+          <SkipNavContent />
           <PostsSection marginBottom="8">
             <PostsSection.Heading>
               Recent Posts

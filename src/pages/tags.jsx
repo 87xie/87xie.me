@@ -4,6 +4,7 @@ import { graphql } from 'gatsby';
 import { Box, Flex } from '@chakra-ui/react';
 import SEO from '@components/seo';
 import PostTag from '@components/post/post-tag';
+import { SkipNavContent } from '@components/skip-nav';
 
 const TagsPage = ({ data }) => {
   const tags = data?.allMdx?.group || [];
@@ -11,6 +12,7 @@ const TagsPage = ({ data }) => {
   return (
     <>
       <SEO title="tags" />
+      <SkipNavContent />
       <Box
         maxWidth="4xl"
         height="100%"
