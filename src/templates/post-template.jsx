@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
 import { graphql } from 'gatsby';
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';

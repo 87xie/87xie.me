@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@chakra-ui/react';
 import { SkipNavLink } from '@components/skip-nav';
@@ -28,7 +27,7 @@ const DefaultLayout = ({ children }) => {
       <Footer />
     </Box>
   );
-}
+};
 
 export default DefaultLayout;
 

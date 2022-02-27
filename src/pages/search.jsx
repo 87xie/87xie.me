@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box } from '@chakra-ui/react';
 import SEO from '@components/seo';
 import PostsSearchCombobox from '@components/search/posts-search-combobox';

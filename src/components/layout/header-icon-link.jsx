@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, useColorModeValue } from '@chakra-ui/react';
 
 const HeaderIconLink = (props) => {
@@ -13,8 +12,13 @@ const HeaderIconLink = (props) => {
       height="8"
       width="8"
       borderRadius="4"
-      sx={{ '&.is-active': { color: hoverColor } }}
-      _hover={{ color: hoverColor, background: hoverBackground }}
+      sx={{
+        '&.is-active': { color: hoverColor },
+        '&:hover': {
+          color: hoverColor,
+          background: hoverBackground,
+        },
+      }}
       {...props}
     />
   );

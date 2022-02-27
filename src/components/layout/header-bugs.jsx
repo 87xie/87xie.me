@@ -1,7 +1,4 @@
-import React from 'react';
-import {
-  Link as ChakraLink,
-} from '@chakra-ui/react';
+import { Link as ChakraLink } from '@chakra-ui/react';
 import { Link as GatsbyLink } from 'gatsby';
 import {
   css,

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link as GatsbyLink } from 'gatsby';
 import {
   Box,
@@ -23,6 +22,7 @@ import HeaderIconLink from './header-icon-link';
 const Header = () => {
   const { colorMode, toggleColorMode } = useColorMode();
   const isDarkMode = colorMode === 'dark';
+
   return (
     <Box
       as="header"

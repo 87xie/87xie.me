@@ -1,5 +1,3 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
 import {
   Box,
   Grid,
@@ -39,11 +37,11 @@ const PostList = ({ posts }) => (
             {frontmatter.title}
           </PostPreview.Heading>
         </ChakraLink>
-        
+
         <PostPreview.DateText>
           {frontmatter.date}
         </PostPreview.DateText>
-        
+
         <PostPreview.TagGroup>
           {frontmatter.tags.map((tag, index) => (
             <PostPreview.Tag

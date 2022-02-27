@@ -1,38 +1,48 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 import { Box, Heading } from '@chakra-ui/react';
+import lottie from 'lottie-web/build/player/lottie_light';
 import SEO from '@components/seo';
-import LottieContainer from '@components/lottie-container';
-import dancingPallbearers from '../assets/lottie-animations/dancing-pallbearers.json';
 import { SkipNavContent } from '@components/skip-nav';
+import dancingPallbearers from '../assets/lottie-animations/dancing-pallbearers.json';
 
-const NotFound = () => (
-  <>
-    <SEO title="404" />
-    <SkipNavContent />
-    <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      height="100%"
-    >
-      <Box role="alert" maxWidth={['280px', '400px']}>
-        <LottieContainer
-          role="alert"
-          tip="Page Not Found"
-          animationData={dancingPallbearers}
-        />
-        <Heading
-          as="h1"
-          mt="5"
-          fontSize="lg"
-          fontWeight="bold"
-          textAlign="center"
-        >
-          Page Not Found
-        </Heading>
+const NotFound = () => {
+  const lottieContainerRef = useRef();
+  useEffect(() => {
+    const animation = lottie.loadAnimation({
+      container: lottieContainerRef.current,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: dancingPallbearers,
+    });
+    return () => animation.destroy();
+  }, []);
+
+  return (
+    <>
+      <SEO title="404" />
+      <SkipNavContent />
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        height="100%"
+      >
+        <Box role="alert" maxWidth={['280px', '400px']}>
+          <Box ref={lottieContainerRef} aria-hidden="true" />
+          <Heading
+            as="h1"
+            mt="5"
+            fontSize="lg"
+            fontWeight="bold"
+            textAlign="center"
+          >
+            Page Not Found
+          </Heading>
+        </Box>
       </Box>
-    </Box>
-  </>
-);
+    </>
+  );
+};
 
 export default NotFound;
