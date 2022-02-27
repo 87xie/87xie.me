@@ -19,9 +19,9 @@
 - 💄 ui style
 - 🔥 remove files
 - 💅 refactor
-- ♻️ refactor (deprecated)
 - ✅ tests
 - 📝 post or documentation
 - 🍱 static files
 - 🏡 changes to the build process or auxiliary tools and libraries
+- 👷‍♂️ add or update ci build system
 - 🚧 work in progress
