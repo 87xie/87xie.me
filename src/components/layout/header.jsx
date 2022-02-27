@@ -1,4 +1,3 @@
-/* eslint-disable object-curly-newline */
 import React from 'react';
 import { Link as GatsbyLink } from 'gatsby';
 import {
