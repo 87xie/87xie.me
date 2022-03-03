@@ -1,0 +1,138 @@
+---
+title: React Portal with a Reusable Component
+slug: react-portal-with-a-reusable-component
+tags:
+  - react
+  - portal
+  - ssr
+date: 2022-03-03
+---
+
+參考 reach-ui 如何實作兼容 ssr 的 reusable portal component 的筆記，版本資訊如下
+
+- react 17.0.2
+- @reach/portal 0.16.2
+
+## use-isomorphic-layout-effect
+
+- `useEffect`: runs after react renders your component and ensures that your effect callback does not block browser painting.
+- `useLayoutEffect`: this runs synchronously immediately after React has performed all DOM mutations.
+
+詳細差異可以參考 
+- [Kent C. Dodds - useEffect vs useLayoutEffect](https://kentcdodds.com/blog/useeffect-vs-uselayouteffect)
+- [hook-flow](https://github.com/donavon/hook-flow)
+
+`useEffect`, `useLayoutEffect` 都只會在 client-side 作用，但因執行階段及關注點有所不同，在 ssr/ssg 的專案中，嘗試在 server-side 使用 `useLayoutEffect` 就會跳出以下警告
+
+>Warning: useLayoutEffect does nothing on the server, because its effect cannot be encoded into the server renderer’s output format. This will lead to a mismatch between the initial, non-hydrated UI and the intended UI. To avoid this, useLayoutEffect should only be used in components that render exclusively on the client
+
+當你的 reusable components, hooks 需要在 ssr/ssg 環境下使用 `useLayoutEffect`，目前比較主流的 workaround 都是判斷當下的執行環境，去做 `useEffect`, `useLayoutEffect` 的切換來避開警告
+
+而 reach-ui 判斷是否為 client-side 的方式如下
+
+```js
+export function canUseDOM() {
+  return !!(
+    typeof window !== 'undefined' &&
+    window.document &&
+    window.document.createElement
+  );
+}
+```
+
+use-isomorphic-layout-effect
+
+```js
+import { useEffect, useLayoutEffect } from 'react';
+import canUseDom from './can-use-dom';
+
+export const useIsomorphicLayoutEffect = canUseDOM()
+  ? useLayoutEffect
+  : useEffect;
+```
+
+## use-force-update
+
+[React - forceUpdate()](https://reactjs.org/docs/react-component.html#forceupdate)
+
+在 class-component 可以透過 `this.forceUpdate` 強制 re-render
+
+在 functional-component，可以透過 `useState` 的 setter 觸發更新，達到 `forceUpdate` 的效果
+
+```js
+export function useForceUpdate() {
+  const [, dispatch] = useState(Object.create(null));
+  return useCallback(() => {
+    dispatch(Object.create(null));
+  }, []);
+}
+```
+
+## Portal
+
+props
+
+- type: 指定 `document.createElement` 創建的元素，預設為 `reach-portal`
+- containerRef: 存放 `ReactDOM.createPortal` 的 dom node 參數的 ref
+
+run layout effect
+
+1. 確認 `<span ref={mountRef} />` 的 `mountRef.current` 存在
+1. 透過 `mountRef.current` 取得正確的 document element, body element
+1. 預設建立一個名為 `reach-portal` 的 autonomous custom elements，存入 `portalRef` 中（autonomous custom elements are standalone — they don't inherit from standard HTML elements）
+1. body 插入 `portalRef.current` 存放的元素後，觸發 `<Portal />` 強制更新
+
+cleanup layout effect
+
+1. 確認 body element 是否存在 `portalRef.current` 中的元素，若存在則刪除
+
+```jsx
+import { useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { useForceUpdate } from '@reach/utils/use-force-update';
+import { useIsomorphicLayoutEffect } from '@reach/utils/use-isomorphic-layout-effect';
+
+const Portal = ({
+  type = 'reach-portal',
+  containerRef = undefined,
+  children,
+}) => {
+  const mountedRef = useRef();
+  const portalRef = useRef();
+  const forceUpdate = useForceUpdate();
+  
+  useIsomorphicLayoutEffect(() => {
+    // This ref may be null when a hot-loader replaces components on the page
+    if (!mountRef.current) return;
+    // It's possible that the content of the portal has, itself, been portaled.
+    // In that case, it's important to append to the correct document element.
+    const ownerDocument = mountRef.current.ownerDocument;
+    const body = containerRef?.current || ownerDocument.body;
+    portalRef.current = ownerDocument?.createElement(type);
+    body.appendChild(portalRef.current);
+    forceUpdate();
+
+    return () => {
+      if (portalRef.current && body) {
+        body.removeChild(portalRef.current);
+      }
+    };
+  }, [type, forceUpdate, containerRef]);
+
+  return portalRef.current
+    ? createPortal(children, portalRef.current)
+    : <span ref={mountRef} />
+};
+
+export default Portal;
+```
+
+## References
+
+[Kent C. Dodds - useEffect vs useLayoutEffect](https://kentcdodds.com/blog/useeffect-vs-uselayouteffect)
+
+[@reach-ui/portal](https://github.com/reach/reach-ui/blob/develop/packages/portal/src/index.tsx)
+
+[MDN - Document.createElement()](https://developer.mozilla.org/zh-TW/docs/Web/API/Document/createElement)
+
+[MDN - Using custom elements](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements)
