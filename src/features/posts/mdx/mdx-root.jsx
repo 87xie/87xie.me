@@ -16,7 +16,7 @@ const mdxCss = css`
   h3, h4, h5, h6, strong {
     font-weight: var(--chakra-fontWeights-bold);
   }
-  h3, h4, h5, h6, p {
+  h3, h4, h5, h6 {
     margin-bottom: var(--chakra-space-6);
   }
   h3 {
@@ -24,6 +24,7 @@ const mdxCss = css`
   }
   p {
     font-size: var(--chakra-fontSizes-md);
+    margin-bottom: var(--chakra-space-3);
   }
   ul, ol {
     margin-bottom: var(--chakra-space-6);
