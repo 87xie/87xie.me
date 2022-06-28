@@ -1,19 +1,24 @@
 ---
-title: The Linkable and Accessible with Interactive Descendant HTML Structure
-slug: the-linkable-and-accessible-with-interactive-descendant-html-structure
+title: Stretched link
+slug: stretched-link
 tags:
   - a11y
   - html
 date: 2022-06-07
 ---
 
-紀錄網頁開發常見的 routable card ui ，個人認為較符合 a11y 的作法，參考樣式如下
+紀錄網頁開發常見的 clickable block ，個人認為較符合 a11y 的作法，大致需求如下
 
-![voicetube-trending-videos-ui](/images/voicetube-trending-videos-ui.png)
+<img
+  width="896"
+  height="212"
+  alt="voicetube-trending-videos-ui"
+  src="/images/voicetube-trending-videos-ui.png"
+/>
 
-- 點擊卡片可以跳轉至該影片頁面
-- 點擊卡片上的 tag 可以跳轉至對應主題的影片列表頁
-- 點擊卡片上的愛心 icon button 可以收藏影片
+- 點擊卡片後，跳轉至該影片頁面
+- 點擊卡片上的 tag 後， 跳轉至對應主題的影片列表頁
+- 點擊卡片上的愛心 icon button， 收藏影片
 
 ## The Anchor Element Content Model
 
@@ -207,9 +212,12 @@ const VideoCard = () => {
 }
 ```
 
+後來才發現 `bootstrap@4.x` 開始，就有提供名為 [stetched link](https://getbootstrap.com/docs/5.2/helpers/stretched-link/#content) 的 css helper
 
 ## References
 
 [stackoverflow - whats-the-difference-between-event-stoppropagation-and-event-preventdefault](https://stackoverflow.com/questions/5963669/whats-the-difference-between-event-stoppropagation-and-event-preventdefault)
 
 [whatwg - the a element standard](https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element)
+
+[bootstrap - stretched link](https://getbootstrap.com/docs/5.2/helpers/stretched-link/#content)
