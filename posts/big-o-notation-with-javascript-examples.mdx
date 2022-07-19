@@ -41,7 +41,7 @@ function fib(n) {
 }
 ```
 
-下方為遞迴檢查是否為回文（順讀和倒讀都一樣的詞) 的範例程式碼
+下方為遞迴檢查是否為回文的範例程式碼（順讀和倒讀都一樣的詞) 
 
 當字串長度為奇數時，`palindrome` 會被遞迴執行 `n/2 + 1` 次，長度為偶數時，遞迴執行 `n/2` 次
 
@@ -162,7 +162,7 @@ function fib(n) {
   if (n < 2) {
     return n;
   }
-  ｀
+
   return fib(n - 1) + fib (n - 2);
 }
 
@@ -215,6 +215,13 @@ function binarySearch(array, id) {
 }
 
 binarySearch(people, 15);
+
+/**
+ * min: 0, max: 7, index: 3
+ * min: 4, max: 7, index: 5
+ * min: 6, max: 7, index: 6
+ * min: 7, max: 7, index: 7
+ **/
 ```
 
 ## Reference
