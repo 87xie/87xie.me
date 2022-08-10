@@ -12,12 +12,13 @@ const toKebabCase = (string) => string
 
 const HeadingWithHashLink = ({ children }) => {
   const id = toKebabCase(children);
+  const hashColor = useColorModeValue('blue.500', 'blue.200');
 
   return (
     <ChakraHeading
       display="flex"
       alignItems="center"
-      marginY="7"
+      marginY="6"
       borderBottom="1px solid"
       borderColor="inherit"
       paddingBottom="2"
@@ -43,7 +44,7 @@ const HeadingWithHashLink = ({ children }) => {
         display="inline-block"
         marginLeft="2"
         fontSize="lg"
-        color={useColorModeValue('blue.500', 'blue.200')}
+        color={hashColor}
         href={`#${id}`}
       >
         #

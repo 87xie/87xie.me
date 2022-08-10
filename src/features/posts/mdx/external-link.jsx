@@ -6,7 +6,7 @@ import {
 import { FiExternalLink } from 'react-icons/fi';
 
 const ExternalLink = ({ href, children }) => {
-  const color = useColorModeValue('pink.500', 'red.200');
+  const color = useColorModeValue('blue.500', 'blue.200');
 
   return (
     <Link
