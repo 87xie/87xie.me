@@ -46,7 +46,6 @@ const PostTemplate = ({ data }) => {
               {date}
             </PostMetadata.Date>
           </Box>
-
           <MdxRoot>
             {data.mdx.body}
           </MdxRoot>
