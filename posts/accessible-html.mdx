@@ -75,6 +75,27 @@ const Button = () => {
 - **Better on mobile** — semantic HTML is arguably lighter in file size than non-semantic spaghetti code, and easier to make responsive.
 - **Good for SEO** — search engines give more importance to keywords inside headings, links, etc. than keywords included in non-semantic `<div>`s, etc., so your documents will be more findable by customers.
 
+### Role
+
+> In general, avoid using role. Use semantic HTML elements that implicitly have a role instead.
+
+引用自 gitlab frontend development guidelines
+
+| Bad                         | Good                               |
+|-----------------------------|------------------------------------|
+| `<div role="button">`       | `<button>`                         |
+| `<div role="img">`          | `<img>`                            |
+| `<div role="link">`         | `<a>`                              |
+| `<div role="header">`       | `<h1>` to `<h6>`                   |
+| `<div role="textbox">`      | `<input>` or `<textarea>`          |
+| `<div role="article">`      | `<article>`                        |
+| `<div role="list">`         | `<ol>` or `<ul>`                   |
+| `<div role="listitem">`     | `<li>`                             |
+| `<div role="table">`        | `<table>`                          |
+| `<div role="rowgroup">`     | `<thead>`, `<tbody>`, or `<tfoot>` |
+| `<div role="columnheader">` | `<th>`                             |
+| `<div role="cell">`         | `<td>`                             |
+
 ## Real World Examples
 
 ### Presentation Role
@@ -180,3 +201,5 @@ Google 表示頁面上有多個 `<h1>` 不會對 SEO 造成影響，但有多個
 [Google Webmasters Youtube Channel - My site's template has multiple H1 tags](https://www.youtube.com/watch?v=WsgrSxCmMbM)
 
 [Heading Order](https://dequeuniversity.com/rules/axe/3.3/heading-order?lang=en)
+
+[Accessibility GitLab](https://docs.gitlab.com/ee/development/fe_guide/accessibility.html)
