@@ -3,6 +3,7 @@ const { siteMetadata } = require('./config/website');
 module.exports = {
   siteMetadata,
   jsxRuntime: 'automatic',
+  jsxImportSource: '@emotion/react',
   plugins: [
     'gatsby-plugin-mdx',
     'gatsby-plugin-emotion',
