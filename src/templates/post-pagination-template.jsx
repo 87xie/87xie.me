@@ -40,7 +40,6 @@ const PostsPaginationTemplate = ({ data, pageContext }) => {
 
   return (
     <>
-      <SEO title="posts" />
       <SkipNavContent />
       <Box maxWidth="4xl" marginX="auto">
         <PostsSection.Section>
@@ -83,5 +82,9 @@ const PostsPaginationTemplate = ({ data, pageContext }) => {
     </>
   );
 };
+
+export const Head = () => (
+  <SEO title="posts" />
+);
 
 export default PostsPaginationTemplate;

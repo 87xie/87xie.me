@@ -5,7 +5,6 @@ import { SkipNavContent } from '@components/skip-nav';
 
 const SearchPage = () => (
   <>
-    <SEO title="search" />
     <SkipNavContent />
     <Box
       maxWidth="500px"
@@ -15,6 +14,10 @@ const SearchPage = () => (
       <PostsSearchCombobox />
     </Box>
   </>
+);
+
+export const Head = () => (
+  <SEO title="search" />
 );
 
 export default SearchPage;

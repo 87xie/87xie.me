@@ -1,8 +1,8 @@
 import { graphql } from 'gatsby';
 import { Box } from '@chakra-ui/react';
+import { SkipNavContent } from '@components/skip-nav';
 import SEO from '@components/seo';
 import HistoryBack from '@components/history-back';
-import { SkipNavContent } from '@components/skip-nav';
 import MdxRoot from '@features/posts/mdx/mdx-root';
 import * as PostMetadata from '@features/posts/post-metadata';
 
@@ -21,14 +21,10 @@ export const query = graphql`
 `;
 
 const PostTemplate = ({ data }) => {
-  const {
-    date,
-    title,
-  } = data.mdx.frontmatter;
+  const { mdx } = data;
 
   return (
     <>
-      <SEO title={data.mdx.frontmatter.title} />
       <SkipNavContent />
       <Box maxW="4xl" marginX="auto">
         <HistoryBack />
@@ -40,19 +36,23 @@ const PostTemplate = ({ data }) => {
             paddingBottom="2"
           >
             <PostMetadata.Heading as="h1" fontSize="3xl">
-              {title}
+              {mdx.frontmatter.title}
             </PostMetadata.Heading>
             <PostMetadata.Date mb="1.5">
-              {date}
+              {mdx.frontmatter.date}
             </PostMetadata.Date>
           </Box>
           <MdxRoot>
-            {data.mdx.body}
+            {mdx.body}
           </MdxRoot>
         </Box>
       </Box>
     </>
   );
 };
+
+export const Head = ({ data }) => (
+  <SEO title={data.mdx.frontmatter.title} />
+);
 
 export default PostTemplate;

@@ -122,53 +122,54 @@ const Index = ({ data }) => {
   const textOrange = useColorModeValue('orange.500', 'orange.200');
 
   return (
-    <>
-      <SEO />
+    <Box
+      display="flex"
+      flexDirection={['column', 'column', 'row']}
+      maxWidth="4xl"
+      margin="0 auto"
+      height="100%"
+    >
       <Box
-        display="flex"
-        flexDirection={['column', 'column', 'row']}
-        maxWidth="4xl"
-        margin="0 auto"
-        height="100%"
+        as="aside"
+        flex={['auto', 'auto', '0 0 25%']}
+        marginBottom={['6', '6', '0']}
+        marginRight={['0', '0', '12']}
       >
-        <Box
-          as="aside"
-          flex={['auto', 'auto', '0 0 25%']}
-          marginBottom={['6', '6', '0']}
-          marginRight={['0', '0', '12']}
+        <Text
+          marginBottom="6"
+          lineHeight="1.2"
         >
-          <Text
-            marginBottom="6"
-            lineHeight="1.2"
+          {description}
+        </Text>
+        <BuiltWith />
+      </Box>
+
+      <Box flex="auto">
+        <SkipNavContent />
+        <PostsSection.Section marginBottom="8">
+          <PostsSection.Heading>
+            Recent Posts
+          </PostsSection.Heading>
+          <PostsSection.Previews posts={posts} />
+        </PostsSection.Section>
+
+        <Box textAlign="right">
+          <ChakraLink
+            as={GatsbyLink}
+            to="/posts"
+            color={textOrange}
+            fontWeight="bold"
           >
-            {description}
-          </Text>
-          <BuiltWith />
-        </Box>
-
-        <Box flex="auto">
-          <SkipNavContent />
-          <PostsSection.Section marginBottom="8">
-            <PostsSection.Heading>
-              Recent Posts
-            </PostsSection.Heading>
-            <PostsSection.Previews posts={posts} />
-          </PostsSection.Section>
-
-          <Box textAlign="right">
-            <ChakraLink
-              as={GatsbyLink}
-              to="/posts"
-              color={textOrange}
-              fontWeight="bold"
-            >
-              to=&quot;/posts&quot;
-            </ChakraLink>
-          </Box>
+            to=&quot;/posts&quot;
+          </ChakraLink>
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
+
+export const Head = () => (
+  <SEO />
+);
 
 export default Index;
