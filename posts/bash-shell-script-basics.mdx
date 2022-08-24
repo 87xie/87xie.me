@@ -73,8 +73,8 @@ default arguments
 |--------|-------------------------|
 | $0     | the file name           |
 | $#     | the number of arguments |
-| $@     | "$1" "$2" "$3" … "${N}" |
-| $*     | "$1c$2c$3c$4c … ${N}" <br /> where c is the first character of the value of the IFS variable. If IFS is unset, the parameters are separated by spaces. |
+| $@     | "$1" "$2" "$3" … "$\{N}" |
+| $*     | "$1c$2c$3c$4c … $\{N}" <br /> where c is the first character of the value of the IFS variable. If IFS is unset, the parameters are separated by spaces. |
 | $?     | the exit status of last command |
 
 ## test Command
@@ -118,7 +118,7 @@ test -e ./package-lock.json -o -e ./yarn.lock
 | operator | description                                 |
 |----------|---------------------------------------------|
 | >        | is greater than in ASCII alphabetical order |
-| <        | is less than in ASCII alphabetical order    |
+| \<        | is less than in ASCII alphabetical order    |
 | -z       | is empty                                    |
 | -n       | is not empty                                |
 
