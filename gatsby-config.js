@@ -8,7 +8,6 @@ module.exports = {
     'gatsby-plugin-mdx',
     'gatsby-plugin-emotion',
     'gatsby-plugin-sitemap',
-    'gatsby-plugin-react-helmet',
     {
       resolve: '@chakra-ui/gatsby-plugin',
       options: { resetCSS: true },

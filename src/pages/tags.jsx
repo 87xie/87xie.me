@@ -10,7 +10,6 @@ const TagsPage = ({ data }) => {
 
   return (
     <>
-      <SEO title="tags" />
       <SkipNavContent />
       <VisuallyHidden as="h1">
         All the tags
@@ -58,5 +57,9 @@ export const query = graphql`
     }
   }
 `;
+
+export const Head = () => (
+  <SEO title="tags" />
+);
 
 export default TagsPage;

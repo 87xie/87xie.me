@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet';
 import { useLocation } from '@reach/router';
 import { useStaticQuery, graphql } from 'gatsby';
 
@@ -41,7 +40,7 @@ const SEO = ({ title, description, image }) => {
   };
 
   return (
-    <Helmet>
+    <>
       <html lang={siteLanguage} />
       <title>{seo.title}</title>
       <meta name="description" content={seo.description} />
@@ -63,7 +62,7 @@ const SEO = ({ title, description, image }) => {
       <meta name="twitter:image" content={seo.image} />
       <meta name="twitter:image:alt" content={seo.description} />
       <meta name="twitter:creator" content={twitter} />
-    </Helmet>
+    </>
   );
 };
 

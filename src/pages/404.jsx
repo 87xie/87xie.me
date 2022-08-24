@@ -20,7 +20,6 @@ const NotFound = () => {
 
   return (
     <>
-      <SEO title="404" />
       <SkipNavContent />
       <Box
         display="flex"
@@ -44,5 +43,9 @@ const NotFound = () => {
     </>
   );
 };
+
+export const Head = () => (
+  <SEO title="404" />
+);
 
 export default NotFound;

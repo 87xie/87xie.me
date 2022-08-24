@@ -8,19 +8,20 @@ const IndividualTagTemplate = ({ pageContext }) => {
   const posts = pageContext?.posts || [];
 
   return (
-    <>
-      <SEO title={tag} />
-      <Box maxWidth="4xl" marginX="auto">
-        <SkipNavContent />
-        <PostsSection.Section>
-          <PostsSection.Heading textTransform="uppercase">
-            {tag}
-          </PostsSection.Heading>
-          <PostsSection.Previews posts={posts} />
-        </PostsSection.Section>
-      </Box>
-    </>
+    <Box maxWidth="4xl" marginX="auto">
+      <SkipNavContent />
+      <PostsSection.Section>
+        <PostsSection.Heading textTransform="uppercase">
+          {tag}
+        </PostsSection.Heading>
+        <PostsSection.Previews posts={posts} />
+      </PostsSection.Section>
+    </Box>
   );
 };
+
+export const Head = ({ pageContext }) => (
+  <SEO title={pageContext.tag} />
+);
 
 export default IndividualTagTemplate;
