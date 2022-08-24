@@ -27,7 +27,6 @@ const SEO = ({ title, description, image }) => {
     defaultDescription,
     defaultImage,
     siteUrl,
-    siteLanguage,
     locale,
     twitter,
   } = data.site.siteMetadata;
@@ -41,7 +40,6 @@ const SEO = ({ title, description, image }) => {
 
   return (
     <>
-      <html lang={siteLanguage} />
       <title>{seo.title}</title>
       <meta name="description" content={seo.description} />
       <meta name="image" content={seo.image} />
