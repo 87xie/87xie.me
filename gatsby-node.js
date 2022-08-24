@@ -1,13 +1,18 @@
+const path = require('path');
+
 const allMdxQuery = (graphql) => graphql(`{
   allMdx(sort: {order: DESC, fields: frontmatter___date}) {
     nodes {
+      id
       frontmatter {
         date(formatString: "YYYY-MM-DD")
         slug
         tags
         title
       }
-      id
+      internal {
+        contentFilePath
+      }
     }
   }
 }`);
@@ -42,12 +47,16 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
 
   const [allMdxResult, tagsGroupResult] = results;
   const posts = allMdxResult.data.allMdx.nodes;
-  posts.forEach(({ frontmatter: { slug = '' }, id }) => {
-    if (slug) {
+  const postTemplate = path.resolve('./src/templates/post-template.jsx');
+
+  posts.forEach((node) => {
+    if (node.frontmatter.slug) {
       actions.createPage({
-        path: `/post/${slug}`,
-        component: require.resolve('./src/templates/post-template.jsx'),
-        context: { id },
+        path: `/post/${node.frontmatter.slug}`,
+        component: `${postTemplate}?__contentFilePath=${node.internal.contentFilePath}`,
+        context: {
+          id: node.id,
+        },
       });
     }
   });
@@ -59,7 +68,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   for (let i = 1; i <= totalPages; i += 1) {
     actions.createPage({
       path: i === 1 ? '/posts' : `/posts/${i}`,
-      component: require.resolve('./src/templates/post-pagination-template.jsx'),
+      component: path.resolve('./src/templates/post-pagination-template.jsx'),
       context: {
         limit: perPage,
         skip: (i - 1) * perPage,
@@ -74,7 +83,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   tagGroup.forEach(({ nodes, fieldValue }) => {
     actions.createPage({
       path: `/tag/${fieldValue}`,
-      component: require.resolve('./src/templates/individual-tag-template.jsx'),
+      component: path.resolve('./src/templates/individual-tag-template.jsx'),
       context: {
         posts: nodes,
         tag: fieldValue,

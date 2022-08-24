@@ -1,6 +1,5 @@
 import { Box, useColorMode } from '@chakra-ui/react';
 import { MDXProvider } from '@mdx-js/react';
-import { MDXRenderer } from 'gatsby-plugin-mdx';
 import { css } from '@emotion/react';
 import CodeBlock from './code-block';
 import InlineCode from './inline-code';
@@ -73,9 +72,7 @@ const MdxRoot = ({ children }) => {
       data-color-mode={colorMode}
     >
       <MDXProvider components={components}>
-        <MDXRenderer>
-          {children}
-        </MDXRenderer>
+        {children}
       </MDXProvider>
     </Box>
   );

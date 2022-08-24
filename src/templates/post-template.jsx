@@ -1,3 +1,4 @@
+import React from 'react';
 import { graphql } from 'gatsby';
 import { Box } from '@chakra-ui/react';
 import { SkipNavContent } from '@components/skip-nav';
@@ -10,7 +11,6 @@ export const query = graphql`
   query ($id: String!) {
     mdx(id: {eq: $id}) {
       id
-      body
       frontmatter {
         date(formatString: "YYYY-MM-DD")
         tags
@@ -20,7 +20,7 @@ export const query = graphql`
   }
 `;
 
-const PostTemplate = ({ data }) => {
+const PostTemplate = ({ data, children }) => {
   const { mdx } = data;
 
   return (
@@ -43,7 +43,7 @@ const PostTemplate = ({ data }) => {
             </PostMetadata.Date>
           </Box>
           <MdxRoot>
-            {mdx.body}
+            {children}
           </MdxRoot>
         </Box>
       </Box>
