@@ -41,12 +41,12 @@ class LinkedList {
       return;
     }
 
-     let node = this.head;
+    let node = this.head;
 
     while(node.next !== null) {
       node = node.next;
     }
-    
+
     node.next = new Node(data, node);
   }
 }
@@ -180,3 +180,18 @@ function reverseList(head) {
 ## Reference
 
 [The Coding Interview Bootcamp: Algorithms + Data Structures](https://www.udemy.com/course/coding-interview-bootcamp-algorithms-and-data-structure/)
+
+```js
+class LinkedList {
+  constructor(head) {
+    this.head = head;
+  }
+
+  append(value) {
+    const newNode = {
+      value,
+      next: null,
+    };
+  }
+}
+```
