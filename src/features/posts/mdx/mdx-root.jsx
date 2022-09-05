@@ -61,7 +61,7 @@ const MdxRoot = ({ children }) => {
     table: Table,
     pre: CodeBlock,
     a: ExternalLink,
-    inlineCode: InlineCode,
+    code: InlineCode,
     blockquote: Blockquote,
     h2: HeadingWithHashLink,
   };
