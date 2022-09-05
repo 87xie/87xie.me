@@ -1,3 +1,4 @@
+const remarkGfm = require('remark-gfm');
 const { siteMetadata } = require('./config/website');
 
 module.exports = {
@@ -5,7 +6,17 @@ module.exports = {
   jsxRuntime: 'automatic',
   jsxImportSource: '@emotion/react',
   plugins: [
-    'gatsby-plugin-mdx',
+    {
+      resolve: 'gatsby-plugin-mdx',
+      options: {
+        mdxOptions: {
+          remarkPlugins: [
+            // Add GitHub Flavored Markdown (GFM) support
+            remarkGfm,
+          ],
+        },
+      },
+    },
     'gatsby-plugin-emotion',
     'gatsby-plugin-sitemap',
     {
