@@ -1,4 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-module.exports = require('babel-jest').default.createTransformer({
+const babelOptions = {
   presets: ['babel-preset-gatsby'],
-});
+};
+
+module.exports = require('babel-jest').default.createTransformer(babelOptions);
