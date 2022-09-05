@@ -21,7 +21,10 @@ module.exports = {
     'gatsby-plugin-sitemap',
     {
       resolve: '@chakra-ui/gatsby-plugin',
-      options: { resetCSS: true },
+      options: {
+        resetCSS: true,
+        isUsingColorMode: true,
+      },
     },
     {
       resolve: 'gatsby-alias-imports',
