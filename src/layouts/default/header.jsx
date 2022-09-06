@@ -35,12 +35,12 @@ const Header = () => {
       transition="border-color 0.2s, background-color 0.2s"
     >
       <Flex
-        maxWidth="5xl"
+        maxWidth="4xl"
         margin="0 auto"
         alignItems="center"
         justifyContent="space-between"
         height="65px"
-        px="6"
+        px={['6', '6', '6', '0']}
       >
         {/* hedaer-left */}
         <HeaderBugs />
