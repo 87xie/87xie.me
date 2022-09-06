@@ -19,10 +19,14 @@ export const Heading = (props) => (
 );
 
 export const Previews = ({ posts }) => (
-  <Grid gap="6">
+  <Grid gap={['6', '6', '7']}>
     {posts.map(({ frontmatter }) => (
       <Box as="article" key={frontmatter.slug}>
-        <PostMetadata.Heading as="h2" fontSize="2xl" display="flex">
+        <PostMetadata.Heading
+          as="h2"
+          fontSize="1.375rem"
+          display="flex"
+        >
           <ChakraLink
             as={GatsbyLink}
             to={`/post/${frontmatter.slug}`}
