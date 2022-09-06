@@ -35,7 +35,7 @@ const PostTemplate = ({ data, children }) => {
             borderColor="inherit"
             paddingBottom="2"
           >
-            <PostMetadata.Heading as="h1" fontSize="3xl">
+            <PostMetadata.Heading>
               {mdx.frontmatter.title}
             </PostMetadata.Heading>
             <PostMetadata.Date mb="1.5">
