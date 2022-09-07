@@ -19,13 +19,24 @@ export const Heading = (props) => (
 );
 
 export const Previews = ({ posts }) => (
-  <Grid gap={['6', '6', '7']}>
+  <Grid gap={['4']}>
     {posts.map(({ frontmatter }) => (
-      <Box as="article" key={frontmatter.slug}>
+      <Box
+        as="article"
+        key={frontmatter.slug}
+        paddingBottom="4"
+        borderBottom="1px"
+        borderColor="inherit"
+      >
+        <PostMetadata.Date>
+          {frontmatter.date}
+        </PostMetadata.Date>
+
         <PostMetadata.Heading
           as="h2"
           fontSize="1.375rem"
           display="flex"
+          mb="2"
         >
           <ChakraLink
             as={GatsbyLink}
@@ -35,10 +46,6 @@ export const Previews = ({ posts }) => (
             {frontmatter.title}
           </ChakraLink>
         </PostMetadata.Heading>
-
-        <PostMetadata.Date mb="1.5">
-          {frontmatter.date}
-        </PostMetadata.Date>
 
         <PostMetadata.TagGroup>
           {frontmatter.tags.map((tag, index) => (
