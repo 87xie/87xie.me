@@ -5,7 +5,6 @@ import {
 import {
   Box,
   Text,
-  Heading,
   Link as ChakraLink,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -41,8 +40,8 @@ const items = [
   {
     imgProps: {
       src: '/images/netlify.svg',
-      width: 40,
-      height: 40,
+      width: 32,
+      height: 32,
     },
     href: 'https://www.netlify.com/',
     ariaLabel: 'Go to netlify.com',
@@ -50,8 +49,8 @@ const items = [
   {
     imgProps: {
       src: '/images/gatsby.svg',
-      width: 40,
-      height: 40,
+      width: 32,
+      height: 32,
     },
     href: 'https://github.com/gatsbyjs/gatsby',
     ariaLabel: 'Go to Gatsby GitHub page',
@@ -59,8 +58,8 @@ const items = [
   {
     imgProps: {
       src: '/images/chakra-ui.svg',
-      width: 40,
-      height: 40,
+      width: 32,
+      height: 32,
     },
     href: 'https://github.com/chakra-ui/chakra-ui',
     ariaLabel: 'Go to Chakra UI GitHub page',
@@ -68,8 +67,8 @@ const items = [
   {
     imgProps: {
       src: '/images/mermaid.png',
-      width: 40,
-      height: 40,
+      width: 32,
+      height: 32,
     },
     href: 'https://github.com/mermaid-js/mermaid',
     ariaLabel: 'Go to mermaid GitHub page',
@@ -77,8 +76,8 @@ const items = [
   {
     imgProps: {
       src: '/images/mdx.svg',
-      width: 96.6,
-      height: 40,
+      width: 77.28,
+      height: 32,
     },
     href: 'https://github.com/mdx-js/mdx',
     ariaLabel: 'Go to mdx-js GitHub page',
@@ -87,23 +86,23 @@ const items = [
 
 const BuiltWith = () => (
   <Box>
-    <Heading
-      as="h2"
-      fontSize="2xl"
-      marginBottom="3"
+    <Text
+      marginBottom="2"
+      fontSize="xl"
+      fontWeight="bold"
       color={useColorModeValue('gray.600', 'gray.200')}
     >
       Built With
-    </Heading>
+    </Text>
     <Box
       display="flex"
       flexWrap="wrap"
-      marginBottom="-1em"
+      marginBottom="-0.875rem"
     >
       {items.map(({ href, imgProps, ariaLabel }) => (
         <ChakraLink
           d="inline-block"
-          margin="0 1em 1em 0"
+          margin="0 0.875rem 0.875rem 0"
           isExternal
           key={href}
           href={href}
@@ -131,7 +130,7 @@ const Index = ({ data }) => {
     >
       <Box flex="auto">
         <SkipNavContent />
-        <PostsSection.Section marginBottom="8">
+        <PostsSection.Section marginBottom="5">
           <PostsSection.Heading>
             Recent Posts
           </PostsSection.Heading>
@@ -158,7 +157,7 @@ const Index = ({ data }) => {
         marginLeft={['0', '0', '0', '12']}
       >
         <Text
-          marginBottom="6"
+          marginBottom="3"
           lineHeight="1.2"
         >
           {description}

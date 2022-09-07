@@ -30,6 +30,7 @@ const Header = () => {
       zIndex="sticky"
       position="sticky"
       top="0"
+      px="6"
       borderColor="inherit"
       background={isDarkMode ? 'gray.800' : 'white'}
       transition="border-color 0.2s, background-color 0.2s"
@@ -40,7 +41,6 @@ const Header = () => {
         alignItems="center"
         justifyContent="space-between"
         height="65px"
-        px={['6', '6', '6', '0']}
       >
         {/* hedaer-left */}
         <HeaderBugs />

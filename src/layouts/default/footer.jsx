@@ -13,7 +13,7 @@ const Footer = () => (
     >
       &copy;
       {` ${new Date().getFullYear()} `}
-      oscar87xie All Rights Reserved.
+      87xie All Rights Reserved.
     </Text>
   </Box>
 );
