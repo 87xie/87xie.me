@@ -1,4 +1,10 @@
-import React from 'react';
+import * as JsSearch from 'js-search';
+import { navigate } from 'gatsby';
+import {
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
 import {
   Box,
   Flex,
@@ -14,10 +20,46 @@ import {
   FiCornerDownLeft,
 } from 'react-icons/fi';
 import { useCombobox } from 'downshift';
-import usePostsSearch from './use-posts-search';
+import { useDebounce } from 'use-debounce';
 
-const PostsSearchCombobox = () => {
-  const { downshiftProps } = usePostsSearch();
+const useJsSearch = (posts) => {
+  const instanceRef = useRef();
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const jsSearch = new JsSearch.Search('slug');
+    jsSearch.addIndex('title');
+    jsSearch.addIndex('tags');
+    jsSearch.addDocuments(posts);
+    instanceRef.current = jsSearch;
+    setIsReady(true);
+  }, []);
+
+  return {
+    isReady,
+    instanceRef,
+  };
+};
+
+const PostsCombobox = ({ posts }) => {
+  const [value, setValue] = useState('');
+  const { isReady, instanceRef } = useJsSearch(posts);
+  const [debouncedValue] = useDebounce(value, 300);
+  const [searchedItems, setSearchedItems] = useState([]);
+
+  useEffect(() => {
+    const jsSearch = instanceRef.current;
+    if (debouncedValue.length >= 2) {
+      setSearchedItems(jsSearch.search(debouncedValue));
+      return;
+    }
+
+    if (debouncedValue.length < 2) {
+      setSearchedItems([]);
+    }
+  }, [debouncedValue]);
+
+  // downshift
   const {
     isOpen,
     getMenuProps,
@@ -25,7 +67,15 @@ const PostsSearchCombobox = () => {
     getInputProps,
     getComboboxProps,
     highlightedIndex,
-  } = useCombobox(downshiftProps);
+  } = useCombobox({
+    items: searchedItems,
+    onSelectedItemChange: ({ selectedItem: post }) => {
+      if (!post) return;
+      navigate(`/post/${post.slug}`);
+    },
+    onInputValueChange: ({ inputValue }) => setValue(inputValue),
+    itemToString: (item) => item?.title || '',
+  });
 
   const listBackground = useColorModeValue('gray.100', 'gray.600');
   const itemActiveBackground = useColorModeValue('pink.300', 'red.200');
@@ -33,17 +83,22 @@ const PostsSearchCombobox = () => {
 
   return (
     <Box {...getComboboxProps()}>
-      <Input {...getInputProps({ autoFocus: true })} />
+      <Input
+        {...getInputProps({
+          autoFocus: true,
+          disabled: !isReady,
+        })}
+      />
       <List
         {...getMenuProps()}
+        shadow="lg"
         maxHeight="384px"
         overflow="scroll"
         borderRadius="4"
         paddingRight="1"
         background={listBackground}
-        shadow="lg"
       >
-        {isOpen && downshiftProps.items.map((item, index) => (
+        {isOpen && searchedItems.map((item, index) => (
           <ListItem
             {...getItemProps({ item, index })}
             key={item.slug}
@@ -74,4 +129,4 @@ const PostsSearchCombobox = () => {
   );
 };
 
-export default PostsSearchCombobox;
+export default PostsCombobox;
