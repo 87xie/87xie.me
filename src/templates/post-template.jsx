@@ -4,7 +4,7 @@ import { Box } from '@chakra-ui/react';
 import { SkipNavContent } from '@components/skip-nav';
 import SEO from '@components/seo';
 import HistoryBack from '@components/history-back';
-import MdxRoot from '@features/posts/mdx/mdx-root';
+import MdxLayout from '@features/posts/mdx/mdx-layout';
 import * as PostMetadata from '@features/posts/post-metadata';
 
 export const query = graphql`
@@ -42,9 +42,9 @@ const PostTemplate = ({ data, children }) => {
               {mdx.frontmatter.date}
             </PostMetadata.Date>
           </Box>
-          <MdxRoot>
+          <MdxLayout>
             {children}
-          </MdxRoot>
+          </MdxLayout>
         </Box>
       </Box>
     </>
