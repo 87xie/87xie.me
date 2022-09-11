@@ -4,13 +4,20 @@ import Mermaid from './code-block-mermaid';
 const CodeBlock = ({ children }) => {
   const languageClassName = (children.props.className || '').toLowerCase();
   const language = languageClassName.replace(/language-/, '');
-  const code = children.props.children.trim();
+  const code = children.props?.children?.trim();
+
+  if (!code) return null;
 
   switch (language) {
     case 'mermaid':
       return <Mermaid code={code} />;
     default:
-      return <Prism code={code} language={language} />;
+      return (
+        <Prism
+          code={code}
+          language={language}
+        />
+      );
   }
 };
 

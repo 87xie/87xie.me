@@ -10,7 +10,7 @@ const InlineCode = ({ children }) => {
   return (
     <Box
       as="code"
-      padding="1"
+      padding="0.125rem 0.25rem"
       borderRadius="sm"
       backgroundColor={backgroundColor}
       color={color}
