@@ -42,10 +42,11 @@ const useJsSearch = (posts) => {
 };
 
 const PostsCombobox = ({ posts }) => {
+  const inputRef = useRef();
   const [value, setValue] = useState('');
-  const { isReady, instanceRef } = useJsSearch(posts);
   const [debouncedValue] = useDebounce(value, 300);
   const [searchedItems, setSearchedItems] = useState([]);
+  const { isReady, instanceRef } = useJsSearch(posts);
 
   useEffect(() => {
     const jsSearch = instanceRef.current;
@@ -58,6 +59,12 @@ const PostsCombobox = ({ posts }) => {
       setSearchedItems([]);
     }
   }, [debouncedValue]);
+
+  // focus the input when js-search ready
+  useEffect(() => {
+    if (!isReady) return;
+    inputRef.current.focus();
+  }, [isReady]);
 
   // downshift
   const {
@@ -85,7 +92,7 @@ const PostsCombobox = ({ posts }) => {
     <Box {...getComboboxProps()}>
       <Input
         {...getInputProps({
-          autoFocus: true,
+          ref: inputRef,
           disabled: !isReady,
         })}
       />
