@@ -68,7 +68,7 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
   for (let i = 1; i <= totalPages; i += 1) {
     actions.createPage({
       path: i === 1 ? '/posts' : `/posts/${i}`,
-      component: path.resolve('./src/templates/post-pagination-template.jsx'),
+      component: path.resolve('./src/templates/posts-pagination-template.jsx'),
       context: {
         limit: perPage,
         skip: (i - 1) * perPage,

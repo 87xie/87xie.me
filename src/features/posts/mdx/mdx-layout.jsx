@@ -55,16 +55,17 @@ const mdxCss = css`
   }
 `;
 
-const MdxRoot = ({ children }) => {
+const components = {
+  table: Table,
+  pre: CodeBlock,
+  a: ExternalLink,
+  code: InlineCode,
+  blockquote: Blockquote,
+  h2: HeadingWithHashLink,
+};
+
+const MdxLayout = ({ children }) => {
   const { colorMode } = useColorMode();
-  const components = {
-    table: Table,
-    pre: CodeBlock,
-    a: ExternalLink,
-    code: InlineCode,
-    blockquote: Blockquote,
-    h2: HeadingWithHashLink,
-  };
 
   return (
     <Box
@@ -78,4 +79,4 @@ const MdxRoot = ({ children }) => {
   );
 };
 
-export default MdxRoot;
+export default MdxLayout;
