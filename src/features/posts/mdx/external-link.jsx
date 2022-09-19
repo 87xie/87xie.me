@@ -11,6 +11,7 @@ const ExternalLink = ({ href, children }) => {
   return (
     <Link
       display="inline-flex"
+      paddingX="1"
       alignItems="center"
       isExternal
       href={href}
