@@ -38,6 +38,7 @@ module.exports = {
     'airbnb',
     'eslint:recommended', // use recommended configs
     'plugin:react/recommended',
+    'plugin:mdx/recommended',
   ],
   rules: {
     'react/jsx-filename-extension': [0],
