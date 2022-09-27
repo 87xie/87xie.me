@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, useColorModeValue } from '@chakra-ui/react';
+import {
+  useRef,
+  useEffect,
+} from 'react';
+import {
+  Box,
+  useColorModeValue,
+} from '@chakra-ui/react';
 import mermaid from 'mermaid';
-
-// https://raymondjulin.com/blog/drawing-diagrams-in-sanity-with-mermaid-js
 
 function getUuid(size = 4) {
   let uuid = '';
@@ -15,33 +19,28 @@ function getUuid(size = 4) {
 }
 
 const Mermaid = ({ code }) => {
-  const isSSR = typeof window === 'undefined';
   const theme = useColorModeValue('default', 'dark');
   const id = `mermaid-${getUuid()}`;
   const graphContainerElementRef = useRef();
   const graphElementRef = useRef();
-  const [opacity, setOpacity] = useState(0);
 
   useEffect(() => {
     mermaid.initialize({
       theme,
-      startOnLoad: false,
+      startOnLoad: true,
     });
 
     mermaid.render(id, code, (graphSvg) => {
       graphContainerElementRef.current.innerHTML = graphSvg;
-      setOpacity(1);
     }, graphElementRef.current);
-  }, [theme]);
+  }, [theme, code]);
 
-  return isSSR ? null : (
+  return (
     <>
       <div ref={graphElementRef} />
       <Box
-        key="mermaid-container"
+        marginY="7"
         ref={graphContainerElementRef}
-        opacity={opacity}
-        transition="opacity .3s"
       />
     </>
   );
