@@ -10,6 +10,6 @@ revert: ['revert/*']
 remove: ['remove/*']
 skip-changelog: [
   'test/*',
-  'doc/*',
+  'docs/*',
   'post/*'
 ]
