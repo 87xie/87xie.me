@@ -60,19 +60,32 @@ export async function createPostPage({
 
   // list
   const perPage = 7;
-  const listTemplate = path.resolve('./src/templates/posts-list-template.tsx');
   const totalPages = Math.ceil(posts.length / perPage);
+  const listTemplate = path.resolve('./src/templates/posts-list-template.tsx');
+
+  actions.createPage({
+    path: '/posts',
+    component: listTemplate,
+    context: {
+      totalPages,
+      skip: 0,
+      limit: perPage,
+      currentPage: 1,
+      items: posts.slice(0, perPage),
+    },
+  });
 
   for (let i = 1; i <= totalPages; i += 1) {
+    const skip = (i - 1) * perPage;
     actions.createPage({
-      path: i === 1 ? '/posts' : `/posts/${i}`,
+      path: `/posts/${i}`,
       component: listTemplate,
       context: {
-        items: posts.slice(i, i + perPage),
-        limit: perPage,
-        skip: (i - 1) * perPage,
+        skip,
         totalPages,
+        limit: perPage,
         currentPage: i,
+        items: posts.slice(skip, skip + perPage),
       },
     });
   }
