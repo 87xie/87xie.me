@@ -8,10 +8,10 @@ tags:
   - javascript
 ---
 
-- node 為 linked list 中的節點，每個 node 會紀錄對應的資料及指向下一個 node 的指標。下方程式碼中分別以 `data`、`next` 屬性表示
-- linked list 紀錄起始的 node，藉此透過 node 的指標，將記憶體中不連續的空間給串連起來
-  - 在 linked list 中當 node 下一個指標為 `null` 時，該 node 即為 tail node
-  - 新增 / 刪除起始節點的時間複雜度為 `O(1)`
+- node 為 linked list 中的節點，每個 node 會紀錄對應的資料，以及指向下一個 node 的指標
+- linked list 紀錄起始的 node，透過 node 的指標，將記憶體中不連續的空間給串連起來
+  - 在 linked list 中，當 node 下一個指標為 `null` 時，該 node 即為 tail node
+  - 新增(刪除)起始節點時間複雜度為： `O(1)`
   - index 相關操作，例如搜尋特定位置對應的 node ，或是在最後一個節點新增 node，時間複雜度為 `O(n)`
   - 實作指定 index 的插入 / 刪除，記得要考慮
     - index 對應的 node 是否為 head node / tail node
@@ -100,7 +100,7 @@ function circular(list) {
   while (fast.next && fast.next.next) {
     slow = slow.next;
     fast = fast.next.next;
-    
+
     if (slow === fast) {
       result = true;
       break;
@@ -150,11 +150,47 @@ function fromLast(list, n) {
 
 ## Reverse a Linked List
 
-1. node size `<= 1` 則不需要反轉
-1. `temporary = current` 用來暫存當前的 node
-1. `current = current.next`，將下一個指標存放至 `current`， 當 `current = null` 則滿足停止 while 迴圈的條件
-1. `temporary.next = previous` 改變當前 node 的指標，`previous` 初始值為 `null` 即為把 head node 反轉為 tail node
-1. `previous = tempoaray` 當前 node 存放至 `previous` 提供下一次迴圈引用
+這邊透過三個變數交換的方式，來改變 `node.next` 指向
+
+- current: 目前的節點
+- previous: 前一個節點
+- temporary: 實作交換用的暫存節點
+
+大致流程如下
+
+```
+null--->1--->2--->3--->4--->5--->null
+|       |
+|       current
+previous
+
+// temporary = current
+// current = current.next
+
+null--->1--->2--->3--->4--->5--->null
+|       |    |
+|       |    current
+|       temporary
+previous
+
+// temporary.next = previous
+
+null<---1--->2--->3--->4--->5--->null
+|       |    |
+|       |    current    
+|       temporary       
+previous 
+
+// previous = temporary
+
+null<---1--->2--->3--->4--->5--->null
+        |    |
+        |    current
+        temporary
+        previous
+```
+
+程式碼實作如下
 
 ```js
 function reverseList(head) {
@@ -180,18 +216,3 @@ function reverseList(head) {
 ## Reference
 
 [The Coding Interview Bootcamp: Algorithms + Data Structures](https://www.udemy.com/course/coding-interview-bootcamp-algorithms-and-data-structure/)
-
-```js
-class LinkedList {
-  constructor(head) {
-    this.head = head;
-  }
-
-  append(value) {
-    const newNode = {
-      value,
-      next: null,
-    };
-  }
-}
-```
