@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["dom", "esnext"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": ["./src/components/*"],
+      "@features/*": ["./src/features/*"],
+      "@layouts/*": ["./src/layouts/*"]
+    }
+  },
+  "include": [
+    "./config/*",
+    "./src/**/*",
+    "./gatsby-browser.tsx",
+    "./gatsby-ssr.tsx",
+    "./gatsby-node.ts",
+    "./gatsby-config.ts",
+    "jest-setup.js",
+    "jest-preprocess.js",
+    "jest.config.js"
+  ]
+}
