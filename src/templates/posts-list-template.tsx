@@ -25,8 +25,8 @@ const PostsListTemplate = ({
 
   const isFirst = currentPage === 1;
   const isLast = currentPage === totalPages;
-  const prevPage = currentPage - 1;
-  const nextPage = currentPage + 1;
+  const prevPage = isFirst ? 1 : currentPage - 1;
+  const nextPage = isLast ? totalPages : currentPage + 1;
 
   return (
     <>
@@ -48,7 +48,8 @@ const PostsListTemplate = ({
             size="sm"
             to={`/posts/${prevPage}`}
             leftIcon={<FiArrowLeft />}
-            colorScheme={isFirst ? 'gray' : 'red'}
+            colorScheme="red"
+            opacity={isFirst ? '0.3' : '1'}
             pointerEvents={isFirst ? 'none' : 'auto'}
             mr="7"
           >
@@ -57,11 +58,12 @@ const PostsListTemplate = ({
 
           <Button
             as={Link}
+            opacity={isLast ? '0.3' : '1'}
             pointerEvents={isLast ? 'none' : 'auto'}
             size="sm"
             to={`/posts/${nextPage}`}
             rightIcon={<FiArrowRight />}
-            colorScheme={isLast ? 'gray' : 'red'}
+            colorScheme="red"
           >
             Next
           </Button>

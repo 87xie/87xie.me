@@ -1,9 +1,9 @@
-import { ReactNode } from 'react';
 import {
   Box,
   Grid,
   Link as ChakraLink,
   Heading as ChakraHeading,
+  BoxProps,
   HeadingProps,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -69,8 +69,6 @@ export const Previews = ({ posts }: PreviewProps) => (
   </Grid>
 );
 
-export const Section = ({ children }: { children: ReactNode }) => (
-  <Box as="section">
-    {children}
-  </Box>
+export const Section = (props: BoxProps) => (
+  <Box as="section" {...props} />
 );
