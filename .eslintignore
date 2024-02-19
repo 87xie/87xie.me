@@ -1,6 +1,6 @@
+.husky
+.vscode
 node_modules
-build
-coverage
 public
-static
-.cache
+dist
+.yarn
