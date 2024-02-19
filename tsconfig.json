@@ -1,33 +1,17 @@
 {
+  "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
-    "target": "esnext",
-    "lib": ["dom", "esnext"],
+    "baseUrl": "src",
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "strict": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "baseUrl": "./",
     "paths": {
-      "@components/*": ["./src/components/*"],
-      "@features/*": ["./src/features/*"],
-      "@layouts/*": ["./src/layouts/*"]
+      "@assets/*": ["assets/*"],
+      "@config": ["config.ts"],
+      "@components/*": ["components/*"],
+      "@content/*": ["content/*"],
+      "@layouts/*": ["layouts/*"],
+      "@pages/*": ["pages/*"],
+      "@styles/*": ["styles/*"],
+      "@utils/*": ["utils/*"]
     }
-  },
-  "include": [
-    "./config/*",
-    "./src/**/*",
-    "./gatsby-browser.tsx",
-    "./gatsby-ssr.tsx",
-    "./gatsby-node.ts",
-    "./gatsby-config.ts",
-    "jest-setup.js",
-    "jest-preprocess.js",
-    "jest.config.js"
-  ]
+  }
 }
