@@ -99,6 +99,18 @@
   blockquote {
     word-wrap: break-word;
   }
+  code[data-line-numbers] {
+    counter-reset: line;
+  }
+  code[data-line-numbers] > [data-line]::before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 1rem;
+    margin-right: 2rem;
+    text-align: right;
+    color: rgba(107, 114, 128, var(--tw-text-opacity));
+  }
 
   pre > code {
     white-space: pre;
