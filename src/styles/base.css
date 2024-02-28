@@ -49,8 +49,8 @@
     sm:scale-110;
   }
   .prose {
-    @apply prose-headings:!mb-3 prose-headings:!text-skin-base 
-    prose-h3:italic prose-p:!text-skin-base 
+    @apply prose-headings:!mb-3 prose-headings:!text-skin-base
+    prose-p:!text-skin-base 
     prose-a:!text-skin-base prose-a:!decoration-dashed prose-a:underline-offset-8
     hover:prose-a:text-skin-accent prose-blockquote:!border-l-skin-accent
     prose-blockquote:border-opacity-50 prose-blockquote:opacity-80
