@@ -1,5 +1,5 @@
+import { LOCALE } from "@config";
 import { slugifyStr } from "@utils/slugify";
-import Datetime from "./Datetime";
 import type { CollectionEntry } from "astro:content";
 
 export interface Props {
@@ -9,27 +9,29 @@ export interface Props {
 }
 
 export default function Card({ href, frontmatter, secHeading = true }: Props) {
-  const { title, pubDatetime, modDatetime, description } = frontmatter;
+  const { title, pubDatetime } = frontmatter;
 
   const headerProps = {
     style: { viewTransitionName: slugifyStr(title) },
-    className: "text-lg font-medium decoration-dashed hover:underline",
+    className: "text-md",
   };
 
   return (
-    <li className="my-6">
-      <a
-        href={href}
-        className="inline-block text-lg font-medium text-skin-accent decoration-dashed underline-offset-4 focus-visible:no-underline focus-visible:underline-offset-0"
-      >
+    <li className="mt-4">
+      <a href={href} className="block pb-3 text-lg hover:text-skin-accent">
+        <time className="text-sm" dateTime={pubDatetime.toISOString()}>
+          {pubDatetime.toLocaleDateString(LOCALE.langTag, {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+          })}
+        </time>
         {secHeading ? (
           <h2 {...headerProps}>{title}</h2>
         ) : (
           <h3 {...headerProps}>{title}</h3>
         )}
       </a>
-      <Datetime pubDatetime={pubDatetime} modDatetime={modDatetime} />
-      <p>{description}</p>
     </li>
   );
 }
