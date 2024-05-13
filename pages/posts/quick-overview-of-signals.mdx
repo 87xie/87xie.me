@@ -1,0 +1,65 @@
+---
+title: Quick Overview of Signals
+tag: javascript, signals, reactivity
+date: 2024-04-15
+---
+
+import { Tabs } from 'nextra/components'
+
+fine-grained reactivity 的一種實作
+
+簡單分成三個部分，分別為：
+
+- observable state：可觀察的值
+- derivations：根據 observable state 推導出來的結果
+- effects：observable state 發生變化，對應 `derivations` 推導完成後，需要執行的 side effects
+
+![simple model of fine-grained reactivity](/simple-model-of-fine-grained-reactivity.png)
+
+## Fine-grained Reactivity
+
+> a = b + c
+>
+> 只要 `b` 或 `c` 發生變化，`a` 的值就會更新
+
+常見由 `getter`, `setter`, `value` 組成
+
+- 透過 `getter` 讀取 `value` 時收集依賴
+- 透過 `setter` 更新 `value` 時通知依賴
+
+從 solid 及 vue 的 api 來看，可以看出一點端倪
+
+<Tabs items={['solid', 'vue']}>
+  <Tabs.Tab>
+    ```js
+    const [count, setCount] = createSignal(0);
+    // read a value
+    console.log(count()); // 0
+    // set a value
+    setCount(5);
+    ```
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```js
+    const count = ref(0);
+    // read a value
+    console.log(count.value); // 0
+    // set a value
+    count.value = 5;
+    ```
+  </Tabs.Tab>
+</Tabs>
+
+常見的 fine-grained reactivity 實作，還會有以下幾點特性：
+
+- 處理 `derivations`, `side effects`，有自動追蹤依賴的特性
+- 如果依賴沒有發生變化，則不需要重新計算 (memoization)
+- 記錄依賴的節點關係，確保一致性、避免無謂的計算或過早反應 (glitch-free)，例如：多個依賴推導出來的值，需要等到全部依賴更新完成後，再做重新計算，如下圖所示
+
+![fine-grained-reactivity-unnecessary-calculation](/fine-grained-reactivity-unnecessary-calculation.png)
+
+## Reference
+
+- [A Hands-on Introduction to Fine-Grained Reactivity](https://dev.to/ryansolid/a-hands-on-introduction-to-fine-grained-reactivity-3ndf)
+- [Building a Reactive Library from Scratch](https://dev.to/ryansolid/building-a-reactive-library-from-scratch-1i0p)
+- [JavaScript Signals standard proposal](https://github.com/tc39/proposal-signals)
