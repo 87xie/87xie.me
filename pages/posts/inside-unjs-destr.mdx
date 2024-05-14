@@ -77,11 +77,11 @@ function destr<T = unknown>(value: any, options: Options = {}): T {
 
 ## Prototype pollution prevention
 
-檢查的流程大致如下：
+檢查流程大致如下：
 
-1. 透過正規表達式檢查是否存在 `"__proto__":` 或 `"constructor":` 的字串 (包含可能導致 prototype polltion 的 unicode 組合)
-1. 如果存在 `"__proto__": 或 "constructor":` 的字串，調用 `JSON.parse(value, jsonParseTransform)`（透過 `JSON.parse` optional reviver function 清除不合法的 property）
-1. 反之調用 `JSON.parse(value)`（可以節省 reviver 檢查 property 的開銷）
+1. 透過正規表達式檢查 `"__proto__":` 或 `"constructor":` 字串是否存在 (包含可能的 unicode 組合)
+1. 如果存在，回傳 `JSON.parse(value, jsonParseTransform){:js}` 的結果，透過 reviver function 來清除不合法的 property
+1. 反之回傳 `JSON.parse(value){:js}`，節省 reviver 檢查 property 的開銷
 
 ```ts
 const suspectProtoRx =
@@ -131,11 +131,10 @@ export function destr<T = unknown>(value: any, options: Options = {}): T {
 ```ts
 const suspectProtoRx =
   /"(?:_|\\u0{2}5[Ff]){2}(?:p|\\u0{2}70)(?:r|\\u0{2}72)(?:o|\\u0{2}6[Ff])(?:t|\\u0{2}74)(?:o|\\u0{2}6[Ff])(?:_|\\u0{2}5[Ff]){2}"\s*:/;
-const suspectConstructorRx =
 ```
 
 - `(?:)` 為 non-capturing group，相關解釋可以參考 [What is a non-capturing group in regular expressions?](https://stackoverflow.com/questions/3512471/what-is-a-non-capturing-group-in-regular-expressions)
-- 以 `suspectProtoRx` 第一組 non-capturing group `(?:_|\\u0{2}5[Ff])` 來說，`\\u0{2}5[Ff]` 是要比對 `_` 在 unicode 中的代碼 (`\u005F`)
+- 以 `suspectProtoRx` 第一組 non-capturing group｀ 為例：`(?:_|\\u0{2}5[Ff])` 其中 `\\u0{2}5[Ff]` 是要比對 `_` 在 unicode 中的代碼 (`\u005F`)
 - 最後面的 `"\s*:` 表示在 json key field 結尾的 `"` 與 `:` 之間，可以接受任意個空白字元，例如：`"__proto__" :`
 
 ### JSON.Parse() reviver
