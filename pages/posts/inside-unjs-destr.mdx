@@ -4,13 +4,15 @@ tag: javascript, unjs, jsonparse, security, prototype pollution
 date: 2024-05-14
 ---
 
-[destr](https://github.com/unjs/destr) 是 [unjs](https://github.com/unjs) 團隊發佈的套件，為 `JSON.parse` alternative，其本質還是基於 `JSON.parse`，在此基礎上加入開發友善的功能，像是：
+這裡紀錄的實作細節，參考版本為 `v2.0.3`，相關 source code 是基於此 [commit](https://github.com/unjs/destr/tree/6a75e3318e7cd743f9f5a3b96721dce48f42e7ba)
+
+[destr](https://github.com/unjs/destr) 是 [UnJS](https://github.com/unjs) 團隊發佈的套件，為 `JSON.parse` alternative，其本質還是基於 `JSON.parse` 之上，新增開發友善的功能，像是：
 
 - fallback to original value if parsing fails
 - supporting known string values (case insensitive)
 - prototype pollution prevention
 
-下方程式碼簡單展示 `destr` 與 `JSON.parse` 使用上的差異
+下方簡單展示 `destr` 與 `JSON.parse` 使用上的差異
 
 ```ts
 // fallback to original value if parsing fails
@@ -27,16 +29,13 @@ JSON.parse(input); // { user: { __proto__: { isAdmin: true } } }
 destr(input);      // { user: {} }
 ```
 
-這裡紀錄的實作細節，參考版本為 `v2.0.3`，source code 是基於此 [commit](https://github.com/unjs/destr/tree/6a75e3318e7cd743f9f5a3b96721dce48f42e7ba)
-
 ## Supporting known string values
 
 目前支援的字串格式有：`true`, `false`, `undefined`, `null`, `nan`, `infinity`, `-infinity`
 
-參考下方程式碼，第 8 行 `_value.length <= 9{:js}` 的判斷是基於效能考量，在上述字串中，最大長度是 `'-infinity'.length{:js}` 即為 `9`，透過此判斷可以避免對 long string 調用不必要的 `toLowerCase()`，相關討論可以參考：
+參考下方程式碼，第 8 行 `_value.length <= 9{:js}` 的判斷是基於效能考量，在上述字串中，最大長度是 `'-infinity'.length{:js}` 即為 `9`，透過此判斷可以避免對 long string 調用不必要的 `toLowerCase()`
 
-- [issue#80](https://github.com/unjs/destr/issues/80)
-- [pull#81](https://github.com/unjs/destr/pull/81)
+相關討論可以參考：[issue#80](https://github.com/unjs/destr/issues/80), [pull#81](https://github.com/unjs/destr/pull/81)
 
 ```ts showLineNumbers
 function destr<T = unknown>(value: any, options: Options = {}): T {
