@@ -1,0 +1,111 @@
+---
+title: Iterative sorting algorithms
+tag: algorithm, sorting
+date: 2021-07-16
+---
+
+- bubble sort
+- insertion sort
+- selection sort
+
+## Bubble sort
+
+將陣列中相鄰元素兩兩做比較，若第一個元素大於第二個元素，調換兩者順序，直到比較完最後兩個元素後，可以確保最大元素被放在陣列的尾端，已經排序完的尾端元素我們可以不列入後續的比較。下方範例程式碼中的 `counter` 變數，用來累積可以略過的尾端元素數量。
+
+- 最佳情況的時間複雜度 `O(n)` (input 為一個已排序過的陣列)
+- 最差情況的時間複雜度 `O(n²)`
+
+```js
+function bubbleSort(nums) {
+  let counter = 0;
+  let swapped = false;
+
+  do {
+    swapped = false;
+    counter += 1;
+
+    for (let i = 0; i < nums.length - counter; i++) {
+      if (nums[i] > nums[i + 1]) {
+        const lesser = nums[i + 1];
+        nums[i + 1] = nums[i];
+        nums[i] = lesser;
+        swapped = true;
+      }
+    }
+  } while(swapped);
+
+  return nums;
+}
+
+bubbleSort([3, 7, 5, 1]);
+```
+
+## Insertion sort
+
+對於未排序資料，在已排序序列中從後向前掃描，找到相應位置並插入。插入排序在實現上，通常採用 in-place 排序（即只需用到 `O(1)` 的額外空間的排序），因而在從後向前掃描過程中，需要反覆把已排序元素逐步向後挪位，為最新元素提供插入空間 (取自維基百科)
+
+`numberToInsert` 暫存未排序過的數字，由後向前與已排序數字做比較，若已排序的值大於未排序的值，則將已排序的值往右移
+
+- 最佳情況的時間複雜度 `O(n)`
+- 最差情況的時間複雜度 `O(n²)`
+
+```js
+function insertionSort(nums) {
+  for (let i = 1; i < nums.length; i++) {
+    const numberToInsert = nums[i];
+    let j = i - 1;
+    
+    while (j >= 0 && numberToInsert < nums[j]) {
+      nums[j + 1] = nums[j];
+      j--;
+    }
+    
+    nums[j + 1] = numberToInsert;
+  }
+  
+  return nums;
+}
+
+insertionSort([3, 7, 5, 1]);
+```
+
+## Selection sort
+
+在未排序序列中找到最小元素，存放到排序序列的起始位置，然後，再從剩餘未排序元素中繼續尋找最小元素，然後放到已排序序列的末尾。以此類推，直到所有元素均排序完畢 (取自維基百科)
+
+實作的範例程式碼如下，`indexOfMin` 用來存放已排序序列的末尾位置，預設為外層迴圈當前的輪次。在未排序序列中找出最小元素，比較該位置與已排序序列末尾位置，若不相同則將兩者進行替換
+
+- 最佳情況的時間複雜度	`О(n²)`
+- 最差情況的時間複雜度 `O(n²)`
+
+```js
+function selectionSort(nums) {
+  for (let i = 0; i < nums.length - 1; i++) {
+    let indexOfMin = i;
+
+    for(let j = i + 1; j < nums.length; j++) {
+      if (nums[j] < nums[indexOfMin]) {
+        indexOfMin = j;
+      }
+    }
+
+    if (i !== indexOfMin) {
+      const lesser = nums[indexOfMin];
+      nums[indexOfMin] = nums[i];
+      nums[i] = lesser;
+    }
+  }
+  
+  return nums;
+}
+
+selectionSort([3, 7, 5, 1]);
+```
+
+## Reference
+
+- [Complete Intro to Computer Science - Bubble Sort](https://btholt.github.io/complete-intro-to-computer-science/bubble-sort)
+- [Complete Intro to Computer Science - Insertion Sort](https://btholt.github.io/complete-intro-to-computer-science/insertion-sort)
+- [維基百科 - 插入排序](https://zh.wikipedia.org/wiki/%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F)
+- [維基百科 - 選擇排序](https://zh.wikipedia.org/wiki/%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F)
+- [初學者學演算法｜排序法入門：選擇排序與插入排序法](https://medium.com/appworks-school/%E5%88%9D%E5%AD%B8%E8%80%85%E5%AD%B8%E6%BC%94%E7%AE%97%E6%B3%95-%E6%8E%92%E5%BA%8F%E6%B3%95%E5%85%A5%E9%96%80-%E9%81%B8%E6%93%87%E6%8E%92%E5%BA%8F%E8%88%87%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E6%B3%95-23d4bc7085ff)
