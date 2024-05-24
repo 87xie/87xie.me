@@ -4,23 +4,23 @@ tag: unjs, ofetch, ufo
 date: 2024-05-23
 ---
 
-紀錄 [ofetch](https://github.com/unjs/ofetch) 如何處理 `baseURL`
-
-URL 相關功能，在 ofetch 實作會調用 [ufo](https://github.com/unjs/ufo) utilities，這裡參考版本：
+參考版本：
 
 - ofetch [`v1.3.4`](https://github.com/unjs/ofetch/tree/5cc16a0d79e003c0418317987ca087032694b14f)
 - ufo [`v1.5.3`](https://github.com/unjs/ufo/tree/27573123da6c36b9837fbc9cb021c3f1e4b1a340)
+
+紀錄 [ofetch](https://github.com/unjs/ofetch) 如何處理 `options.baseURL`
 
 ```ts
 ofetch('/movie', {
   baseURL: 'https://api.example.com',
 });
-// url: https://api.example.com/movie
+// url: "https://api.example.com/movie"
 ```
 
-參考 ofetch 實作，是調用 `withBase(context.request, context.options.baseURL){:js}` 處理 `baseURL`
+對照 ofetch 實作，如果 `context.options.baseURL` 為 truthy，調用 `withBase(context.request, context.options.baseURL){:js}`
 
-```ts showLineNumbers, {15-19}
+```ts showLineNumbers, {16-18}
 import { withBase } from "ufo";
 
 // skip
@@ -39,18 +39,21 @@ const $fetchRaw: $Fetch["raw"] = async function $fetchRaw(
     if (context.options.baseURL) {
       context.request = withBase(context.request, context.options.baseURL);
     }
+    if (context.options.query) {
+      context.request = withQuery(context.request, context.options.query);
+    }
   }
   // skip
 }
 ```
 
-繼續看到 `withBase(input, base){:js}`，其大致流程為：
+繼續看到 `withBase(input, base){:js}`
 
-1. `base` 為空或 `"/"`，回傳 `input`
-1. `input` 包含 protocol format，回傳 `input`
-1. `_base` 變數保存 `baseURL` 清除結尾 `"/"` 的結果
-1. `input` 開頭包含 `_base`，回傳 `input`
-1. 回傳 `joinURL(_base, input){:js}`
+`baseURL` 只需要加在**相對路徑**之前，這裡做了以下驗證：
+
+1. 如果 `base` 為空或 `/`，不額外處理
+1. 如果 `input` 包含 protocol 格式，代表不是相對路徑
+1. 如果 `input` 開頭與 `base` 重複，代表不是相對路徑
 
 ```ts
 function withBase(input: string, base: string) {
@@ -69,14 +72,12 @@ function isEmptyURL(url: string) {
 }
 ```
 
-`withBase` 調用 `hasProtocol(input){:js}` 檢查是否含有 protocol format
-
-`hasProtocol` 有三組正規表達式支援不同的情境，這裡會使用預設的 `PROTOCOL_REGEX`
+`hasProtocol(input){:js}`，有三組正規表達式支援不同的情境，這裡會使用預設
 
 `const PROTOCOL_REGEX = /^[\s\w\0+.-]{2,}:([/\\]{2})?/{:js}`
 
 - `[\s\w\0+.-]{2,}:` literal colon 前至少兩個 `[]` 集合內的任意 character
-- `([/\\]{2})?` 出現兩次 `"/"` 或 `"\"` 為 optional
+- `([/\\]{2})?` 出現兩次 `/` 或 `\` 為 optional
 
 ```ts showLineNumbers, {33-36}
 const PROTOCOL_STRICT_REGEX = /^[\s\w\0+.-]{2,}:([/\\]{1,2})/;
@@ -118,12 +119,12 @@ function hasProtocol(
 }
 ```
 
-`withoutTrailingSlash` 用來清除 `baseURL` 結尾的 `"/"`
+`withoutTrailingSlash` 用來清除 `baseURL` 結尾的 `/`
 
 這裡不考慮包含 query, fragment(hash) 的情境，大致流程為：
 
-1. `input.endsWith("/"){:js}` 判斷是否為 `"/"` 結尾
-1. 如果結尾為 `"/"`，調用 `input.slice(0, -1){:js}` 來清除
+1. `input.endsWith("/"){:js}` 判斷是否為 `/` 結尾
+1. 如果結尾為 `/`，調用 `input.slice(0, -1){:js}` 來清除
 
 ```ts showLineNumbers, {5-7, 29-31}
 function withoutTrailingSlash(
@@ -162,14 +163,13 @@ function hasTrailingSlash(
 }
 ```
 
-`joinURL` 流程大致如下：
+`joinURL` 確保不要有多餘空格或重複 `/`
 
-1. `const segments = input.filter(isNonEmptyURL){:js}` 排除為空字串或 `"/"`
-1. `for (segment of segments){:js}` 依序處理 string concatenation
-1. `const _segment = /^\.?\//.replace(/^\.?\//, ""){:js}` 確保 `_segment` 開頭不包含 `"./"` 或 `"/"`
-1. `withTrailingSlash(url)`，確保 `url` 結尾帶有 `"/"`
+- 過濾空字串或 `/` 的參數
+- `segment.replace(JOIN_LEADING_SLASH_RE, ""){:js}` 確保開頭不包含 `./` 或 `/`
+- `withTrailingSlash(url)`，確保 `url` 結尾帶有 `/`
 
-```ts showLineNumbers, {24-26}
+```ts showLineNumbers
 function joinURL(base: string, ...input: string[]): string {
   let url = base || "";
   const segments = input.filter(isNonEmptyURL);

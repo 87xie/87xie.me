@@ -1,0 +1,257 @@
+---
+title: Inside unjs/ofetch query search params
+tag: unjs, ofetch, ufo, security, prototype pollution
+date: 2024-05-25
+---
+
+參考版本：
+
+- ofetch [`v1.3.4`](https://github.com/unjs/ofetch/tree/5cc16a0d79e003c0418317987ca087032694b14f)
+- ufo [`v1.5.3`](https://github.com/unjs/ufo/tree/27573123da6c36b9837fbc9cb021c3f1e4b1a340)
+
+紀錄 [ofetch](https://github.com/unjs/ofetch) 如何處理 `options.query`
+
+```ts
+ofetch('/movie?lang=en', {
+  query: { id: 123 },
+});
+// url: "/movie?lang=en&id=123"
+```
+
+上方 ofetch usage 對應到實作細節，如果 `context.options.query` 為 truthy，則調用 `withQuery(context.request, context.options.query){:js}`
+
+```ts showLineNumbers, {18-20}
+import { withQuery } from "ufo";
+
+const $fetchRaw: $Fetch["raw"] = async function $fetchRaw(
+  _request,
+  _options = {}
+) {
+  const context: FetchContext = {
+    request: _request,
+    options: mergeFetchOptions(_options, globalOptions.defaults, Headers),
+    response: undefined,
+    error: undefined,
+  };
+  // skip
+  if (typeof context.request === "string") {
+    if (context.options.baseURL) {
+      context.request = withBase(context.request, context.options.baseURL);
+    }
+    if (context.options.query) {
+      context.request = withQuery(context.request, context.options.query);
+    }
+  }
+  // skip
+}
+```
+
+`withQuery`
+
+```ts showLineNumbers
+function withQuery(input: string, query: QueryObject): string {
+  const parsed = parseURL(input);
+  const mergedQuery = { ...parseQuery(parsed.search), ...query };
+  parsed.search = stringifyQuery(mergedQuery);
+  return stringifyParsedURL(parsed);
+}
+```
+
+`parseURL`
+
+這裡對照 URI syntax 比較好理解
+
+```plain
+URI = scheme ":" ["//" authority] path ["?" query] ["#" fragment]
+authority = [userinfo "@"] host [":" port]
+```
+
+- 多數 protocol 後面接著 `//`，像是：`https://`，第 2-16 行負責處理部分例外，像是：`data:image/jpeg;base64,/9j/4AAQSk`
+- 第 18-20 行，如果是相對路徑且沒有 `defaultProto`，只回傳 `parsePath(input){:js}`
+- `/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/{:js}`
+  - `([\w+.-]{2,}:)?` 擷取 protocol（例如：`http:`, `ftp:`）
+  - `([^/@]+@)?` 擷取 userinfo（例如：`user:pass@`）
+  - `(.*)` 剩餘的任意字元，對應到 URI 中的 host, port, path, query, fragment
+- `/([^#/?]*)(.*)?/{:js}`，以 `localhost:3000/foo` 為例，第一個 group 為 `localhost:3000`，第二個 group 為 `/foo`
+
+```ts showLineNumbers
+function parseURL(input = "", defaultProto?: string): ParsedURL {
+  const _specialProtoMatch = input.match(
+    /^[\s\0]*(blob:|data:|javascript:|vbscript:)(.*)/i,
+  );
+  if (_specialProtoMatch) {
+    const [, _proto, _pathname = ""] = _specialProtoMatch;
+    return {
+      protocol: _proto.toLowerCase(),
+      pathname: _pathname,
+      href: _proto + _pathname,
+      auth: "",
+      host: "",
+      search: "",
+      hash: "",
+    };
+  }
+
+  if (!hasProtocol(input, { acceptRelative: true })) {
+    return defaultProto ? parseURL(defaultProto + input) : parsePath(input);
+  }
+
+  const [, protocol = "", auth, hostAndPath = ""] =
+    input
+      .replace(/\\/g, "/")
+      .match(/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/) || [];
+  const [, host = "", path = ""] = hostAndPath.match(/([^#/?]*)(.*)?/) || [];
+  const { pathname, search, hash } = parsePath(
+    path.replace(/\/(?=[A-Za-z]:)/, ""),
+  );
+
+  return {
+    protocol: protocol.toLowerCase(),
+    auth: auth ? auth.slice(0, Math.max(0, auth.length - 1)) : "",
+    host,
+    pathname,
+    search,
+    hash,
+    [protocolRelative]: !protocol,
+  };
+}
+```
+
+`parsePath`
+
+- `/([^#?]*)(\?[^#]*)?(#.*)?/{:js}`，以 `/foo?query=bar#baz` 為例：
+  - `([^#?]*)`：任意非 `#` 或 `?` 的字元序列，這裡擷取到 `/foo`
+  - `(\?[^#]*)?`：零或一組以 `?` 開頭，後面不包含 `#` 的字元序列，這裡擷取到 `?query=bar`
+  - `(#.*)?`：零或一組以 `#` 開頭的任意字元序列，這裡擷取到 `#baz`
+
+```ts
+function parsePath(input = "") {
+  const [pathname = "", search = "", hash = ""] = (
+    input.match(/([^#?]*)(\?[^#]*)?(#.*)?/) || []
+  ).splice(1);
+
+  return {
+    pathname,
+    search,
+    hash,
+  };
+}
+```
+
+`parseQuery`
+
+- `/([^=]+)=?(.*)/{:js}` 以 `test=123` 為例：第一個 group 為 `test`，第二個 group 為 `123`
+- 第 13-16 行避免 prototype pollution，略過 key 為 `__proto__` 或 `constructor` 的 parameter
+
+```ts showLineNumbers
+function parseQuery<T extends ParsedQuery = ParsedQuery>(
+  parametersString = "",
+): T {
+  const object: ParsedQuery = {};
+  if (parametersString[0] === "?") {
+    parametersString = parametersString.slice(1);
+  }
+  for (const parameter of parametersString.split("&")) {
+    const s = parameter.match(/([^=]+)=?(.*)/) || [];
+    if (s.length < 2) {
+      continue;
+    }
+    const key = decodeQueryKey(s[1]);
+    if (key === "__proto__" || key === "constructor") {
+      continue;
+    }
+    const value = decodeQueryValue(s[2] || "");
+    if (object[key] === undefined) {
+      object[key] = value;
+    } else if (Array.isArray(object[key])) {
+      (object[key] as string[]).push(value);
+    } else {
+      object[key] = [object[key] as string, value];
+    }
+  }
+  return object as T;
+}
+
+const PLUS_RE = /\+/g; // %2B
+
+function decodeQueryKey(text: string): string {
+  return decode(text.replace(PLUS_RE, " "));
+}
+
+function decodeQueryValue(text: string): string {
+  return decode(text.replace(PLUS_RE, " "));
+}
+
+/**
+ * Decode text using `decodeURIComponent`. Returns the original text if it
+ * fails.
+ */
+function decode(text: string | number = ""): string {
+  try {
+    return decodeURIComponent("" + text);
+  } catch {
+    return "" + text;
+  }
+}
+```
+
+`stringifyQuery`
+
+- 如果 value 為 boolean，轉換成 `true` 或 `false` 的字串，例如： `?foo=true`
+- 如果 value 為 array，轉換成多個 key-value pairs，例如： `?foo=123&foo=456`
+
+```ts
+function stringifyQuery(query: QueryObject): string {
+  return Object.keys(query)
+    .filter((k) => query[k] !== undefined)
+    .map((k) => encodeQueryItem(k, query[k]))
+    .filter(Boolean)
+    .join("&");
+}
+
+function encodeQueryItem(
+  key: string,
+  value: QueryValue | QueryValue[],
+): string {
+  if (typeof value === "number" || typeof value === "boolean") {
+    value = String(value);
+  }
+  if (!value) {
+    return encodeQueryKey(key);
+  }
+
+  if (Array.isArray(value)) {
+    return value
+      .map((_value) => `${encodeQueryKey(key)}=${encodeQueryValue(_value)}`)
+      .join("&");
+  }
+
+  return `${encodeQueryKey(key)}=${encodeQueryValue(value)}`;
+}
+```
+
+`stringifyParsedURL`
+
+```ts
+function stringifyParsedURL(parsed: Partial<ParsedURL>): string {
+  const pathname = parsed.pathname || "";
+  const search = parsed.search
+    ? (parsed.search.startsWith("?") ? "" : "?") + parsed.search
+    : "";
+  const hash = parsed.hash || "";
+  const auth = parsed.auth ? parsed.auth + "@" : "";
+  const host = parsed.host || "";
+  const proto =
+    parsed.protocol || parsed[protocolRelative]
+      ? (parsed.protocol || "") + "//"
+      : "";
+  return proto + auth + host + pathname + search + hash;
+}
+```
+
+## Reference
+
+- https://github.com/unjs/ufo
+- https://github.com/unjs/ofetch
+- https://en.wikipedia.org/wiki/Wikipedia:Protocol-relative_URL
+- https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Definition
