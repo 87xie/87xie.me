@@ -6,57 +6,103 @@ date: 2024-04-15
 
 import { Tabs } from 'nextra/components'
 
-fine-grained reactivity 的一種實作
+singals 為 fine-grained reactivity 的一種實作，這裡先簡單分成三個部分：
 
-簡單分成三個部分，分別為：
-
-- observable state：可觀察的值
-- derivations：根據 observable state 推導出來的結果
-- effects：observable state 發生變化，對應 `derivations` 推導完成後，需要執行的 side effects
+- **observable state**：可觀察的值
+- **derivations**：根據 observable state 推導出來的結果
+- **effects**：observable state 發生變化，對應 derivations 推導完成後，需要執行的 side effects
 
 ![simple model of fine-grained reactivity](/simple-model-of-fine-grained-reactivity.png)
 
-## Fine-grained reactivity
-
-> a = b + c
->
-> 只要 `b` 或 `c` 發生變化，`a` 的值就會更新
-
-常見由 `getter`, `setter`, `value` 組成
-
-- 透過 `getter` 讀取 `value` 時收集依賴
-- 透過 `setter` 更新 `value` 時通知依賴
-
-從 solid 及 vue 的 api 來看，可以看出一點端倪
+從 solid 及 vue 的 api 可以看到類似的概念
 
 <Tabs items={['solid', 'vue']}>
   <Tabs.Tab>
     ```js
+    import {
+      createMemo,
+      createSignal,
+      createEffect,
+    } from 'solid-js';
+
+    // observable state
     const [count, setCount] = createSignal(0);
-    // read a value
-    console.log(count()); // 0
+
+    // derivation
+    const double = createMemo(() => {
+      // read a value
+      return count() * 2
+    });
+
+    // effect
+    createEffect(() => {
+      // read a value
+      console.log(count());
+    });
+    
     // set a value
     setCount(5);
     ```
   </Tabs.Tab>
   <Tabs.Tab>
     ```js
+    import {
+      ref,
+      computed,
+      watchEffect,
+    } from 'vue';
+
+    // observable state
     const count = ref(0);
-    // read a value
-    console.log(count.value); // 0
+
+    // derivation
+    const double = computed(() => {
+      // read a value
+      return count.value * 2;
+    });
+
+    // effect
+    watchEffect(() => {
+      // read a value
+      console.log(count.value);
+    });
+
     // set a value
     count.value = 5;
     ```
   </Tabs.Tab>
 </Tabs>
 
-常見的 fine-grained reactivity 實作，還會有以下幾點特性：
+observable state 實作上，常見包含 `value`, `getter`, `setter`
 
-- 處理 `derivations`, `side effects`，有自動追蹤依賴的特性
+- 透過 `getter` 讀取 `value` 時收集依賴
+- 透過 `setter` 更新 `value` 時通知依賴
+
+derivations, effects 實作上，需要考慮：
+
+- derivations, effects 需要具備自動追蹤依賴的特性
 - 如果依賴沒有發生變化，則不需要重新計算 (memoization)
 - 記錄依賴的節點關係，確保一致性、避免無謂的計算或過早反應 (glitch-free)，例如：多個依賴推導出來的值，需要等到全部依賴更新完成後，再做重新計算，如下圖所示
 
 ![fine-grained-reactivity-unnecessary-calculation](/fine-grained-reactivity-unnecessary-calculation.png)
+
+未來 signals 也有機會標準化，這些複雜的實作細節，如果在 runtime layer 都處理好那是再好不過
+
+```ts
+// observable state
+const count = new Signal.State(0);
+
+// derivations
+const double = new Signal.Computed(() => counter.get() * 2);
+
+// effect
+effect(() => {
+  console.log(count.get());
+});
+
+// set value
+count.set(counter.get() + 1);
+```
 
 ## Reference
 
