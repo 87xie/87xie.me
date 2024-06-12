@@ -6,59 +6,28 @@ date: 2024-05-16
 
 import { Tabs } from 'nextra/components'
 
-本文是參考此 [commit](https://github.com/unjs/hookable/tree/ddc01ba16b9d66da16f40e995cc2e63970386727) 所做的紀錄，版本為 `v5.5.3`
+參考版本為 [`v5.5.3`](https://github.com/unjs/hookable/tree/ddc01ba16b9d66da16f40e995cc2e63970386727)
 
-[hookable](https://github.com/unjs/hookable) 為 [UnJS](https://github.com/unjs) 團隊釋出的套件，可以簡單想像成 event emitter
+[hookable](https://github.com/unjs/hookable) 為 [UnJS](https://github.com/unjs) 團隊釋出的套件，我認為其優點有：
 
-共通概念如下：
+- 實作 typesafe awaitable hooking system 較輕鬆（例如：不用自己處理 generic constraints）
+- 可以參考 Nuxt, UnJS 團隊，在其他專案如何使用、設計，像是：[nuxt](https://github.com/nuxt/nuxt/blob/803100e34ea19858e0c193056d3ce6975c2c3234/packages/nuxt/src/app/nuxt.ts#L39-L62), [unhead](https://github.com/unjs/unhead/blob/00de6a8893174c78550c931a5833804c72f9f0cb/packages/schema/src/hooks.ts), [nitro](https://github.com/unjs/nitro/blob/d20ffcbd16fc4003b774445e1a01e698c2bb078a/src/types/hooks.ts)
 
-- 定義「事件」與「觀察者」之間的一對多關係
-- 事件由一個名稱及對應的資料格式組成，不同事件都有其對應的觀察者介面
-- 事件發生時，向已註冊的觀察者推送資料
-- 事件只關注觀察者的介面，不會知道觀察者的實作細節，藉此保持鬆耦合
-- 觀察者依據不同事件的介面實作監聽方法
-
-主要差異：
-
-- hookable 透過 `callHook` 觸發 listeners，預設以非同步方式依序執行 ([下方說明](#awaitable-hooks))
-- 為了讓非同步的 log 更好被追蹤，在調用 listeners 前，會透過 [console.createTask](https://developer.chrome.com/docs/devtools/console/api#createtask) 建立關聯，可參考 [pull#69](https://github.com/unjs/hookable/pull/69)
-- 上述兩點需要額外的開銷，如果沒有非同步需求，且有效能考量，event emitter 或許是比較好的選擇，可參考 [issue#64](https://github.com/unjs/hookable/issues/64#issuecomment-1430076522)
-
-<Tabs items={['hookable', 'event emitter']}>
-  <Tabs.Tab>
-    ```ts
-    const hooks = createHooks();
-    // add a callback function that's going to be executed when the event is triggered
-    hooks.hook('hello', () => { console.log('Hello World' )});
-    // trigger an event
-    hooks.callHook('hello');
-    ```
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```ts
-    const emitter = new EventEmitter();
-    // add a callback function that's going to be executed when the event is triggered
-    emitter.on('hello', () => { console.log('Hello World' )});
-    // trigger an event
-    emitter.emit('hello');
-    ```
-  </Tabs.Tab>
-</Tabs>
+不過若是沒有非同步需求，且有效能考量，event emitter 或許是比較好的選擇，這部分可以參考 [issue#64](https://github.com/unjs/hookable/issues/64#issuecomment-1430076522)
 
 ## Internal data structure
 
-- 透過一個名為 `_hooks` 的 internal object 來儲存 listeners
-- key 為 hook name
-- value 為已註冊的 listeners array
+hookable 實作上，是用 object 儲存 hook, hook callbacks 之間一對多的關係
 
-```ts
+```ts showLineNumbers, {7-12}
+type HookCallback = (...arguments_: any) => Promise<void> | void;
+
 class Hookable<
   HooksT extends Record<string, any> = Record<string, HookCallback>,
   HookNameT extends HookKeys<HooksT> = HookKeys<HooksT>
 > {
   private _hooks: { [key: string]: HookCallback[] };
   // skip
-
   constructor() {
     this._hooks = {};
     // skip
@@ -78,34 +47,16 @@ class Hookable<
 }
 ```
 
-大致示意如下：
+## Awaitable hook callbacks
+
+簡單說明下方程式碼：
+
+1. `foo`, `bar` 為回傳 promise 的 asynchronous function
+1. 註冊 `foo`, `bar` 至 `hello` hook
+1. 調用 `await callHook('hello'){:js}` 查看 log 順序
+1. 從 log 順序可以得知，hook callback 會依照順序，等到當前的 promise resolved，再執行下一個 callback
 
 ```ts
-const hooks = hookable.createHooks();
-hooks.hook('hello:foo', () => {});
-hooks.hook('hello:bar', () => {});
-
-/**
- * _hooks
- *
- * {
- *   'hello:foo': [() => {}],
- *   'hello:bar': [() => {}],
- * }
-*/
-
-```
-
-## Awaitable hooks
-
-- listeners 可以為 promise based 的 asynchronous function
-- `await callHook{:js}` 可以確保對應的 listeners 皆已執行完成
-
-```ts
-const hooks = createHooks();
-hooks.hook('hello', foo);
-hooks.hook('hello', bar);
-
 function foo() {
   return new Promise((resolve) => {
     console.log('foo started');
@@ -126,6 +77,10 @@ function bar() {
   });
 }
 
+const hooks = createHooks();
+hooks.hook('hello', foo);
+hooks.hook('hello', bar);
+
 async function run() {
   await hooks.callHook('hello');
   console.log('hook finished');
@@ -139,11 +94,86 @@ run();
 // "hook finished"
 ```
 
-`callHook` 預設使用 `serialTaskCaller`
+對應到 hookable 實作，當調用 `hooks.callHook(event){:js}`，最終是透過 `serialTaskCaller(this.hooks[name], arguments_){:js}` 來執行 hook callbacks
 
-下方為 `serialTaskCaller` 的程式碼，這裡附上 [source code](https://github.com/unjs/hookable/blob/ddc01ba16b9d66da16f40e995cc2e63970386727/src/utils.ts#L67-L76)
+```ts showLineNumbers {27-28, 43-46}
+class Hookable<
+  HooksT extends Record<string, any> = Record<string, HookCallback>,
+  HookNameT extends HookKeys<HooksT> = HookKeys<HooksT>
+> {
+  private _hooks: { [key: string]: HookCallback[] };
+  // skip
+  constructor() {
+    this._hooks = {};
+    // skip
+  }
+ 
+  hook<NameT extends HookNameT>(
+    name: NameT,
+    function_: InferCallback<HooksT, NameT>,
+    options: { allowDeprecated?: boolean } = {}
+  ) {
+    // skip
+    this._hooks[name] = this._hooks[name] || [];
+    this._hooks[name].push(function_);
+    // skip
+  }
+  // skip
+  callHook<NameT extends HookNameT>(
+    name: NameT,
+    ...arguments_: Parameters<InferCallback<HooksT, NameT>>
+  ): Promise<any> {
+    arguments_.unshift(name);
+    return this.callHookWith(serialTaskCaller, name, ...arguments_);
+  }
 
-```ts showLineNumbers
+  callHookWith<
+    NameT extends HookNameT,
+    CallFunction extends (
+      hooks: HookCallback[],
+      arguments_: Parameters<InferCallback<HooksT, NameT>>
+    ) => any
+  >(
+    caller: CallFunction,
+    name: NameT,
+    ...arguments_: Parameters<InferCallback<HooksT, NameT>>
+  ): ReturnType<CallFunction> {
+    // skip
+    const result = caller(
+      name in this._hooks ? [...this._hooks[name]] : [],
+      arguments_
+    );
+    // skip
+    return result;
+  }
+}
+```
+
+接著看到 `serialTaskCaller`，為了讓非同步的 log 更好被追蹤，在調用 hook callbacks 前，先透過 [console.createTask](https://developer.chrome.com/docs/devtools/console/api#createtask) 建立關聯。第 2-6 行的 `createTask` 是為了兼容不同瀏覽器或較舊的版本，因為 `console.createTask` 可能不存在，更多細節可參考 [pull#69](https://github.com/unjs/hookable/pull/69)
+
+```ts showLineNumbers {2-6, 10}
+// https://developer.chrome.com/blog/devtools-modern-web-debugging/#linked-stack-traces
+type CreateTask = typeof console.createTask;
+const defaultTask: ReturnType<CreateTask> = { run: (function_) => function_() };
+const _createTask: CreateTask = () => defaultTask;
+const createTask =
+  typeof console.createTask !== "undefined" ? console.createTask : _createTask;
+  
+function serialTaskCaller(hooks: HookCallback[], args: any[]) {
+  const name = args.shift();
+  const task = createTask(name);
+  // skip
+}
+```
+
+`serialTaskCaller` 調用的 hook callbacks 的流程如下：
+
+1. 第一個 hook callback 是透過 `Promise.resolve{:js}` 產生一個已實現的 promise
+1. 委派 fulfill callback 給已實現的 promise，在 fufill callback 內會調用下一個 hook callback
+1. `hooks.reduce` 會回傳最後一個 hook callback 對應的 promise，當最後一個 promise 的狀態變更為已實現，即代表所有 hook callbacks 依序執行完成
+
+```ts showLineNumbers {6-10}
+// skip
 function serialTaskCaller(hooks: HookCallback[], args: any[]) {
   const name = args.shift();
   const task = createTask(name);
@@ -155,15 +185,6 @@ function serialTaskCaller(hooks: HookCallback[], args: any[]) {
   );
 }
 ```
-
-第 3 行的 `const task = createTask(name);{:js}` 與 [console.createTask](https://developer.chrome.com/docs/devtools/console/api#createtask) 兼容相關
-
-第 5-9 行
-
-1. 第一次調用 listener，是透過 `Promise.resolve{:js}` 產生的 promise
-1. 後續透過 `Promise.then{:js}` 產生新的 promise 並委派 fulfilled callback，當 promise 狀態為 fulfilled 才會調用下一個 listener
-1. 回傳最後一個 listener 對應的 promise，當最後一個 promise 的狀態變更成 fulfilled，即代表所有 listeners 已經依序執行完成
-
 
 ## Reference
 
