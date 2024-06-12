@@ -46,7 +46,16 @@ const $fetchRaw: $Fetch["raw"] = async function $fetchRaw(
 }
 ```
 
-繼續看到 `withQuery`，是由多個不同 function 組合而成，後面我們會對子 function 逐一進行拆解
+`withQuery` 是由多個不同 function 組合而成，這裡先做個小結，後面會對這些 function 逐一進行拆解
+
+1. `const parsed = parseURL(input){:js}` 是將字串格式，轉換成帶有 URL 資料的物件 (query, pathname, etc.)
+1. `const mergedQuery = { ...parseQuery(parsed.search), ...query }{:js}`
+    1. 先將 `parsed.search` 字串格式，轉換成 key value pair 的物件格式
+    1. 以新增或取代的方式，合併兩個 query params 物件
+1. `parsed.search = stringifyQuery(mergedQuery){:js}`
+    1. 將物件格式的 `mergedQuery` 轉換成字串格式
+    1. 將 `parsed.search` 更新至合併後的結果
+1. 透過 `stringifyParsedURL(parsed)` 得到合併後的字串結果
 
 ```ts filename="ufo"
 export function withQuery(input: string, query: QueryObject): string {
@@ -187,39 +196,9 @@ function parseURL(input = "", defaultProto?: string): ParsedURL {
 }
 ```
 
-拆解出 host, path
+拆解出 host, path 後，解析 path
 
-```ts showLineNumbers, {24}
-function parseURL(input = "", defaultProto?: string): ParsedURL {
-  const _specialProtoMatch = input.match(
-    /^[\s\0]*(blob:|data:|javascript:|vbscript:)(.*)/i,
-  );
-  if (_specialProtoMatch) {
-    const [, _proto, _pathname = ""] = _specialProtoMatch;
-    return {
-      protocol: _proto.toLowerCase(),
-      pathname: _pathname,
-      href: _proto + _pathname,
-      auth: "",
-      host: "",
-      search: "",
-      hash: "",
-    };
-  }
-  if (!hasProtocol(input, { acceptRelative: true })) {
-    return defaultProto ? parseURL(defaultProto + input) : parsePath(input);
-  }
-  const [, protocol = "", auth, hostAndPath = ""] =
-    input
-      .replace(/\\/g, "/")
-      .match(/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/) || [];
-  const [, host = "", path = ""] = hostAndPath.match(/([^#/?]*)(.*)?/) || [];
-}
-```
-
-完整程式碼
-
-```ts showLineNumbers
+```ts showLineNumbers {26-29}
 function parseURL(input = "", defaultProto?: string): ParsedURL {
   const _specialProtoMatch = input.match(
     /^[\s\0]*(blob:|data:|javascript:|vbscript:)(.*)/i,
