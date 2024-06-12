@@ -18,9 +18,9 @@ ofetch('/movie?lang=en', {
 // url: "/movie?lang=en&id=123"
 ```
 
-上方 ofetch usage 對應到實作細節，如果 `context.options.query` 為 truthy，則調用 `withQuery(context.request, context.options.query){:js}`
+上方 usage，對應到 ofetch 的實作細節如下
 
-```ts showLineNumbers, {18-20}
+```ts filename="ofetch" showLineNumbers, {18-20}
 import { withQuery } from "ufo";
 
 const $fetchRaw: $Fetch["raw"] = async function $fetchRaw(
@@ -46,10 +46,10 @@ const $fetchRaw: $Fetch["raw"] = async function $fetchRaw(
 }
 ```
 
-`withQuery`
+繼續看到 `withQuery`，是由多個不同 function 組合而成，後面我們會對子 function 逐一進行拆解
 
-```ts showLineNumbers
-function withQuery(input: string, query: QueryObject): string {
+```ts filename="ufo"
+export function withQuery(input: string, query: QueryObject): string {
   const parsed = parseURL(input);
   const mergedQuery = { ...parseQuery(parsed.search), ...query };
   parsed.search = stringifyQuery(mergedQuery);
@@ -57,22 +57,167 @@ function withQuery(input: string, query: QueryObject): string {
 }
 ```
 
-`parseURL`
+## `parseURL`
 
-這裡對照 URI syntax 比較好理解
+先簡單說明 `parseURL` 實作：透過正規表達式，拆解出 URI syntax 的各個部分
+
+URI syntax
 
 ```plain
 URI = scheme ":" ["//" authority] path ["?" query] ["#" fragment]
 authority = [userinfo "@"] host [":" port]
 ```
 
-- 多數 protocol 後面接著 `//`，像是：`https://`，第 2-16 行負責處理部分例外，像是：`data:image/jpeg;base64,/9j/4AAQSk`
-- 第 18-20 行，如果是相對路徑且沒有 `defaultProto`，只回傳 `parsePath(input){:js}`
-- `/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/{:js}`
-  - `([\w+.-]{2,}:)?` 擷取 protocol（例如：`http:`, `ftp:`）
-  - `([^/@]+@)?` 擷取 userinfo（例如：`user:pass@`）
-  - `(.*)` 剩餘的任意字元，對應到 URI 中的 host, port, path, query, fragment
-- `/([^#/?]*)(.*)?/{:js}`，以 `localhost:3000/foo` 為例，第一個 group 為 `localhost:3000`，第二個 group 為 `/foo`
+URI example
+
+```plain
+        userinfo       host      port
+        ┌──┴───┐ ┌──────┴──────┐ ┌┴─┐
+https://john.doe@www.example.com:1234/forum/questions/?tag=networking&order=newest#top
+└─┬─┘   └─────────────┬─────────────┘└───────┬───────┘ └────────────┬────────────┘ └┬┘
+scheme            authority                path                   query          fragment
+```
+
+usage
+
+```ts
+parseURL(
+  'https://john.doe@www.example.com:1234/forum/questions/?tag=networking&order=newest#top'
+);
+
+/**
+ * {
+ *   auth: "john.doe",
+ *   hash: "#top",
+ *   host: "www.example.com:1234",
+ *   pathname: "/forum/questions/",
+ *   protocol: "https:",
+ *   search: "?tag=networking&amp;order=newest"
+ * }
+ */
+
+```
+
+實作細節：
+
+多數完整路徑，透過 `/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/{:js}` 分群
+
+- `([\w+.-]{2,}:)?\/\/` 擷取 protocol（多數情況 protocol 後方會接著兩個斜線，例如：`http://`, `ftp://`）
+- `([^/@]+@)?` 擷取 userinfo（例如：`user:pass@`）
+- `(.*)` 剩餘的任意字元，對應到 URI 中的 host, port, path, query, fragment
+
+```ts showLineNumbers, {3-6}
+function parseURL(input = "", defaultProto?: string): ParsedURL {
+  // skip
+  const [, protocol = "", auth, hostAndPath = ""] =
+    input
+      .replace(/\\/g, "/")
+      .match(/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/) || [];
+  /**
+   * example:
+   * https://john.doe@www.foo.com:1234/forum/questions/?order=newest#top
+   * 
+   * protocol: https:
+   * auth: john.doe@
+   * hostAndPath: www.foo.com:1234/forum/questions/?order=newest#top
+   */
+
+  // skip
+}
+```
+
+考慮特殊的 protocol 格式，例如：
+
+- `data:image/jpeg;base64,/9j/4AAQSk`
+- `blob:http://example.com/550e8400-e29b-41d4-a716-446655440000`
+
+```ts showLineNumbers, {2-16}
+function parseURL(input = "", defaultProto?: string): ParsedURL {
+  const _specialProtoMatch = input.match(
+    /^[\s\0]*(blob:|data:|javascript:|vbscript:)(.*)/i,
+  );
+  if (_specialProtoMatch) {
+    const [, _proto, _pathname = ""] = _specialProtoMatch;
+    return {
+      protocol: _proto.toLowerCase(),
+      pathname: _pathname,
+      href: _proto + _pathname,
+      auth: "",
+      host: "",
+      search: "",
+      hash: "",
+    };
+  }
+  // skip
+  const [, protocol = "", auth, hostAndPath = ""] =
+    input
+      .replace(/\\/g, "/")
+      .match(/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/) || [];
+  // skip
+}
+```
+
+支援 parse 相對路徑
+
+```ts showLineNumbers, {17-19}
+function parseURL(input = "", defaultProto?: string): ParsedURL {
+  const _specialProtoMatch = input.match(
+    /^[\s\0]*(blob:|data:|javascript:|vbscript:)(.*)/i,
+  );
+  if (_specialProtoMatch) {
+    const [, _proto, _pathname = ""] = _specialProtoMatch;
+    return {
+      protocol: _proto.toLowerCase(),
+      pathname: _pathname,
+      href: _proto + _pathname,
+      auth: "",
+      host: "",
+      search: "",
+      hash: "",
+    };
+  }
+  if (!hasProtocol(input, { acceptRelative: true })) {
+    return defaultProto ? parseURL(defaultProto + input) : parsePath(input);
+  }
+  const [, protocol = "", auth, hostAndPath = ""] =
+    input
+      .replace(/\\/g, "/")
+      .match(/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/) || [];
+  // skip
+}
+```
+
+拆解出 host, path
+
+```ts showLineNumbers, {24}
+function parseURL(input = "", defaultProto?: string): ParsedURL {
+  const _specialProtoMatch = input.match(
+    /^[\s\0]*(blob:|data:|javascript:|vbscript:)(.*)/i,
+  );
+  if (_specialProtoMatch) {
+    const [, _proto, _pathname = ""] = _specialProtoMatch;
+    return {
+      protocol: _proto.toLowerCase(),
+      pathname: _pathname,
+      href: _proto + _pathname,
+      auth: "",
+      host: "",
+      search: "",
+      hash: "",
+    };
+  }
+  if (!hasProtocol(input, { acceptRelative: true })) {
+    return defaultProto ? parseURL(defaultProto + input) : parsePath(input);
+  }
+  const [, protocol = "", auth, hostAndPath = ""] =
+    input
+      .replace(/\\/g, "/")
+      .match(/^[\s\0]*([\w+.-]{2,}:)?\/\/([^/@]+@)?(.*)/) || [];
+  const [, host = "", path = ""] = hostAndPath.match(/([^#/?]*)(.*)?/) || [];
+}
+```
+
+完整程式碼
 
 ```ts showLineNumbers
 function parseURL(input = "", defaultProto?: string): ParsedURL {
@@ -117,14 +262,28 @@ function parseURL(input = "", defaultProto?: string): ParsedURL {
 }
 ```
 
-`parsePath`
+## `parsePath`
 
-- `/([^#?]*)(\?[^#]*)?(#.*)?/{:js}`，以 `/foo?query=bar#baz` 為例：
+`parsePath` 的實作，也是透過正規表達式，將 path 拆解出相應的部分
+
+```ts
+parsePath('/foo?tag=bar#baz')
+
+/**
+ * {
+ *   pathname: "/foo",
+ *   search: "?tag=bar"
+ *   hash: "#baz",
+ * }
+ */
+```
+
+`/([^#?]*)(\?[^#]*)?(#.*)?/{:js}`，以 `/foo?query=bar#baz` 為例：
   - `([^#?]*)`：任意非 `#` 或 `?` 的字元序列，這裡擷取到 `/foo`
   - `(\?[^#]*)?`：零或一組以 `?` 開頭，後面不包含 `#` 的字元序列，這裡擷取到 `?query=bar`
   - `(#.*)?`：零或一組以 `#` 開頭的任意字元序列，這裡擷取到 `#baz`
 
-```ts
+```ts showLineNumbers, {3}
 function parsePath(input = "") {
   const [pathname = "", search = "", hash = ""] = (
     input.match(/([^#?]*)(\?[^#]*)?(#.*)?/) || []
@@ -138,12 +297,116 @@ function parsePath(input = "") {
 }
 ```
 
-`parseQuery`
+## `parseQuery`
 
-- `/([^=]+)=?(.*)/{:js}` 以 `test=123` 為例：第一個 group 為 `test`，第二個 group 為 `123`
-- 第 13-16 行避免 prototype pollution，略過 key 為 `__proto__` 或 `constructor` 的 parameter
+```ts
+parseQuery('?test=123&foo=456&bar=789');
 
-```ts showLineNumbers
+/**
+ * {
+ *   bar: "789",
+ *   foo: "456",
+ *   test: "123"
+ *  }
+ */
+```
+
+如果 input 開頭包含 `?`，則透過 `slice(1){:js}` 清除
+
+```ts showLineNumbers {5-7}
+function parseQuery<T extends ParsedQuery = ParsedQuery>(
+  parametersString = "",
+): T {
+  const object: ParsedQuery = {};
+  if (parametersString[0] === "?") {
+    parametersString = parametersString.slice(1);
+  }
+  // skip
+  return object as T;
+}
+```
+
+透過 `split('&')` 轉換成陣列，執行 for of loop
+
+```ts showLineNumbers {8-10}
+function parseQuery<T extends ParsedQuery = ParsedQuery>(
+  parametersString = "",
+): T {
+  const object: ParsedQuery = {};
+  if (parametersString[0] === "?") {
+    parametersString = parametersString.slice(1);
+  }
+  for (const parameter of parametersString.split("&")) {
+    // skip
+  }
+  return object as T;
+}
+```
+
+透過 `/([^=]+)=?(.*)/{:js}` 拆解出 key, value，以 `test=123` 為例：
+
+- `([^=]+)` 擷取到 `test`
+- `?(.*)` 擷取到 `123`
+
+```ts showLineNumbers {9}
+function parseQuery<T extends ParsedQuery = ParsedQuery>(
+  parametersString = "",
+): T {
+  const object: ParsedQuery = {};
+  if (parametersString[0] === "?") {
+    parametersString = parametersString.slice(1);
+  }
+  for (const parameter of parametersString.split("&")) {
+    const s = parameter.match(/([^=]+)=?(.*)/) || [];
+    if (s.length < 2) {
+      continue;
+    }
+
+    const value = decodeQueryValue(s[2] || "");
+    if (object[key] === undefined) {
+      object[key] = value;
+    } else if (Array.isArray(object[key])) {
+      (object[key] as string[]).push(value);
+    } else {
+      object[key] = [object[key] as string, value];
+    }
+  }
+  return object as T;
+}
+```
+
+考慮 multi-value 的情境
+
+```ts showLineNumbers, {17-21}
+function parseQuery<T extends ParsedQuery = ParsedQuery>(
+  parametersString = "",
+): T {
+  const object: ParsedQuery = {};
+  if (parametersString[0] === "?") {
+    parametersString = parametersString.slice(1);
+  }
+  for (const parameter of parametersString.split("&")) {
+    const s = parameter.match(/([^=]+)=?(.*)/) || [];
+    if (s.length < 2) {
+      continue;
+    }
+
+    const value = decodeQueryValue(s[2] || "");
+    if (object[key] === undefined) {
+      object[key] = value;
+    } else if (Array.isArray(object[key])) {
+      (object[key] as string[]).push(value);
+    } else {
+      object[key] = [object[key] as string, value];
+    }
+  }
+  return object as T;
+}
+```
+
+避免 prototype pollution，略過 key 為 `__proto__` 或 `constructor` 的 parameter
+
+```ts showLineNumbers {13-16}
 function parseQuery<T extends ParsedQuery = ParsedQuery>(
   parametersString = "",
 ): T {
@@ -171,36 +434,23 @@ function parseQuery<T extends ParsedQuery = ParsedQuery>(
   }
   return object as T;
 }
-
-const PLUS_RE = /\+/g; // %2B
-
-function decodeQueryKey(text: string): string {
-  return decode(text.replace(PLUS_RE, " "));
-}
-
-function decodeQueryValue(text: string): string {
-  return decode(text.replace(PLUS_RE, " "));
-}
-
-/**
- * Decode text using `decodeURIComponent`. Returns the original text if it
- * fails.
- */
-function decode(text: string | number = ""): string {
-  try {
-    return decodeURIComponent("" + text);
-  } catch {
-    return "" + text;
-  }
-}
 ```
 
-`stringifyQuery`
-
-- 如果 value 為 boolean，轉換成 `true` 或 `false` 的字串，例如： `?foo=true`
-- 如果 value 為 array，轉換成多個 key-value pairs，例如： `?foo=123&foo=456`
+## `stringifyQuery`
 
 ```ts
+stringifyQuery({
+  foo: [123, 456],
+  bar: true,
+  hello: 'world'
+});
+
+// foo=123&foo=456&bar=true&hello=world
+```
+
+`stringifyQuery` 會調用 `encodeQueryItem` key, value 轉換成字串
+
+```ts showLineNumbers {4}
 function stringifyQuery(query: QueryObject): string {
   return Object.keys(query)
     .filter((k) => query[k] !== undefined)
@@ -208,7 +458,14 @@ function stringifyQuery(query: QueryObject): string {
     .filter(Boolean)
     .join("&");
 }
+```
 
+`encodeQueryItem` 的處理方式：
+
+- 如果 `typeof value` 為 number 或 boolean，會被轉換成字串，例如： `?foo=123&bar=true`
+- 如果 value 為 array，轉換成多個 key-value pairs，例如： `?foo=123&foo=456`
+
+```ts showLineNumbers {5-7, 11-15}
 function encodeQueryItem(
   key: string,
   value: QueryValue | QueryValue[],
@@ -219,7 +476,6 @@ function encodeQueryItem(
   if (!value) {
     return encodeQueryKey(key);
   }
-
   if (Array.isArray(value)) {
     return value
       .map((_value) => `${encodeQueryKey(key)}=${encodeQueryValue(_value)}`)
@@ -230,7 +486,9 @@ function encodeQueryItem(
 }
 ```
 
-`stringifyParsedURL`
+## `stringifyParsedURL`
+
+按照 URI syntax 將各個部分組合成字串格式
 
 ```ts
 function stringifyParsedURL(parsed: Partial<ParsedURL>): string {
