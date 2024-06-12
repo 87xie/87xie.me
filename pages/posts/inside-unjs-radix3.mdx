@@ -65,12 +65,27 @@ flowchart TD
 
 節點上的 `children` 屬性為儲存子節點的 map，key 為該子節點對應的字串
 
-如何遍歷 tree 與 `children` 及輸入的路徑相關，以新增 `/products/:id` 節點為例：
+```ts showLineNumbers {6}
+function createRadixNode(options: Partial<RadixNode> = {}): RadixNode {
+  return {
+    type: options.type || NODE_TYPES.NORMAL,
+    maxDepth: 0,
+    parent: options.parent || null,
+    children: new Map(),
+    data: options.data || null,
+    paramName: options.paramName || null,
+    wildcardChildNode: null,
+    placeholderChildren: [],
+  };
+}
+```
+
+遍歷 tree 與 `children` 及輸入的路徑相關，以新增 `/products/:id` 路徑為例：
 
 - `const sections = path.split('/'){:js}` 即為 `['', 'products', ':id']{:js}`
-- `for (const section of sections){:js}`，`section` 順序與樹高有對應關係，所以依序從 `rootNode` 開始，透過 `children.get(section){:js}` 向下遍歷
+-  `sections` 的元素順序與樹高有對應關係，所以依序從 `rootNode` 開始，透過 `children.get(section){:js}` 查詢，如果不存在，則新增一個節點
 
-```ts showLineNumbers
+```ts showLineNumbers {2, 5, 8-17}
 function insert(ctx: RadixRouterContext, path: string, data: any) {
   const sections = path.split('/');
   let node = ctx.rootNode;
@@ -249,7 +264,7 @@ function insert(ctx: RadixRouterContext, path: string, data: any) {
 
 `router.lookup(path){:js}` 搜尋靜態路徑，如果 `staticRoutesMap[path]` 有資料就提前回傳，藉此節省遍歷 tree 及判斷、計算 `data.params` 的開銷
 
-```ts
+```ts showLineNumbers {6-8}
 function lookup<T extends RadixNodeData = RadixNodeData>(
   ctx: RadixRouterContext,
   path: string,
