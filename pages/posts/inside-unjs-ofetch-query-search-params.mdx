@@ -361,44 +361,9 @@ function parseQuery<T extends ParsedQuery = ParsedQuery>(
     if (s.length < 2) {
       continue;
     }
-
+    const key = decodeQueryKey(s[1]);
     const value = decodeQueryValue(s[2] || "");
-    if (object[key] === undefined) {
-      object[key] = value;
-    } else if (Array.isArray(object[key])) {
-      (object[key] as string[]).push(value);
-    } else {
-      object[key] = [object[key] as string, value];
-    }
-  }
-  return object as T;
-}
-```
-
-考慮 multi-value 的情境
-
-```ts showLineNumbers, {17-21}
-function parseQuery<T extends ParsedQuery = ParsedQuery>(
-  parametersString = "",
-): T {
-  const object: ParsedQuery = {};
-  if (parametersString[0] === "?") {
-    parametersString = parametersString.slice(1);
-  }
-  for (const parameter of parametersString.split("&")) {
-    const s = parameter.match(/([^=]+)=?(.*)/) || [];
-    if (s.length < 2) {
-      continue;
-    }
-
-    const value = decodeQueryValue(s[2] || "");
-    if (object[key] === undefined) {
-      object[key] = value;
-    } else if (Array.isArray(object[key])) {
-      (object[key] as string[]).push(value);
-    } else {
-      object[key] = [object[key] as string, value];
-    }
+    // skip
   }
   return object as T;
 }
@@ -424,6 +389,29 @@ function parseQuery<T extends ParsedQuery = ParsedQuery>(
       continue;
     }
     const value = decodeQueryValue(s[2] || "");
+    // skip
+  }
+  return object as T;
+}
+```
+
+考慮 multi-value 的情境
+
+```ts showLineNumbers, {17-21}
+function parseQuery<T extends ParsedQuery = ParsedQuery>(
+  parametersString = "",
+): T {
+  const object: ParsedQuery = {};
+  if (parametersString[0] === "?") {
+    parametersString = parametersString.slice(1);
+  }
+  for (const parameter of parametersString.split("&")) {
+    const s = parameter.match(/([^=]+)=?(.*)/) || [];
+    if (s.length < 2) {
+      continue;
+    }
+    const key = decodeQueryKey(s[1]);
+    const value = decodeQueryValue(s[2] || "");
     if (object[key] === undefined) {
       object[key] = value;
     } else if (Array.isArray(object[key])) {
@@ -433,6 +421,32 @@ function parseQuery<T extends ParsedQuery = ParsedQuery>(
     }
   }
   return object as T;
+}
+```
+
+下方附上 `decodeQueryKey`, `decodeQueryValue` 的程式碼
+
+```ts
+const PLUS_RE = /\+/g; // %2B
+
+function decodeQueryKey(text: string): string {
+  return decode(text.replace(PLUS_RE, " "));
+}
+
+function decodeQueryValue(text: string): string {
+  return decode(text.replace(PLUS_RE, " "));
+}
+
+/**
+ * Decode text using `decodeURIComponent`. Returns the original text if it
+ * fails.
+ */
+function decode(text: string | number = ""): string {
+  try {
+    return decodeURIComponent("" + text);
+  } catch {
+    return "" + text;
+  }
 }
 ```
 
