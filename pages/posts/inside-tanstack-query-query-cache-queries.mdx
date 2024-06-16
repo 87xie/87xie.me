@@ -1,0 +1,358 @@
+---
+title: Inside TanStack Query - QueryCache queries
+date: 2024-06-15
+tag: react, react-query
+---
+
+import { Callout } from 'nextra/components'
+
+看了 [Inside React Query](https://tkdodo.eu/blog/inside-react-query) 後，想要更了解 TanStack Query
+
+- 是用什麼資料結構保存 `Query`
+- `queryKey` 如何對應到 `Query`
+
+這裡的程式碼是參考 [@tanstack/query-core@5.45.0](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
+
+![](/react-query-architecture.png)
+
+## QueryCache queries
+
+從 `QueryClient` 開始看起，可以在 `QueryClient.prototype.constructor` 發現：
+
+- 在建立 `QueryClient` 實例時，同時也會建立 `QueryCache` 實例（如果沒額外提供）
+
+```ts showLineNumbers {2, 5}
+class QueryClient {
+  #queryCache: QueryCache
+  // ...
+  constructor() {
+    this.#queryCache = config.queryCache || new QueryCache()
+    // ...
+  }
+  // ...
+}
+```
+
+接著看到 `QueryCache.prototype.constructor`，可以得知：
+
+- `QueryCache.queries` 是用來存放 `Query` 實例的 `Map`，key 為 string 型別
+
+```ts showLineNumbers {2, 6}
+class QueryCache extends Subscribable<QueryCacheListener> {
+  #queries: QueryStore
+
+  constructor(public config: QueryCacheConfig = {}) {
+    super()
+    this.#queries = new Map<string, Query>()
+  }
+  // ...
+}
+```
+
+## Query key to query hash
+
+知道 `queries` 是一個 `Map` 之後，想了解要如何新增一筆 `Query`，在 `QueryCache.add()` 得知：
+
+- 每個 `Query` 實例帶有 `queryHash` 屬性
+- `queryHash` 為 `QueryCache.queries` 的 key
+
+```ts showLineNumbers {5}
+class QueryCache extends Subscribable<QueryCacheListener> {
+  // ...
+  add(query: Query<any, any, any, any>): void {
+    if (!this.#queries.has(query.queryHash)) {
+      this.#queries.set(query.queryHash, query)
+
+      this.notify({
+        type: 'added',
+        query,
+      })
+    }
+  }
+  // ...
+}
+```
+
+繼續深入 `queryHash`，這裡方向是先觀察 `QueryCache.add()` 如何被調用，可以在 `Query.build()` 中得知：
+
+- 在建立 `Query` 實例時，透過 `hashQueryKeyByOptions` 將 `queryKey` 轉換成 `queryHash`
+- 如果該 `queryHash` 在 `queries` 查詢不到對應的 `Query`，則建立一個 `Query` 實例並新增至 `queries`
+
+```ts showLineNumbers {18-19, 31}
+class QueryCache extends Subscribable<QueryCacheListener> {
+  #queries: QueryStore
+
+  build<
+    TQueryFnData = unknown,
+    TError = DefaultError,
+    TData = TQueryFnData,
+    TQueryKey extends QueryKey = QueryKey,
+  >(
+    client: QueryClient,
+    options: WithRequired<
+      QueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+      'queryKey'
+    >,
+    state?: QueryState<TData, TError>,
+  ): Query<TQueryFnData, TError, TData, TQueryKey> {
+    const queryKey = options.queryKey
+    const queryHash =
+      options.queryHash ?? hashQueryKeyByOptions(queryKey, options)
+    let query = this.get<TQueryFnData, TError, TData, TQueryKey>(queryHash)
+
+    if (!query) {
+      query = new Query({
+        cache: this,
+        queryKey,
+        queryHash,
+        options: client.defaultQueryOptions(options),
+        state,
+        defaultOptions: client.getQueryDefaults(queryKey),
+      })
+      this.add(query)
+    }
+
+    return query
+  }
+}
+```
+
+繼續看到 `hashQueryKeyByOptions`，這個 function 用途很單純：
+
+- 先判斷要用 query-core 預設的 `hashKey`，或 user-land 設定的 `queryKeyHashFn`
+- 將 `queryKey` 轉換成 `queryHash` 並回傳
+
+<Callout>
+另外補充：以 `useQuery` 為例，`hashQueryKeyByOptions` 收到的 `options`，是在初始 `QueryClient` 設置的 `defaultOptions.queries` 及 `useQuery` 設置的 `queryOptions`，合併後的結果
+</Callout>
+
+<br/>
+
+```ts showLineNumbers
+function hashQueryKeyByOptions<TQueryKey extends QueryKey = QueryKey>(
+  queryKey: TQueryKey,
+  options?: Pick<QueryOptions<any, any, any, any>, 'queryKeyHashFn'>,
+): string {
+  const hashFn = options?.queryKeyHashFn || hashKey
+  return hashFn(queryKey)
+}
+```
+
+預設的 `hashKey` 是使用 `JSON.stringify`，透過 [replacer parameter](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#the_replacer_parameter) 針對物件進行 key 的排序，目的是：**確保不會因為物件內的 key 順序不同，得到不一致的 hash**
+
+
+```ts showLineNumbers {6-14}
+/**
+ * Default query & mutation keys hash function.
+ * Hashes the value into a stable hash.
+ */
+function hashKey(queryKey: QueryKey | MutationKey): string {
+  return JSON.stringify(queryKey, (_, val) =>
+    isPlainObject(val)
+      ? Object.keys(val)
+          .sort()
+          .reduce((result, key) => {
+            result[key] = val[key]
+            return result
+          }, {} as any)
+      : val,
+  )
+}
+
+hashKey(['todos', { page: 1, status: 'done' }])
+// '["todos",{"page":1,"status":"done"}]'
+
+hashKey(['todos', { status: 'done', page: 1 }])
+// '["todos",{"page":1,"status":"done"}]'
+
+(hashKey(['todos', { page: 1, status: 'done' }])
+  === hashKey(['todos', { status: 'done', page: 1 }]))
+// true
+```
+
+## Matching queries
+
+理解 `@tanstack/query` 如何透過 `queryKey` 實作結構化查詢 `Query`，像是：
+
+```ts
+// Invalidate every query with a key that starts with `todos`
+queryClient.invalidateQueries({ queryKey: ['todos'] })
+```
+
+從 `QueryClient.invalidateQueries()` 開始看起，可以發現：
+
+- 調用 `QueryCache.findAll` 會得到一個型別為 `Query[]` 的陣列
+
+```ts showLineNumbers {8-10}
+class QueryClient {
+  // ...
+  invalidateQueries(
+    filters: InvalidateQueryFilters = {},
+    options: InvalidateOptions = {},
+  ): Promise<void> {
+    return notifyManager.batch(() => {
+      this.#queryCache.findAll(filters).forEach((query) => {
+        query.invalidate()
+      })
+
+      if (filters.refetchType === 'none') {
+        return Promise.resolve()
+      }
+      const refetchFilters: RefetchQueryFilters = {
+        ...filters,
+        type: filters.refetchType ?? filters.type ?? 'active',
+      }
+      return this.refetchQueries(refetchFilters, options)
+    })
+  }
+  // ...
+}
+```
+
+`QueryCache.findAll()` 的實作，大致流程：
+
+1. 先將 `QueryCache.queries` 內所有的 `Query`，轉換成陣列格式
+1. 如果有提供 `filters` 參數，會透過 `matchQuery` 進行篩選
+
+```ts showLineNumbers {16}
+class QueryCache extends Subscribable<QueryCacheListener> {
+  #queries: QueryStore
+
+  constructor(public config: QueryCacheConfig = {}) {
+    super()
+    this.#queries = new Map<string, Query>()
+  }
+  // ...
+  getAll(): Array<Query> {
+    return [...this.#queries.values()]
+  }
+
+  findAll(filters: QueryFilters = {}): Array<Query> {
+    const queries = this.getAll()
+    return Object.keys(filters).length > 0
+      ? queries.filter((query) => matchQuery(filters, query))
+      : queries
+  }
+  // ...
+}
+```
+
+從 `matchQuery` 中得知：
+
+- 如果 `filters.queryKey` 存在，則會參考 `filters.exact`，決定 `queryKey` 的比對方式
+- 部分比對的邏輯，實作在 `partialMatchKey`
+
+```ts showLineNumbers {14-22}
+function matchQuery(
+  filters: QueryFilters,
+  query: Query<any, any, any, any>,
+): boolean {
+  const {
+    type = 'all',
+    exact,
+    fetchStatus,
+    predicate,
+    queryKey,
+    stale,
+  } = filters
+
+  if (queryKey) {
+    if (exact) {
+      if (query.queryHash !== hashQueryKeyByOptions(queryKey, query.options)) {
+        return false
+      }
+    } else if (!partialMatchKey(query.queryKey, queryKey)) {
+      return false
+    }
+  }
+
+  if (type !== 'all') {
+    const isActive = query.isActive()
+    if (type === 'active' && !isActive) {
+      return false
+    }
+    if (type === 'inactive' && isActive) {
+      return false
+    }
+  }
+
+  if (typeof stale === 'boolean' && query.isStale() !== stale) {
+    return false
+  }
+
+  if (fetchStatus && fetchStatus !== query.state.fetchStatus) {
+    return false
+  }
+
+  if (predicate && !predicate(query)) {
+    return false
+  }
+
+  return true
+}
+```
+
+看到 `partialMatchKey` 的實作細節：
+
+1. 先用 `===`（嚴格相等），比對 `a`, `b` 是否一致
+1. 再透過 `typeof`，比對 `a`, `b` 型別是否一致
+1. 如果 `a`, `b` 的 `typeof` 皆為 `object`，會透過遞迴方式，比對兩者是否相等
+
+```ts showLineNumbers
+export function partialMatchKey(a: QueryKey, b: QueryKey): boolean {
+  if (a === b) {
+    return true
+  }
+
+  if (typeof a !== typeof b) {
+    return false
+  }
+
+  if (a && b && typeof a === 'object' && typeof b === 'object') {
+    return !Object.keys(b).some((key) => !partialMatchKey(a[key], b[key]))
+  }
+
+  return false
+}
+```
+
+<Callout>
+  另外補充：`QueryCache.find` 也使是透過 `matchQuery`，不過預設將 `filter.exact` 設為 `true`
+</Callout>
+
+<br/>
+
+```ts showLineNumbers {6, 9}
+class QueryCache extends Subscribable<QueryCacheListener> {
+  // ...
+  find<TQueryFnData = unknown, TError = DefaultError, TData = TQueryFnData>(
+    filters: WithRequired<QueryFilters, 'queryKey'>,
+  ): Query<TQueryFnData, TError, TData> | undefined {
+    const defaultedFilters = { exact: true, ...filters }
+
+    return this.getAll().find((query) =>
+      matchQuery(defaultedFilters, query),
+    ) as Query<TQueryFnData, TError, TData> | undefined
+  }
+  // ...
+}
+```
+
+## Summary
+
+- 在建立 `QueryClient` 實例時，同時也會建立 `QueryCache`（如果沒額外提供）
+- `QueryCache.queries` 是用來存放 `Query` 實例的 `Map`，key 為 `queryHash`
+- 在建立 `Query` 實例時，透過 `hashQueryKeyByOptions` 將 `queryKey` 轉換成 `queryHash`
+- 如果 `queryKey` 含有 serializable object， query-core 預設的 `hashKey` 會對 object 進行 key 的排序，確保不會因為物件 key 的順序不同，得到不一致的 hash
+
+透過 `queryKey` 做結構化查詢的流程：
+
+1. `[...QueryCache.queries.values()]{:js}` 得到一個 `Query[]`，這裡以 `allQueries` 代稱
+1.  `allQueries.filter((query) => matchQuery(query, filters)){:js}`
+    - 使用 `===` 比對 `a`, `b`
+    - 如果 `a`, `b` 的 `typeof` 皆為 `object`，會透過遞迴方式比對是否相等
+
+## Reference
+
+- [Inside React Query](https://tkdodo.eu/blog/inside-react-query)
+- [@tanstack/query-core@5.45.0](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
