@@ -1,0 +1,223 @@
+---
+title: Inside zustand
+tag: react, zustand
+date: 2024-06-17
+---
+
+import { Callout } from 'nextra/components'
+
+zustand 參考版本為 [v5.0.0-beta.0](https://github.com/pmndrs/zustand/tree/e0502cf763351a4b593c4627f7a13f8c9a9a77bc)
+
+從下方 counter 範例開始看起，主要分兩個部分：
+
+- **creating a store (L8-L11)**
+- **binding components (L14-L15)**
+
+```tsx showLineNumbers {8-11, 14-15}
+import { create } from 'zustand'
+ 
+type CountStore = {
+  count: number
+  inc: () => void
+}
+ 
+const useCountStore = create<CountStore>()((set) => ({
+  count: 1,
+  inc: () => set((state) => ({ count: state.count + 1 })),
+}))
+ 
+function Counter() {
+  const count = useCountStore(({ count }) => count)
+  const inc = useCountStore(({ inc }) => inc)
+ 
+  return (
+    <div>
+      <span>{count}</span>
+      <button onClick={inc}>one up</button>
+    </div>
+  )
+}
+```
+
+## Creating a store
+
+第一步是透過 `create`，得到 `useCountStore`。調用 `create` 後的參數判斷，可以對應到官方文件中的 [TypeScript Guide](https://docs.pmnd.rs/zustand/guides/typescript)，主要是為了處理型別推導的問題
+
+>The difference when using TypeScript is that instead of writing `create(...)`, you have to write `create<T>()(...)` (notice the extra parentheses `()` too along with the type parameter) where `T` is the type of the state to annotate it.
+
+<Callout>
+補充：從 [discussions#1865](https://github.com/pmndrs/zustand/discussions/1865) 來看，主要與 zustand middlewares 有關
+</Callout>
+
+<br/>
+
+```ts showLineNumbers filename="src/react.ts"
+export const create = (<T>(createState: StateCreator<T, [], []> | undefined) =>
+  createState ? createImpl(createState) : createImpl) as Create
+```
+
+從上方程式碼得知，`create` 會調用 `createImpl`，這裡繼續深入 `createImpl` 的細節，先透過 `createStore` 建立一個 vanilla store
+
+```ts showLineNumbers filename="src/react.ts" {4}
+import { createStore } from './vanilla.ts'
+
+const createImpl = <T>(createState: StateCreator<T, [], []>) => {
+  const api = createStore(createState)
+  // ...
+}
+```
+
+vanilla store 為常見的 observer pattern
+
+`getInitialState` 主要是為了支援 server-side rendering，相關討論可以參考： [pull#2277](https://github.com/pmndrs/zustand/pull/2277)
+
+`setState` 做了 shallow merging 處理（參考下方 highlighting），可以對應到官方文件提到：
+
+>The `set` function merges state at only one level. If you have a nested object, you need to merge them explicitly.
+
+
+```ts showLineNumbers filename="src/vanilla.ts" {16-19}
+const createStoreImpl: CreateStoreImpl = (createState) => {
+  type TState = ReturnType<typeof createState>
+  type Listener = (state: TState, prevState: TState) => void
+  let state: TState
+  const listeners: Set<Listener> = new Set()
+
+  const setState: StoreApi<TState>['setState'] = (partial, replace) => {
+    // TODO: Remove type assertion once https://github.com/microsoft/TypeScript/issues/37663 is resolved
+    // https://github.com/microsoft/TypeScript/issues/37663#issuecomment-759728342
+    const nextState =
+      typeof partial === 'function'
+        ? (partial as (state: TState) => TState)(state)
+        : partial
+    if (!Object.is(nextState, state)) {
+      const previousState = state
+      state =
+        replace ?? (typeof nextState !== 'object' || nextState === null)
+          ? (nextState as TState)
+          : Object.assign({}, state, nextState)
+      listeners.forEach((listener) => listener(state, previousState))
+    }
+  }
+
+  const getState: StoreApi<TState>['getState'] = () => state
+
+  const getInitialState: StoreApi<TState>['getInitialState'] = () =>
+    initialState
+
+  const subscribe: StoreApi<TState>['subscribe'] = (listener) => {
+    listeners.add(listener)
+    // Unsubscribe
+    return () => listeners.delete(listener)
+  }
+
+  const api = { setState, getState, getInitialState, subscribe }
+  const initialState = (state = createState(setState, getState, api))
+  return api as any
+}
+
+export const createStore = ((createState) =>
+  createState ? createStoreImpl(createState) : createStoreImpl) as CreateStore
+```
+
+稍微理解 vanilla store 後，繼續回到 `createImpl`，這裡可以得知：
+
+- `api` 是 vanilla store 的介面
+- `useBoundStore` 是接收 `selector` 參數的 higher order function，output 與 `useStore` 相同
+
+```ts showLineNumbers filename="src/react.ts"
+const createImpl = <T>(createState: StateCreator<T, [], []>) => {
+  const api = createStore(createState)
+
+  const useBoundStore: any = (selector?: any) => useStore(api, selector)
+  // ...
+}
+```
+
+往下看到 `useStore`，是透過 react 的 [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore#subscribing-to-an-external-store) 整合 vanilla store 的 api：
+
+```ts showLineNumbers filename="src/react.ts"
+export function useStore<TState, StateSlice>(
+  api: StoreApi<TState>,
+  selector: (state: TState) => StateSlice = identity as any,
+) {
+  const slice = useSyncExternalStore(
+    api.subscribe,
+    () => selector(api.getState()),
+    () => selector(api.getInitialState()),
+  )
+  useDebugValue(slice)
+  return slice
+}
+```
+
+再回到完整程式碼的 `createImpl`，並將目前資訊整合：
+
+- `api` 是 vanilla store 的介面
+- `api` 會被複製到 `useBoundStore` 上
+- `useBoundStore` 是接收 `selector` 參數的 react hook
+  - `selector` 是用來選取 vanilla store state 的 callback
+  - `useBoundStore` 將 scope 內的 `selector`, `api` 提供給 `useStore`
+- `useStore` 為一個 react hook，用來整合 `useSyncExternalStore`, `api`, `selector`
+
+```ts showLineNumbers filename="src/react.ts"
+const createImpl = <T>(createState: StateCreator<T, [], []>) => {
+  const api = createStore(createState)
+
+  const useBoundStore: any = (selector?: any) => useStore(api, selector)
+
+  Object.assign(useBoundStore, api)
+
+  return useBoundStore
+}
+```
+
+<Callout>
+  補充：`Object.assign(useBoundStore, api){:js}`，可以對應到官方文件中提到：
+</Callout>
+
+>Reading/writig state and reacting to changes outside of components
+
+```ts showLineNumbers
+const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
+
+// Getting non-reactive fresh state
+const paw = useDogStore.getState().paw
+// Listening to all changes, fires synchronously on every change
+const unsub = useDogStore.subscribe(console.log)
+useDogStore.setState({ paw: false })
+// Unsubscribe listeners
+unsub()
+```
+
+## Binding Components
+
+從上述結果得知 `useBoundStore` 是基於 `useSyncExternalStore` 實現，所以當調用 `useBoundStore(selector){:js}` 時：
+
+- 會新增一個觸發 component re-render 的 listener 至 vanilla store
+- 透過 `selector` 得到的 snapshot，需要符合 [`useSyncExternalStore - getSanpshot`](https://react.dev/reference/react/useSyncExternalStore#parameters) 的規則
+
+>While the store has not changed, repeated calls to getSnapshot must return the same value. If the store changes and the returned value is different (as compared by `Object.is`), React re-renders the component.
+
+<Callout>
+補充：在目前 react 的版本（v18.3.1），任何同步外部儲存的狀態，都需要透過 `useSyncExternalStore` 來避免 [tearing](https://github.com/reactwg/react-18/discussions/69)。除了 zustand 外，[@tanstack/react-query](https://github.com/TanStack/query/blob/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b/packages/react-query/src/useBaseQuery.ts#L72-L89) 也可以看到 `useSyncExternalStore` 的身影
+</Callout>
+
+
+
+## Summary
+
+以下簡單總結：
+
+- 調用 `create` 得到 `useBoundStore` 的流程：
+  1. 建立 vanilla store，兼容 `useSyncExternalStore` 的 API，例如：`subscribe`, `getSnapshot`
+  1. 建立 based-on `useSyncExternalStore` 的 react hook，即為 `useBoundStore`
+  1. 將 vanilla store API 複製至 `useBoundStore` 後回傳 (目前實作是透過 `Object.assign`)
+- `useBoundStore` 透過 `useSyncExternalStore` 整合 vanilla store
+- `useBoundStore(selector)` 的 `selector` output，`useSyncExternalStore` 會用 [`Object.is`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is) 比對是否有變更
+
+## Reference
+
+- [zustand](https://github.com/pmndrs/zustand)
+- [useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore)
+- [What is tearing?](https://github.com/reactwg/react-18/discussions/69)
