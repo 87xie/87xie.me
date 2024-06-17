@@ -1,6 +1,6 @@
 ---
 title: Inside zustand
-tag: react, zustand
+tag: react, zustand, state management
 date: 2024-06-17
 ---
 
@@ -69,9 +69,9 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
 
 vanilla store 為常見的 observer pattern
 
-`getInitialState` 主要是為了支援 server-side rendering，相關討論可以參考： [pull#2277](https://github.com/pmndrs/zustand/pull/2277)
-
-`setState` 做了 shallow merging 處理（參考下方 highlighting），可以對應到官方文件提到：
+- 透過 `Set<Listener>` 來存放 listener callback
+- `getInitialState` 主要是為了支援 server-side rendering，相關討論可以參考： [pull#2277](https://github.com/pmndrs/zustand/pull/2277)
+- `setState` 做了 shallow merging 處理（參考下方 highlighting），可以對應到官方文件提到：
 
 >The `set` function merges state at only one level. If you have a nested object, you need to merge them explicitly.
 
@@ -134,7 +134,7 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
 }
 ```
 
-往下看到 `useStore`，是透過 react 的 [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore#subscribing-to-an-external-store) 整合 vanilla store 的 api：
+先看到 `useStore`，是透過 react 的 [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore#subscribing-to-an-external-store) 整合 vanilla store：
 
 ```ts showLineNumbers filename="src/react.ts"
 export function useStore<TState, StateSlice>(
@@ -151,13 +151,11 @@ export function useStore<TState, StateSlice>(
 }
 ```
 
-再回到完整程式碼的 `createImpl`，並將目前資訊整合：
+再回到完整程式碼的 `createImpl`，這裡整理一下目前已知：
 
 - `api` 是 vanilla store 的介面
-- `api` 會被複製到 `useBoundStore` 上
-- `useBoundStore` 是接收 `selector` 參數的 react hook
-  - `selector` 是用來選取 vanilla store state 的 callback
-  - `useBoundStore` 將 scope 內的 `selector`, `api` 提供給 `useStore`
+- `api` 會被複製到 `useBoundStore` 上（透過 `Object.assign`）
+- `useBoundStore` 是接收 `selector` 參數的 react hook，`selector` 是用來選取 vanilla store state 的 callback
 - `useStore` 為一個 react hook，用來整合 `useSyncExternalStore`, `api`, `selector`
 
 ```ts showLineNumbers filename="src/react.ts"
@@ -174,25 +172,23 @@ const createImpl = <T>(createState: StateCreator<T, [], []>) => {
 
 <Callout>
   補充：`Object.assign(useBoundStore, api){:js}`，可以對應到官方文件中提到：
+  >Reading/writig state and reacting to changes outside of components
+  ```ts showLineNumbers
+  const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
+
+  // Getting non-reactive fresh state
+  const paw = useDogStore.getState().paw
+  // Listening to all changes, fires synchronously on every change
+  const unsub = useDogStore.subscribe(console.log)
+  useDogStore.setState({ paw: false })
+  // Unsubscribe listeners
+  unsub()
+  ```
 </Callout>
-
->Reading/writig state and reacting to changes outside of components
-
-```ts showLineNumbers
-const useDogStore = create(() => ({ paw: true, snout: true, fur: true }))
-
-// Getting non-reactive fresh state
-const paw = useDogStore.getState().paw
-// Listening to all changes, fires synchronously on every change
-const unsub = useDogStore.subscribe(console.log)
-useDogStore.setState({ paw: false })
-// Unsubscribe listeners
-unsub()
-```
 
 ## Binding Components
 
-從上述結果得知 `useBoundStore` 是基於 `useSyncExternalStore` 實現，所以當調用 `useBoundStore(selector){:js}` 時：
+從上述結果得知 `useBoundStore` 是基於 `useSyncExternalStore` 實現，當調用 `useBoundStore(selector){:js}`：
 
 - 會新增一個觸發 component re-render 的 listener 至 vanilla store
 - 透過 `selector` 得到的 snapshot，需要符合 [`useSyncExternalStore - getSanpshot`](https://react.dev/reference/react/useSyncExternalStore#parameters) 的規則
