@@ -67,7 +67,7 @@ class QueryCache extends Subscribable<QueryCacheListener> {
 }
 ```
 
-繼續深入 `queryHash`，這裡方向是先觀察 `QueryCache.add()` 如何被調用，可以在 `Query.build()` 中得知：
+繼續深入 `queryHash`，這裡方向是先觀察 `QueryCache.add()` 如何被調用，可以在 `QueryCache.build()` 中得知：
 
 - 先透過 `hashQueryKeyByOptions` 將 `queryKey` 轉換成 `queryHash`
 - 如果該 `queryHash` 在 `queries` 查詢不到對應的 `Query`，則建立一個 `Query` 實例並新增至 `queries`
@@ -334,7 +334,7 @@ export function partialMatchKey(a: QueryKey, b: QueryKey): boolean {
 
 - 建立 `QueryClient` 實例時，同時也會建立 `QueryCache`（如果沒額外提供）
 - `QueryCache.queries` 是用來存放 `Query` 實例的 `Map`，key 為 `queryHash`
-- 將 `queryKey` 轉換成 `queryHash`，預設是透過 `JSON.stringify`，如果 `queryKey` 含有 serializable object，會對該 object 進行 key 的排序，確保不會因為物件 key 順序不同，得到不一致的 hash
+-  `queryHash` 是由 `queryKey` 轉換而來，預設是透過 `JSON.stringify`，如果 `queryKey` 含有 serializable object，會對 key 進行排序，確保不會因為物件 key 順序不同，得到不一致的 hash
 - `QueryCache` 在查詢 `Query` 時，會先透過 `[...QueryCache.queries.values()]{:js}` 得到一個 `Query[]`，所以查詢 `Query` 的時間複雜度為 `O(n)`
 - `QueryCache` 做結構化查詢的流程：
   1. `[...QueryCache.queries.values()]{:js}` 得到一個 `Query[]`，這裡以 `allQueries` 代稱
