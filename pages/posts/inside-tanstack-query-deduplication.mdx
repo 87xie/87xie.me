@@ -29,13 +29,15 @@ import { Callout } from 'nextra/components'
   - 以 react 為例，在呼叫 `useQuery` 時被建立，作為與 query-core 與 react component 連接組件，提供 [useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore) 需要的 API
   - 每個 `QueryObserver` 只會訂閱一個 `Query`
 
-下方的圖片來自 [Inside React Query](https://tkdodo.eu/blog/inside-react-query)
+下方圖片來自 [Inside React Query](https://tkdodo.eu/blog/inside-react-query)
 
 ![](/react-query-architecture.png)
 
 ## `QueryClient.fetchQuery()`
 
-1. 先透過 `QueryCache.build()` 得到一個 `Query`，`QueryCache.build()` 在 [Query key to query hash](/posts/inside-tanstack-query-query-cache-queries#query-key-to-query-hash) 看過，大致流程為：
+先從 `QueryClient.fetch()` 開始看起，大致流程如下
+
+1. 透過 `QueryCache.build()` 得到一個 `Query`，`QueryCache.build()` 在 [Query key to query hash](/posts/inside-tanstack-query-query-cache-queries#query-key-to-query-hash) 看過，大致流程為：
     1. 先透過 `queryKey` 查詢是否已經存在對應 `Query`
     1. 如果有，回傳該 `Query`，反之新增一個 `Query` 實例，儲存至 `QueryCache` 後回傳
 1. 如果最新一筆請求已過時，回傳 `Query.fetch()`，反之沿用最新一筆請求的資料
@@ -370,5 +372,5 @@ class QueryObserver<
 
 ## Reference
 
-- [tanstack/query](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
 - [Inside React Query](https://tkdodo.eu/blog/inside-react-query)
+- [tanstack/query](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
