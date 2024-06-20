@@ -34,9 +34,7 @@ test('queries should be garbage collected even if they never fetched', async () 
 })
 ```
 
-知道可能與 `Query` 相關後，從 `Query` 的程式碼得知：
-
-- `Query` 為 `Removable` 的子類別 (L6, L9)
+知道與 `Query` 相關，所以先看到 `Query` 實作。`Query` 為 `Removable` 的子類別 (L6, L9)
 
 ```ts showLineNumbers filename="query.ts" {6, 9}
 export class Query<
@@ -55,11 +53,14 @@ export class Query<
 
 `Removable` 為一個抽象類別，可以看到 garbage collection 相關實作：
 
-- 透過 `setTimeout` 設置 garbage collected 的定時器 (L15-17)
-- 在 `updateGcTime` (L23-L26) 對應官方文件提到：
-    - client-side `gcTime` 預設 5 minutes
-    - server-side `gcTime` 預設 `Infinity`
+- 透過 `setTimeout` 設置 garbage collected 的定時器 (L15-L17)
 - 每個子類別都需實作 `optionalRemove` 方法 (L36)
+
+`updateGcTime` (L23-L26) 對應官方文件對 `gcTime` 的說明：
+
+> - Defaults to 5 * 60 * 1000 (5 minutes) or Infinity during SSR
+> - When different garbage collection times are specified, the longest one will be used.
+
 
 ```ts showLineNumbers filename="removable.ts" {15-17, 23-26, 36}
 import { isServer, isValidTimeout } from './utils'
