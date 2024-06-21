@@ -1,6 +1,6 @@
 ---
 title: Inside TanStack Query - garbage collection
-tag: tanstack-query, state management
+tag: tanstack query, state management
 date: 2024-06-20
 ---
 
@@ -296,16 +296,16 @@ export class Mutation<
 
 ## Summary
 
-- TanStack Query 是透過 `setTimeout`，定時檢查 `Query`, `Mutation` 實例的狀態，若判定為未使用，則向 `QueryCache` 或 `MutationCache` 清除該實例。`gcTime` 即為 `setTimeout` 的 delay ms
-- 如果 `Query` 的請求進行中，或正被 `QueryObserver` 訂閱，該實例不會被清除
-- 如果 `Mutation` 的請求進行中，或正被 `MutationObserver` 訂閱，該實例不會被清除
+- TanStack Query 是透過 `setTimeout` 定時檢查 `Query`, `Mutation` 實例的狀態，判斷是否需要向 `QueryCache`, `MutationCache` 清除該實例。`gcTime` 即為 `setTimeout` 的 delay ms
+- 如果 `Query` 的請求進行中，或是有 `QueryObserver` 訂閱中，該實例不會被清除
+- 如果 `Mutation` 的請求進行中，或是有 `MutationObserver` 訂閱中，該實例不會被清除
 - `Query`, `Mutation` 會在不同時機，設置 garbage collection 定時器，例如：
     - 建立 `Query`, `Mutation` 實例時
-    - `Query` 執行請求後，收到失敗或成功回覆時
+    - `Query` 執行請求，收到失敗或成功回覆時
     - `QueryObserver` 向 `Query` 取消訂閱，且該 `Query` 沒有其他訂閱者時
     - `MutationObserver` 向 `Mutation` 取消訂閱時
     - `Mutation.scheduleGc()` 定時器觸發後，該 `Mutation.state.status` 仍為 `pending` 時
 
 ## Reference
 
-- [tanstack/query](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
+- [GitHub - tanstack/query](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
