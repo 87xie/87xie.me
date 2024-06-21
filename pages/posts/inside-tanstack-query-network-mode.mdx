@@ -35,9 +35,9 @@ export class OnlineManager extends Subscribable<Listener> {
 - `subscribe` (L12-14)
 - `unsubscribe` (L16-19)
 
-`Subscriable.onSubscribe()`, `Subscriable.onUnsubscribe()` 的部分，可以視子類別的需求，決定是否實作。因為原型鏈繼承，如果子類別有實作會優先被選取
+`Subscriable.onSubscribe()`, `Subscriable.onUnsubscribe()`，可以視子類別的需求決定是否實作。因為原型鏈繼承，如果子類別有實作會優先選取 (L26-28, L30-32)
 
-```ts showLineNumbers filename="subscribable.ts" {4, 12-14, 16-19}
+```ts showLineNumbers filename="subscribable.ts" {4, 12-14, 16-19, 26-28, 30-32}
 type Listener = () => void
 
 export class Subscribable<TListener extends Function = Listener> {
@@ -76,8 +76,8 @@ export class Subscribable<TListener extends Function = Listener> {
 繼續看到 `OnlineManager`：
 
 - 預設 `#online` 狀態為 `true` (L2)
-- 建立 `OnlineManager` 實例時，**不會馬上設置 online, offline 的事件監聽** (L9-24)，直到有人呼叫 `OnlineManager.subscribe()` 向 `OnlineManager` 訂閱，觸發 `OnlineManager.onSubscribe()` 檢查是否需要呼叫 `#setup` 設置監聽 (L30-34, L43-47)
-- 每次收到 window online, offline event 會呼叫 `setOnline`，當 `#online` 狀態有變化，同時向所有 listener 進行通知 (L52-57)
+- 建立 `OnlineManager` 實例時，**不會馬上設置 online, offline 的事件監聽** (L9-24)，直到有人呼叫 `OnlineManager.subscribe()`，觸發 `OnlineManager.onSubscribe()` 檢查是否呼叫 `#setup` 設置監聽 (L30-34, L43-47)
+- 每次收到 online, offline event 會呼叫 `setOnline`，當狀態變化時，同時向 `listeners` 進行通知 (L52-57)
 - TanStack Query 中，只有一個 `OnlineManager` 實例 (L65)
 
 ```ts showLineNumbers filename="onlineManager.ts" {2, 9-24, 30-34, 43-47, 52-57, 65}
@@ -165,7 +165,10 @@ export class QueryClient {
 }
 ```
 
-tanstack/react-query 是在 `QueryClientProvier`，透過 `useEffect` 設置呼叫 `QueryClient.mount()` 的 callback，及 `QueryClient.unmount()` 的 cleanup function
+tanstack/react-query 是在 `QueryClientProvier` 透過 `useEffect`：
+
+- 設置呼叫 `QueryClient.mount()` 的 effect callback
+- 設置呼叫 `QueryClient.unmount()` 的 cleanup callback
 
 ```tsx showLineNumbers filename="QueryClientProvider.tsx" {2, 10-15}
 export type QueryClientProviderProps = {
@@ -193,7 +196,7 @@ export const QueryClientProvider = ({
 ```
 
 <Callout>
-補充：tanstack/react-query 有 re-export query-core，所以可以 access `OnlineManager` 實例，如下方範例：
+補充：tanstack/react-query 有 re-export query-core，可以 import `OnlineManager` 實例，如下方範例：
 
 ```ts showLineNumbers
 import { onlineManager } from '@tanstack/react-query'
@@ -206,7 +209,9 @@ const unsubscribe = onlineManager.subscribe((isOnline) => {
 
 ## `QueryCache.onLine()`
 
-在 `QueryClient` 實作中看到，當收到 `OnlineManager` 恢復連線的通知時，會呼叫 `this.#queryCache.onOnline(){:js}`，對應到 `QueryCache.onOnline` 實作即為，對所有 `Query` 呼叫 `Query.onOnline()`
+在 `QueryClient.mount()` 得知，當收到 `OnlineManager` 恢復連線的通知時，會呼叫 `this.#queryCache.onOnline(){:js}`
+
+ `QueryCache.onOnline` 會對所有 `Query` 呼叫 `Query.onOnline()`
 
 ```ts showLineNumbers filename="queryCache.ts" {5-7}
 export class QueryCache extends Subscribable<QueryCacheListener> {
@@ -223,15 +228,15 @@ export class QueryCache extends Subscribable<QueryCacheListener> {
 
 ## `Query.onOnline()`
 
-先看到 `observer` 的部分，`observer` 為 `QueryObserver` 的實例，在呼叫 `useQuery` 後產生，並紀錄在 `Query` 中
+先看到前三行 `observer` 的部分 (`observer` 為 `QueryObserver` 的實例，在呼叫 `useQuery` 後產生，並保存在 `Query` 中)
 
-1. 找到任一需要重新連線的 `observer`，判斷方式：
+1. 找到任一需要重新請求的 `observer`，`QueryObserver.shouldFetchOnReconnect()` 會判斷：
     - `queryOptions.enabled !== false{:js}`
     - `queryOptions.refetchOnReconnect === 'always'{:js}`，不考慮資料是否過期，直接 refetch
-    - `queryOptions.refetchOnReconnect === true{:js}`，如果資料過期才做 refetch
+    - `queryOptions.refetchOnReconnect === true{:js}`，資料過期才會 refetch
 1. `observer?.refetch({ cancelRefetch: false }){:js}`：
     - `{ cancelRefetch: false }{:js}`，表示如果該請求進行中，不做 refetch
-    - 最後會呼叫 `QueryObserver.#currentQuery.fetch()` 即為 `Query.fetch()`
+    - 最後會呼叫 `this.#currentQuery.fetch(){:js}` 即為 `Query.fetch()`
 
 ```ts showLineNumbers filename="query.ts" {9-11, 17-21, 32-37}
 export class Query<
@@ -274,9 +279,13 @@ function shouldFetchOn(
 }
 ```
 
-接著看到 `retryer` 的部分，這裡 `retryer?.continue()` 主要用來確保 `fetchStatus` 為 `fetching`
+`#this.retryer?.continue(){:js}`：
 
-```ts showLineNumbers filename="query.ts" {14, 26-28, 40-44}
+- 當 `state.fetchStatus === 'paused'{:js}`，呼叫 `retryer.continue(){:js}` 才會觸發 `config.onContinue(){:js}` 執行，這部分細節在下一段說明
+-  `config.onContinue(){:js}` 觸發 `#dispatch({ type: 'continue' }){:js}`，將 `state.fetchStatus` 更新成 `fetching` (L26-29, L40-44, L49)
+- 每次透過 `Query.dispatch()` 更新 `state` 都會向 `observers` 進行通知 (L51-53)
+
+```ts showLineNumbers filename="query.ts" {14, 29-31, 44-48, 53, 55-57}
 export class Query<
   TQueryFnData = unknown,
   TError = DefaultError,
@@ -302,10 +311,14 @@ export class Query<
     // Try to fetch the data
     this.#retryer = createRetryer({
       // ...
+      onPause: () => {
+        this.#dispatch({ type: 'pause' })
+      },
       onContinue: () => {
         this.#dispatch({ type: 'continue' })
       },
-      // ...
+      networkMode: context.options.networkMode,
+      canRun: () => true,
     })
 
     return this.#retryer.start()
@@ -324,17 +337,33 @@ export class Query<
         // ...
       }
     }
+
+    this.state = reducer(this.state)
+    notifyManager.batch(() => {
+      this.observers.forEach((observer) => {
+        observer.onQueryUpdate()
+      })
+
+      this.#cache.notify({ query: this, type: 'updated', action })
+    })
   }
 }
 ```
 
-每次調用 `retryer?.continue(){:js}`，不一定會觸發 `config.onContinue()`，在 `retryer` 的實作有以下判斷：
+看到 `Retryer` 的實作：
 
-- 呼叫 `retryer.start(){:js}`，未能滿足 `canStart(){:js}`，會呼叫 `retryer.pause(){:js}` 暫停請求 (L39-43)
-    - `config.networkMode === 'online'`，呼叫 `OnlineManager.isOnline()` 也要為 `true` (L50-52)
-- 呼叫 `retryer.pause(){:js}` 後，才會設置 `continueFn`，後續呼叫 `retryer.continue(){:js}` 才會觸發 `continueFn` 執行 `config.onContinue()` (L32-35)
+- `Retryer.start()` 內，先透過 `canStart(){:js}` 判斷是否暫停請求 (L39-43)
+  - `canStart(){:js}` 由 `catFetch(){:js}` 及 `config.canRun(){:js}` 組成 (L12)
+  - `canFetch(){:js}` 參考 `config.networkMode` 及 `OnlineManager.isOnline()` (L50-52)
+  - 在 `Query` 設置的 `config.canRun(){:js}` 為： `() => true{:js}`
+- 呼叫 `Retryer.pause(){:js}`：
+    - 設置 `continueFn` (L18-22)
+    - 觸發在 `Query` 設置的  `config.onPause(){:js}`， 將 `Query.state.fetchStatus` 更新成 `paused` (L21)
+    - 後續呼叫 `Retryer.continue(){:js}` 觸發 `continueFn` 執行 `config.onContinue()` (L32-35)
 
-```ts showLineNumbers filename="retryer.ts" {5, 23-26, 32-35, 39-43, 50-52}
+```ts showLineNumbers filename="retryer.ts" {7, 14, 18-22, 23, 25-28, 34-37, 41-45, 52-54}
+import { onlineManager } from './onlineManager'
+
 export function createRetryer<TData = unknown, TError = DefaultError>(
   config: RetryerConfig<TData, TError>,
 ): Retryer<TData> {
@@ -388,6 +417,21 @@ export function canFetch(networkMode: NetworkMode | undefined): boolean {
     ? onlineManager.isOnline()
     : true
 }
+
+interface RetryerConfig<TData = unknown, TError = DefaultError> {
+  fn: () => TData | Promise<TData>
+  initialPromise?: Promise<TData>
+  abort?: () => void
+  onError?: (error: TError) => void
+  onSuccess?: (data: TData) => void
+  onFail?: (failureCount: number, error: TError) => void
+  onPause?: () => void
+  onContinue?: () => void
+  retry?: RetryValue<TError>
+  retryDelay?: RetryDelayValue<TError>
+  networkMode: NetworkMode | undefined
+  canRun: () => boolean
+}
 ```
 
 ## Summary
@@ -397,9 +441,13 @@ export function canFetch(networkMode: NetworkMode | undefined): boolean {
 - 呼叫 `QueryClinet.mount()`，會向 `OnlineManager` 訂閱網路連線狀態
     - tanstack/react-query 是在 `QueryClientProvier`，透過 `useEffect` 設置呼叫 `QueryClient.mount()` 的 callback，及 `QueryClient.unmount()` 的 cleanup function
 - 當 `QueryClient` 收到 `OnlineManager` 的恢復連線通知，觸發 `Query` 重新連線的流程：
-    1. `QueryClient` 呼叫 `QueryCache.onOnline`
-    1. `QueryCache` 對所有 `Query` 呼叫 `Query.onOnline`
-    1. `Query` 根據各自的 `observers`, `options.networkMode`, `retryer`，決定是否觸發重新連線
+    1. `QueryClient` 呼叫 `QueryCache.onOnline()`
+    1. `QueryCache` 對所有 `Query` 呼叫 `Query.onOnline()`
+    1. `Query` 根據各自的 `observers`, `options.networkMode`, `retryer`, `state`，決定是否觸發 refetch
+- 預設 `networkMode` 為 `online`，預設情況下，資料未過期不觸發 refetch
+- `Query` 會建立 `Retryer` 實例處理請求，如果 `networkMode === 'online' && !onlineManager.isOnline(){:js}`
+    - 呼叫 `Retryer.start()` 會先暫停請求
+    - `Query.state.fetchStatus` 為 `paused`
 
 ## Reference
 
