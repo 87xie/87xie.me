@@ -1,0 +1,407 @@
+---
+title: Inside TanStack Query - network mode
+tag: tanstack query, state management
+date: 2024-06-21
+---
+
+import { Callout } from 'nextra/components'
+
+在官方文件提到：TanStack Query 提供三種不同的 network modes，區分沒有網路連線的情況下，Queries, Mutations 的運作方式
+
+>TanStack Query provides three different network modes to distinguish how Queries and Mutations should behave if you have no network connection. This mode can be set for each Query / Mutation individually, or globally via the query / mutation defaults.
+>
+>Since TanStack Query is most often used for data fetching in combination with data fetching libraries, the default network mode is online.
+
+這裡紀錄 `Query` 與 network mode 相關實作，參考版本為 [v5.45.1](https://github.com/TanStack/query/tree/80a03229f411f347d64a689bca045a577ed201ae)
+
+## OnlineManager
+
+先從 `query-core` 的 `OnlineManager` 開始看起，`OnlineManager` 是 `Subscribable` 的子類別
+
+```ts showLineNumbers filename="onlineManager.ts" {1, 4}
+export class OnlineManager extends Subscribable<Listener> {
+  // ...
+  constructor() {
+    super()
+    // ...
+  }
+  // ...
+}
+```
+
+`Subscribable` 大致實作 observer pattern 中的：
+
+- `listeners` (L4)
+- `subscribe` (L12-14)
+- `unsubscribe` (L16-19)
+
+`Subscriable.onSubscribe()`, `Subscriable.onUnsubscribe()` 的部分，可以視子類別的需求，決定是否實作。因為原型鏈繼承，如果子類別有實作會優先被選取
+
+```ts showLineNumbers filename="subscribable.ts" {4, 12-14, 16-19}
+type Listener = () => void
+
+export class Subscribable<TListener extends Function = Listener> {
+  protected listeners: Set<TListener>
+
+  constructor() {
+    this.listeners = new Set()
+    this.subscribe = this.subscribe.bind(this)
+  }
+
+  subscribe(listener: TListener): () => void {
+    this.listeners.add(listener)
+
+    this.onSubscribe()
+
+    return () => {
+      this.listeners.delete(listener)
+      this.onUnsubscribe()
+    }
+  }
+
+  hasListeners(): boolean {
+    return this.listeners.size > 0
+  }
+
+  protected onSubscribe(): void {
+    // Do nothing
+  }
+
+  protected onUnsubscribe(): void {
+    // Do nothing
+  }
+}
+```
+
+繼續看到 `OnlineManager`：
+
+- 預設 `#online` 狀態為 `true` (L2)
+- 建立 `OnlineManager` 實例時，**不會馬上設置 online, offline 的事件監聽** (L9-24)，直到有人呼叫 `OnlineManager.subscribe()` 向 `OnlineManager` 訂閱，觸發 `OnlineManager.onSubscribe()` 檢查是否需要呼叫 `#setup` 設置監聽 (L30-34, L43-47)
+- 每次收到 window online, offline event 會呼叫 `setOnline`，當 `#online` 狀態有變化，同時向所有 listener 進行通知 (L52-57)
+- TanStack Query 中，只有一個 `OnlineManager` 實例 (L65)
+
+```ts showLineNumbers filename="onlineManager.ts" {2, 9-24, 30-34, 43-47, 52-57, 65}
+export class OnlineManager extends Subscribable<Listener> {
+  #online = true
+  #cleanup?: () => void
+
+  #setup: SetupFn
+
+  constructor() {
+    super()
+    this.#setup = (onOnline) => {
+      // addEventListener does not exist in React Native, but window does
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!isServer && window.addEventListener) {
+        const onlineListener = () => onOnline(true)
+        const offlineListener = () => onOnline(false)
+        // Listen to online
+        window.addEventListener('online', onlineListener, false)
+        window.addEventListener('offline', offlineListener, false)
+
+        return () => {
+          // Be sure to unsubscribe if a new handler is set
+          window.removeEventListener('online', onlineListener)
+          window.removeEventListener('offline', offlineListener)
+        }
+      }
+
+      return
+    }
+  }
+
+  protected onSubscribe(): void {
+    if (!this.#cleanup) {
+      this.setEventListener(this.#setup)
+    }
+  }
+
+  protected onUnsubscribe() {
+    if (!this.hasListeners()) {
+      this.#cleanup?.()
+      this.#cleanup = undefined
+    }
+  }
+
+  setEventListener(setup: SetupFn): void {
+    this.#setup = setup
+    this.#cleanup?.()
+    this.#cleanup = setup(this.setOnline.bind(this))
+  }
+
+  setOnline(online: boolean): void {
+    const changed = this.#online !== online
+
+    if (changed) {
+      this.#online = online
+      this.listeners.forEach((listener) => {
+        listener(online)
+      })
+    }
+  }
+
+  isOnline(): boolean {
+    return this.#online
+  }
+}
+
+export const onlineManager = new OnlineManager()
+```
+
+呼叫 `QueryClient.mount()`，`QueryClient` 會對 `OnlineManager` 進行訂閱：
+
+```ts showLineNumbers filename="queryClient.ts" {5-10}
+export class QueryClient {
+  // ...
+  mount(): void {
+    // ...
+    this.#unsubscribeOnline = onlineManager.subscribe(async (online) => {
+      if (online) {
+        await this.resumePausedMutations()
+        this.#queryCache.onOnline()
+      }
+    })
+  }
+}
+```
+
+tanstack/react-query 是在 `QueryClientProvier`，透過 `useEffect` 設置呼叫 `QueryClient.mount()` 的 callback，及 `QueryClient.unmount()` 的 cleanup function
+
+```tsx showLineNumbers filename="QueryClientProvider.tsx" {2, 10-15}
+export type QueryClientProviderProps = {
+  client: QueryClient
+  children?: React.ReactNode
+}
+
+export const QueryClientProvider = ({
+  client,
+  children,
+}: QueryClientProviderProps): React.JSX.Element => {
+  React.useEffect(() => {
+    client.mount()
+    return () => {
+      client.unmount()
+    }
+  }, [client])
+
+  return (
+    <QueryClientContext.Provider value={client}>
+      {children}
+    </QueryClientContext.Provider>
+  )
+}
+```
+
+<Callout>
+補充：tanstack/react-query 有 re-export query-core，所以可以 access `OnlineManager` 實例，如下方範例：
+
+```ts showLineNumbers
+import { onlineManager } from '@tanstack/react-query'
+
+const unsubscribe = onlineManager.subscribe((isOnline) => {
+  console.log('isOnline', isOnline)
+})
+```
+</Callout>
+
+## `QueryCache.onLine()`
+
+在 `QueryClient` 實作中看到，當收到 `OnlineManager` 恢復連線的通知時，會呼叫 `this.#queryCache.onOnline(){:js}`，對應到 `QueryCache.onOnline` 實作即為，對所有 `Query` 呼叫 `Query.onOnline()`
+
+```ts showLineNumbers filename="queryCache.ts" {5-7}
+export class QueryCache extends Subscribable<QueryCacheListener> {
+  //...
+  onOnline(): void {
+    notifyManager.batch(() => {
+      this.getAll().forEach((query) => {
+        query.onOnline()
+      })
+    })
+  }
+}
+```
+
+## `Query.onOnline()`
+
+先看到 `observer` 的部分，`observer` 為 `QueryObserver` 的實例，在呼叫 `useQuery` 後產生，並紀錄在 `Query` 中
+
+1. 找到任一需要重新連線的 `observer`，判斷方式：
+    - `queryOptions.enabled !== false{:js}`
+    - `queryOptions.refetchOnReconnect === 'always'{:js}`，不考慮資料是否過期，直接 refetch
+    - `queryOptions.refetchOnReconnect === true{:js}`，如果資料過期才做 refetch
+1. `observer?.refetch({ cancelRefetch: false }){:js}`：
+    - `{ cancelRefetch: false }{:js}`，表示如果該請求進行中，不做 refetch
+    - 最後會呼叫 `QueryObserver.#currentQuery.fetch()` 即為 `Query.fetch()`
+
+```ts showLineNumbers filename="query.ts" {9-11, 17-21, 32-37}
+export class Query<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Removable {
+  // ...
+  onOnline(): void {
+    const observer = this.observers.find((x) => x.shouldFetchOnReconnect())
+
+    observer?.refetch({ cancelRefetch: false })
+
+    // Continue fetch if currently paused
+    this.#retryer?.continue()
+  }
+  shouldFetchOnReconnect(): boolean {
+    return shouldFetchOn(
+      this.#currentQuery,
+      this.options,
+      this.options.refetchOnReconnect,
+    )
+  }
+}
+
+function shouldFetchOn(
+  query: Query<any, any, any, any>,
+  options: QueryObserverOptions<any, any, any, any, any>,
+  field: (typeof options)['refetchOnMount'] &
+    (typeof options)['refetchOnWindowFocus'] &
+    (typeof options)['refetchOnReconnect'],
+) {
+  if (options.enabled !== false) {
+    const value = typeof field === 'function' ? field(query) : field
+
+    return value === 'always' || (value !== false && isStale(query, options))
+  }
+  return false
+}
+```
+
+接著看到 `retryer` 的部分，這裡 `retryer?.continue()` 主要用來確保 `fetchStatus` 為 `fetching`
+
+```ts showLineNumbers filename="query.ts" {14, 26-28, 40-44}
+export class Query<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Removable {
+  // ...
+  onOnline(): void {
+    const observer = this.observers.find((x) => x.shouldFetchOnReconnect())
+
+    observer?.refetch({ cancelRefetch: false })
+
+    // Continue fetch if currently paused
+    this.#retryer?.continue()
+  }
+  // ...
+  fetch(
+    options?: QueryOptions<TQueryFnData, TError, TData, TQueryKey>,
+    fetchOptions?: FetchOptions<TQueryFnData>,
+  ): Promise<TData> {
+    // ...
+
+    // Try to fetch the data
+    this.#retryer = createRetryer({
+      // ...
+      onContinue: () => {
+        this.#dispatch({ type: 'continue' })
+      },
+      // ...
+    })
+
+    return this.#retryer.start()
+  }
+  #dispatch(action: Action<TData, TError>): void {
+    const reducer = (
+      state: QueryState<TData, TError>,
+    ): QueryState<TData, TError> => {
+      switch (action.type) {
+        // ...
+        case 'continue':
+          return {
+            ...state,
+            fetchStatus: 'fetching',
+          }
+        // ...
+      }
+    }
+  }
+}
+```
+
+每次調用 `retryer?.continue(){:js}`，不一定會觸發 `config.onContinue()`，在 `retryer` 的實作有以下判斷：
+
+- 呼叫 `retryer.start(){:js}`，未能滿足 `canStart(){:js}`，會呼叫 `retryer.pause(){:js}` 暫停請求 (L39-43)
+    - `config.networkMode === 'online'`，呼叫 `OnlineManager.isOnline()` 也要為 `true` (L50-52)
+- 呼叫 `retryer.pause(){:js}` 後，才會設置 `continueFn`，後續呼叫 `retryer.continue(){:js}` 才會觸發 `continueFn` 執行 `config.onContinue()` (L32-35)
+
+```ts showLineNumbers filename="retryer.ts" {5, 23-26, 32-35, 39-43, 50-52}
+export function createRetryer<TData = unknown, TError = DefaultError>(
+  config: RetryerConfig<TData, TError>,
+): Retryer<TData> {
+  let isResolved = false
+  let continueFn: ((value?: unknown) => void) | undefined
+
+  const canContinue = () =>
+    focusManager.isFocused() &&
+    (config.networkMode === 'always' || onlineManager.isOnline()) &&
+    config.canRun()
+
+  const canStart = () => canFetch(config.networkMode) && config.canRun()
+
+  const pause = () => {
+    return new Promise((continueResolve) => {
+      continueFn = (value) => {
+        if (isResolved || canContinue()) {
+          continueResolve(value)
+        }
+      }
+      config.onPause?.()
+    }).then(() => {
+      continueFn = undefined
+      if (!isResolved) {
+        config.onContinue?.()
+      }
+    })
+  }
+
+  return {
+    // ...
+    continue: () => {
+      continueFn?.()
+      return promise
+    },
+    // ...
+    start: () => {
+      // Start loop
+      if (canStart()) {
+        run()
+      } else {
+        pause().then(run)
+      }
+      return promise
+    },
+  }
+}
+
+export function canFetch(networkMode: NetworkMode | undefined): boolean {
+  return (networkMode ?? 'online') === 'online'
+    ? onlineManager.isOnline()
+    : true
+}
+```
+
+## Summary
+
+- `OnlineManager` 繼承 `Subscriable`，是基於 observer pattern 的實作，可以透過 `OnlineManager.subscribe()` 訂閱目前網路連線狀態
+- `OnlineManager` 有第一個訂閱者時，才會設置 online, offline 的事件監聽
+- 呼叫 `QueryClinet.mount()`，會向 `OnlineManager` 訂閱網路連線狀態
+    - tanstack/react-query 是在 `QueryClientProvier`，透過 `useEffect` 設置呼叫 `QueryClient.mount()` 的 callback，及 `QueryClient.unmount()` 的 cleanup function
+- 當 `QueryClient` 收到 `OnlineManager` 的恢復連線通知，觸發 `Query` 重新連線的流程：
+    1. `QueryClient` 呼叫 `QueryCache.onOnline`
+    1. `QueryCache` 對所有 `Query` 呼叫 `Query.onOnline`
+    1. `Query` 根據各自的 `observers`, `options.networkMode`, `retryer`，決定是否觸發重新連線
+
+## Reference
+
+- [TanStack Query - Network Mode](https://tanstack.com/query/latest/docs/framework/react/guides/network-mode#network-mode-online)
+- [GitHub - tanstack/query](https://github.com/TanStack/query/tree/80a03229f411f347d64a689bca045a577ed201ae)
