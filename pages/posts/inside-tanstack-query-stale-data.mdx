@@ -1,0 +1,492 @@
+---
+title: Inside TanStack Query - stale data
+tag: tanstack query, state management
+date: 2024-06-23
+---
+
+import { Callout } from 'nextra/components'
+
+紀錄 TanStack Query 判斷 stale data 的機制，包含：
+
+- 資料更新後，超過指定的 `staleTime`
+- 透過 `QueryClient.invalidateQueries()` 標記無效
+
+參考版本為 [v5.45.1](https://github.com/TanStack/query/tree/80a03229f411f347d64a689bca045a577ed201ae)
+
+## `QueryObserverResult.isStale`
+
+從 `const { isStale } = useQuery(...){:js}` 開始看起：
+
+```ts filename="useQuery.ts"
+import { QueryObserver } from '@tanstack/query-core'
+
+function useQuery(options: UseQueryOptions, queryClient?: QueryClient) {
+  return useBaseQuery(options, QueryObserver, queryClient)
+}
+```
+
+呼叫 `useQuery()`：
+
+- 得到 `QueryObserver.getOptimisticResult()` 的結果 (L30, L34-36)
+- `QueryObserver.trackResult()` 與透過 `Object.defineProperty()` 設置 custom getters，追蹤 accessed fields 的優化相關 (L35)
+
+```ts showLineNumbers filename="useBaseQuery.ts" {30, 34-36}
+export function useBaseQuery<
+  TQueryFnData,
+  TError,
+  TData,
+  TQueryData,
+  TQueryKey extends QueryKey,
+>(
+  options: UseBaseQueryOptions<
+    TQueryFnData,
+    TError,
+    TData,
+    TQueryData,
+    TQueryKey
+  >,
+  Observer: typeof QueryObserver,
+  queryClient?: QueryClient,
+): QueryObserverResult<TData, TError> {
+  // ...
+  const client = useQueryClient(queryClient)
+  const defaultedOptions = client.defaultQueryOptions(options)
+  // ...
+  const [observer] = React.useState(
+    () =>
+      new Observer<TQueryFnData, TError, TData, TQueryData, TQueryKey>(
+        client,
+        defaultedOptions,
+      ),
+  )
+
+  const result = observer.getOptimisticResult(defaultedOptions)
+  // ...
+
+  // Handle result property usage tracking
+  return !defaultedOptions.notifyOnChangeProps
+    ? observer.trackResult(result)
+    : result
+}
+```
+
+`QueryObserver.getOptimisticResult()` 是回傳 `QueryObserver.createResult()` 的執行結果 (L20, L28)
+
+<Callout>
+`if (shouldAssignObserverCurrentProperties(this, result)){:js}`，可以參考：[issue#5538](https://github.com/TanStack/query/issues/5538), [pull#5573](https://github.com/TanStack/query/pull/5573), [pull#5839](https://github.com/TanStack/query/pull/5839)
+</Callout>
+
+<br/>
+
+```ts showLineNumbers filename="queryObserver.ts" {20, 28}
+export class QueryObserver<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Subscribable<QueryObserverListener<TData, TError>> {
+  // ...
+  getOptimisticResult(
+    options: DefaultedQueryObserverOptions<
+      TQueryFnData,
+      TError,
+      TData,
+      TQueryData,
+      TQueryKey
+    >,
+  ): QueryObserverResult<TData, TError> {
+    const query = this.#client.getQueryCache().build(this.#client, options)
+
+    const result = this.createResult(query, options)
+
+    if (shouldAssignObserverCurrentProperties(this, result)) {
+      this.#currentResult = result
+      this.#currentResultOptions = this.options
+      this.#currentResultState = this.#currentQuery.state
+    }
+
+    return result
+  }
+}
+```
+
+`QueryObserver.createResult()`：
+
+- `resolveStaleTime` 負責判斷 `options.staleTime` 是否為 function，解析出 `staleTime`
+- `Query.isStaleByTime()`：
+  - `Query.state.isInvalidated === true{:js}`
+  - `Query.state.data === undefined{:js}`
+  - `!timeUntilStale(this.state.dataUpdatedAt, staleTime){:js}`，`timeUntilStale()` 的最小結果為 `0`
+
+```ts showLineNumbers filename="queryObserver.ts" {22, 34-37}
+export class QueryObserver<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Subscribable<QueryObserverListener<TData, TError>> {
+  // ...
+  createResult(
+    query: Query<TQueryFnData, TError, TQueryData, TQueryKey>,
+    options: QueryObserverOptions<
+      TQueryFnData,
+      TError,
+      TData,
+      TQueryData,
+      TQueryKey
+    >,
+  ): QueryObserverResult<TData, TError> {
+    // ...
+    const result: QueryObserverBaseResult<TData, TError> = {
+      // ...
+      isStale: isStale(query, options),
+      // ...
+    }
+
+    return result as QueryObserverResult<TData, TError>
+  }
+}
+
+function isStale(
+  query: Query<any, any, any, any>,
+  options: QueryObserverOptions<any, any, any, any, any>,
+): boolean {
+  return (
+    options.enabled !== false &&
+    query.isStaleByTime(resolveStaleTime(options.staleTime, query))
+  )
+}
+```
+
+```ts showLineNumbers filename="utils.ts" {10}
+export function resolveStaleTime<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+>(
+  staleTime: undefined | StaleTime<TQueryFnData, TError, TData, TQueryKey>,
+  query: Query<TQueryFnData, TError, TData, TQueryKey>,
+): number | undefined {
+  return typeof staleTime === 'function' ? staleTime(query) : staleTime
+}
+```
+
+```ts showLineNumbers filename="query.ts" {11-15}
+import { timeUntilStale } from './utils'
+
+export class Query<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Removable {
+  // ...
+  isStaleByTime(staleTime = 0): boolean {
+    return (
+      this.state.isInvalidated ||
+      this.state.data === undefined ||
+      !timeUntilStale(this.state.dataUpdatedAt, staleTime)
+    )
+  }
+  // ...
+}
+```
+
+```ts showLineNumbers filename="utils"
+export function timeUntilStale(updatedAt: number, staleTime?: number): number {
+  return Math.max(updatedAt + (staleTime || 0) - Date.now(), 0)
+}
+```
+
+## Query invalidation
+
+`QueryClient.invalidateQueries()` 根據 `filters` 參數，找出對應的 `Query` 呼叫 `Query.invalidate()`
+
+```ts showLineNumbers filename="queryClient.ts" {8-10}
+export class QueryClient {
+  // ...
+  invalidateQueries(
+    filters: InvalidateQueryFilters = {},
+    options: InvalidateOptions = {},
+  ): Promise<void> {
+    return notifyManager.batch(() => {
+      this.#queryCache.findAll(filters).forEach((query) => {
+        query.invalidate()
+      })
+      // ...
+    })
+  }
+  // ...
+}
+```
+
+`Query.invalidate()`：
+
+1. 將 `Query.state.isInvalidated` 更新為 `true` (L12-14, L23-27)
+1. 向 `Query` 內的 `QueryObserver` 通知狀態更新 (L35-37)
+1. 向 `QueryCache` 通知狀態更新 (L39)
+
+```ts showLineNumbers filename="query.ts" {12-14, 23-27, 35-37, 39}
+export class Query<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Removable {
+  // ...
+  state: QueryState<TData, TError>
+  // ...
+
+  invalidate(): void {
+    if (!this.state.isInvalidated) {
+      this.#dispatch({ type: 'invalidate' })
+    }
+  }
+
+  #dispatch(action: Action<TData, TError>): void {
+    const reducer = (
+      state: QueryState<TData, TError>,
+    ): QueryState<TData, TError> => {
+      switch (action.type) {
+        // ...
+        case 'invalidate':
+          return {
+            ...state,
+            isInvalidated: true,
+          }
+        // ...
+      }
+    }
+
+    this.state = reducer(this.state)
+
+    notifyManager.batch(() => {
+      this.observers.forEach((observer) => {
+        observer.onQueryUpdate()
+      })
+
+      this.#cache.notify({ query: this, type: 'updated', action })
+    })
+  }
+}
+```
+
+`QueryClient.invalidateQueries()` 預設 `RefetchQueryFilters.type` 為 `active` (L16)
+
+>When set to `active`, only queries that match the refetch predicate and are actively being rendered via `useQuery` and friends will be refetched in the background.
+
+```ts showLineNumbers filename="queryClient.ts" {14-18}
+export class QueryClient {
+  // ...
+  invalidateQueries(
+    filters: InvalidateQueryFilters = {},
+    options: InvalidateOptions = {},
+  ): Promise<void> {
+    return notifyManager.batch(() => {
+      this.#queryCache.findAll(filters).forEach((query) => {
+        query.invalidate()
+      })
+      if (filters.refetchType === 'none') {
+        return Promise.resolve()
+      }
+      const refetchFilters: RefetchQueryFilters = {
+        ...filters,
+        type: filters.refetchType ?? filters.type ?? 'active',
+      }
+      return this.refetchQueries(refetchFilters, options)
+    })
+  }
+  // ...
+}
+```
+
+`QueryClient.refetchQueries()`
+
+先看到 `this.#queryCache.findAll(filters){:js}`，因為有 `filters` 參數，所以會使用 `matchQuery`
+
+```ts showLineNumbers filename="queryClient.ts" {4, 12-13}
+export class QueryClient {
+  // ...
+  refetchQueries(
+    filters: RefetchQueryFilters = {},
+    options?: RefetchOptions,
+  ): Promise<void> {
+    const fetchOptions = {
+      ...options,
+      cancelRefetch: options?.cancelRefetch ?? true,
+    }
+    const promises = notifyManager.batch(() =>
+      this.#queryCache
+        .findAll(filters)
+        .filter((query) => !query.isDisabled())
+        .map((query) => {
+          let promise = query.fetch(undefined, fetchOptions)
+          if (!fetchOptions.throwOnError) {
+            promise = promise.catch(noop)
+          }
+          return query.state.fetchStatus === 'paused'
+            ? Promise.resolve()
+            : promise
+        }),
+    )
+
+    return Promise.all(promises).then(noop)
+  }
+}
+```
+
+```ts showLineNumbers filename="queryCache.ts" {8}
+import { matchQuery } from './utils'
+
+export class QueryCache extends Subscribable<QueryCacheListener> {
+  // ...
+  findAll(filters: QueryFilters = {}): Array<Query> {
+    const queries = this.getAll()
+    return Object.keys(filters).length > 0
+      ? queries.filter((query) => matchQuery(filters, query))
+      : queries
+  }
+  // ...
+}
+```
+
+上面提到，這裡 `filters.type` 預設為 `active`
+
+- 如果 `filters.queryKey` 不存在，`matchQuery` 會參考 `Query.isActive()`
+- `Query.isActive()` 表示 `Query` 中有任一 `QueryObserver.options.enabled !== false{:js}`
+
+```ts showLineNumbers filename="utils" {24-32}
+export function matchQuery(
+  filters: QueryFilters,
+  query: Query<any, any, any, any>,
+): boolean {
+  const {
+    type = 'all',
+    exact,
+    fetchStatus,
+    predicate,
+    queryKey,
+    stale,
+  } = filters
+
+  if (queryKey) {
+    if (exact) {
+      if (query.queryHash !== hashQueryKeyByOptions(queryKey, query.options)) {
+        return false
+      }
+    } else if (!partialMatchKey(query.queryKey, queryKey)) {
+      return false
+    }
+  }
+
+  if (type !== 'all') {
+    const isActive = query.isActive()
+    if (type === 'active' && !isActive) {
+      return false
+    }
+    if (type === 'inactive' && isActive) {
+      return false
+    }
+  }
+  // ...
+}
+```
+
+```ts showLineNumbers filename="query.ts" {12}
+export class Query<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Removable {
+  // ...
+  observers: Array<QueryObserver<any, any, any, any, any>>
+  // ...
+
+  isActive(): boolean {
+    return this.observers.some((observer) => observer.options.enabled !== false)
+  }
+  // ...
+}
+```
+
+接著看回 `filter((query) => !query.isDisabled()){:js}`
+
+```ts showLineNumbers filename="queryClient.ts" {14}
+export class QueryClient {
+  // ...
+  refetchQueries(
+    filters: RefetchQueryFilters = {},
+    options?: RefetchOptions,
+  ): Promise<void> {
+    const fetchOptions = {
+      ...options,
+      cancelRefetch: options?.cancelRefetch ?? true,
+    }
+    const promises = notifyManager.batch(() =>
+      this.#queryCache
+        .findAll(filters)
+        .filter((query) => !query.isDisabled())
+        .map((query) => {
+          let promise = query.fetch(undefined, fetchOptions)
+          if (!fetchOptions.throwOnError) {
+            promise = promise.catch(noop)
+          }
+          return query.state.fetchStatus === 'paused'
+            ? Promise.resolve()
+            : promise
+        }),
+    )
+
+    return Promise.all(promises).then(noop)
+  }
+}
+```
+
+`Query.isDisabled()` 表示：
+
+- 目前有 `QueryObserver` 正在訂閱此 `Query`
+- 訂閱中的 `QueryObserver`，含有 `options.enabled === false{:js}` 的設定
+
+```ts showLineNumbers filename="query.ts" {12, 16}
+export class Query<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Removable {
+  // ...
+  observers: Array<QueryObserver<any, any, any, any, any>>
+  // ...
+
+  isDisabled(): boolean {
+    return this.getObserversCount() > 0 && !this.isActive()
+  }
+  
+  getObserversCount(): number {
+    return this.observers.length
+  }
+  // ...
+}
+```
+
+## Summary
+
+- stale data 的條件：`useQuery(options){:js}`，其中 `options.enabled !== false{:js}` 且：
+    - `Query.state.isInvalidated === true{:js}` 或
+    - `Query.state.data === undefined{:js}` 或
+    - `Query.state.dataUpdatedAt + staleTime - Date.now() <= 0{:js}`
+- `QueryClient.invalidateQueries()` 大致流程：
+    1. 篩選出對應的 `Query`，將 `Query.state.isInvalidated` 設為 `true`
+    1. 對步驟一的 `Query` 再次進行 `!Query.isDisabled()` 篩選：
+        - 有 `QueryObserver` 訂閱中
+        - 訂閱中的 `QueryObserver`，不能含有 `Query.options.enabled === false {:js}` 的設定
+    1. 對步驟二的 `Query` 呼叫 `Query.fetch()`
+
+## Reference
+
+- [GitHub - tanstack/query](https://github.com/TanStack/query/tree/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b)
+- [QueryClient - invalidateQueries](https://tanstack.com/query/latest/docs/reference/QueryClient/#queryclientinvalidatequeries)
