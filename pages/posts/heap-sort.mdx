@@ -1,16 +1,10 @@
 ---
 title: Heap sort
-tag: algorithm, sorting, data structure, heap
+tag: algorithm, sorting, data structure, heap, tree
 date: 2021-07-27
 ---
 
 ## Heap
-
-- 由上至下，由左至右依順序加入節點
-- 完全二元樹 (complete binary tree)，若節點非葉節點，則一定擁有兩個子節點
-- 所有父節點大於子節點稱為最大堆積 (max-heap)，最小堆積 (min-heap) 反之
-
-max-heap
 
 ```mermaid
 graph TB
@@ -24,65 +18,68 @@ graph TB
   left_left---left_left_right((7))
 ```
 
-以陣列表示 (由上至下，由左至右排列)，若 n 為陣列中任意的 index
-
-- left child index equals `2n + 1`
-- right child index equals `2n + 2`
-
-```js
-const maxHeap = [100, 19, 36, 17, 3, 25, 1, 2, 7];
-```
+- 完全二元樹 (complete binary tree)
+  - 由上至下，由左至右依順序加入節點
+  - 若節點非葉節點，則一定擁有兩個子節點
+- 所有父節點大於子節點，稱為最大堆積 (max-heap)，反之所有父節點小於子節點，稱為最小堆積 (min-heap)
+- 上圖 max-heap 以陣列表示為 `[100, 19, 36, 17, 3, 25, 1, 2, 7]{:js}`
+  - 假設父節點 index 為 `n`，左子節點 index 為 `2n + 1`，右子節點 index 為 `2n + 2` 
 
 ## Heapify
 
-heapify 是將陣列調整為 heap 的操作，以 max-heap 來例
+將無序數列轉換成 heap 的過程稱為 heapify
 
-- 子節點小於父節點
-- 根節點為最大元素
+以 `[5, 3, 2, 10, 1, 9, 8, 6, 4, 7]{:js}` 為例：
 
-下方範例先取出父節點、左子節點、右子節點三者做比較，當子節點大於父節點則與之對調，因為不確保每次對調後，子樹是否符合「子節點小於父節點」的條件，所以透過遞迴方式一層一層向下檢查
+```mermaid
+graph TB
+  root((5))---left((3))
+  root---right((2))
+  left---left_left((10))
+  left---left_right((1))
+  right---right_left((9))
+  right---right_right((8))
+  left_left---left_left_left((6))
+  left_left---left_left_right((4))
+  left_right---right_left_left((7))
+```
 
-```js
-const maxHeapify = (array, index, heapSize) => {
-  const leftIndex = 2 * index + 1;
-  const rightIndex = 2 * index + 2;
-  let largestValueIndex = index;
-  
-  if (heapSize > leftIndex && array[largestValueIndex] < array[leftIndex]) {
-    largestValueIndex = leftIndex;
-  }
-  
-  if (heapSize > rightIndex && array[largestValueIndex] < array[rightIndex]) {
-    largestValueIndex = rightIndex;
-  }
-  
-  if (index !== largestValueIndex) {
-    const largest = array[largestValueIndex];
-    array[largestValueIndex] = array[index];
-    array[index] = largest;
-    maxHeapify(array, largestValueIndex, heapSize);
-  }
-}
+轉換成 max-heap 為： `[10, 7, 9, 6, 5, 2, 8, 3, 4, 1]{:js}`
 
+```mermaid
+graph TB
+  root((10))---left((7))
+  root---right((9))
+  left---left_left((6))
+  left---left_right((5))
+  right---right_left((2))
+  right---right_right((8))
+  left_left---left_left_left((3))
+  left_left---left_left_right((4))
+  left_right---left_right_left((1))
+```
+
+程式碼實作流程如下：
+
+1. 從最後一個父節點開始 (L4)
+1. 先找出左、右子節點的 index (L9-10)
+1. 比較父節點、左子節點、右子節點的值，暫存最大值的 index (L12-20)
+1. 如果父節點 index，與最大值 index 不同 (L22)
+    1. 互換兩者位置 (L24-25)
+    1. 對更新後的子節點，再進行一次 heapify (L26)
+
+```js showLineNumbers
 // create max-heap
 const nums = [5, 3, 2, 10, 1, 9, 8, 6, 4, 7];
 
 for (let i = Math.floor(nums.length / 2) - 1; i >= 0; i--) {
   maxHeapify(nums, i, nums.length);
 }
-// [10, 7, 9, 6, 5, 2, 8, 3, 4, 1]
-```
 
-## Heap Sort
-
-1. 將序列轉換為 max-heap 結構
-1. 將最大值 (root) 與最後一筆未排序元素對調，即為排序一筆元素
-1. 忽略已排序的元素，重複以上步驟
-
-```js
-const maxHeapify = (array, index, heapSize) => {
+function maxHeapify(array, index, heapSize) {
   const leftIndex = 2 * index + 1;
   const rightIndex = 2 * index + 2;
+
   let largestValueIndex = index;
   
   if (heapSize > leftIndex && array[largestValueIndex] < array[leftIndex]) {
@@ -100,6 +97,17 @@ const maxHeapify = (array, index, heapSize) => {
     maxHeapify(array, largestValueIndex, heapSize);
   }
 }
+```
+
+## Heap Sort
+
+1. 將序列轉換為 max-heap 結構 (L4-6)
+1. max-heap 第一筆元素為最大值，將第一筆與最後一筆元素對調，即完成一筆排序 (L9-11)
+1. 對未排序元素，重新進行 max-heapify (L12)
+1. 持續步驟 2、步驟 3，直到排序完成
+
+```js showLineNumbers
+heapSort([5, 3, 2, 10, 1, 9, 8, 6, 4, 7]);
 
 function heapSort(array) {
   for (let i = Math.floor(array.length / 2) - 1; i >= 0; i--) {
@@ -116,7 +124,26 @@ function heapSort(array) {
   return array;
 }
 
-heapSort([5, 3, 2, 10, 1, 9, 8, 6, 4, 7]);
+function maxHeapify(array, index, heapSize) {
+  const leftIndex = 2 * index + 1;
+  const rightIndex = 2 * index + 2;
+  let largestValueIndex = index;
+  
+  if (heapSize > leftIndex && array[largestValueIndex] < array[leftIndex]) {
+    largestValueIndex = leftIndex;
+  }
+  
+  if (heapSize > rightIndex && array[largestValueIndex] < array[rightIndex]) {
+    largestValueIndex = rightIndex;
+  }
+  
+  if (index !== largestValueIndex) {
+    const largest = array[largestValueIndex];
+    array[largestValueIndex] = array[index];
+    array[index] = largest;
+    maxHeapify(array, largestValueIndex, heapSize);
+  }
+}
 ```
 
 ## Reference
