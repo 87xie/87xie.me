@@ -4,7 +4,11 @@ tag: javascript, clsx
 date: 2024-06-27
 ---
 
-[clsx](https://github.com/lukeed/clsx) 及 [classnames](https://github.com/JedWatson/classnames) 都是在 react 中常見，處理 `className` 的工具，不過 clsx 在 [README.md](https://github.com/lukeed/clsx/blob/925494cf31bcd97d3337aacd34e659e80cae7fe2/readme.md) 提到
+import { Callout } from 'nextra/components'
+
+[clsx](https://github.com/lukeed/clsx) 及 [classnames](https://github.com/JedWatson/classnames) 都是在 react 中常見，處理 `className` 的工具
+
+不過 clsx 在 [README.md](https://github.com/lukeed/clsx/blob/925494cf31bcd97d3337aacd34e659e80cae7fe2/readme.md) 提到
 
 >Also serves as a faster & smaller drop-in replacement for the classnames module.
 
@@ -18,10 +22,11 @@ date: 2024-06-27
 先從 `clsx` 開始看起：
 
 - `clsx` 是一個可以將數量不定的參數，轉換成字串的 function
-- 當我們呼叫 `clsx(...){:js}`，會對 `arguments` 進行 for-loop，每次 loop：
-  1. 將 `arguments[i]{:js}` 暫存至變數 `tmp`
+- 呼叫 `clsx(...){:js}`，透過 `arguments` 得到所有參數進行 for-loop，每次 loop：
+  1. 將 `arguments[i]{:js}` 依序暫存至變數 `tmp`
   1. 如果 `tmp` 為 truthy，調用 `toVal(tmp){:js}`，將結果暫存至變數 `x`
-  1. 如果 `x` 為 truthy，則做字串串接 (string concatenation)
+  1. 如果 `x` 為 truthy，進行 string concatenation
+  1. 變數 `str` 為 truthy 表示非空字串，在 string concatenation 前補上空格 (space-separated classes)
 
 ```ts showLineNumbers
 export function clsx() {
@@ -41,14 +46,16 @@ export function clsx() {
 接著看到 `toVal` 的實作：
 
 - 透過 `typeof` 判斷 `string | number` (L8)
-- `typeof mix === 'object'{:js}`，`mix` 可能為 (L10)
-  - `null`
-  - `ClassArray`
-  - `ClassDictionary`
+- `typeof mix === 'object'{:js}`，`mix` 可能為 `null`, `ClassArray`, `ClassDictionary` (L10)
 - 透過 `Array.isArray(mix)` 判斷 `mix` 是否為 `ClassValue` (L11)
-- 如果 `mix` 為 `ClassArray`，透過 for-loop 及遞迴做字串串接 (L13-20)
+- 如果 `mix` 為 `ClassArray`，透過 for-loop 搭配遞迴得到 string concatenation 的結果 (L13-20)
 - 如果 `mix` 為 `ClassDictionary` 或 `null`，透過 for...in，將 value 為 truthy 的 key 做字串串接
-  - A for...in loop only iterates over enumerable, non-symbol properties. (`null` 不會進到 for...in block)
+
+<Callout>
+  A for...in loop only iterates over enumerable, non-symbol properties.
+</Callout>
+
+<br/>
 
 ```ts showLineNumbers
 type ClassValue = ClassArray | ClassDictionary | string | number | bigint | null | boolean | undefined;
@@ -87,19 +94,19 @@ function toVal(mix: ClassValue) {
 
 ## Benchmarks
 
-benchmark cases 是參考 [clsx](https://github.com/lukeed/clsx/tree/925494cf31bcd97d3337aacd34e659e80cae7fe2/bench)，環境資訊如下：
+benchmark suite 是參考 [clsx](https://github.com/lukeed/clsx/tree/925494cf31bcd97d3337aacd34e659e80cae7fe2/bench)，運行環境為 Apple M1 Pro，Node 版本 v20.13.1
 
-- **cpu**: Apple M1 Pro
-- **runtime**: node v20.13.1
+classnames v2.3.0 的[實作](https://github.com/JedWatson/classnames/blob/f2379c3d1eae8c9d6527279bc6a0630a2e78b051/index.js#L14-L44)：
 
-classnames v2.3.0 的實作，每次迴圈計算出的字串，會先放進 `classes` 陣列，最後再透過 `classes.join(' '){:js}`，在每個字串之間加上空格
+1. 每次迴圈計算出的字串，會先放進 `classes` 陣列
+1. 呼叫 `classes.join(' '){:js}`，在每個字串之間加上空格
 
 ```ts
 function classNames () {
   var classes = [];
 
   for (var i = 0; i < arguments.length; i++) {
-    // parse class-name
+    // parse arguments
   }
 
   return classes.join(' ');
@@ -139,7 +146,9 @@ function classNames () {
 ```
 
 
-classnames v2.4.0 後，也改用了 string concatenation 來優化效能 ([pull#36](https://github.com/JedWatson/classnames/pull/336))，實作方式與 clsx 有九成像，這個調整後的 benchmarks 如下：
+classnames v2.4.0 後，也改用 string concatenation 來優化效能 ([pull#36](https://github.com/JedWatson/classnames/pull/336))，實作方式與 clsx 有九成像
+
+調整後的 benchmarks 如下：
 
 ```plain
 # Strings
@@ -171,12 +180,12 @@ classnames v2.4.0 後，也改用了 string concatenation 來優化效能 ([pull
   clsx         x 3,921,987 ops/sec ±0.31% (100 runs sampled)
 ```
 
-clsx 在速度上略勝於 classnames，我認為可能的差異：
+從上方的結果得知，clsx 在速度上還是優於 classnames，我認為可能的差異：
 
 - 在 clsx 的 [pull#26](https://github.com/lukeed/clsx/pull/26) 中看到，將 for-loop 需要的 `Array.length` 暫存在變數中，可以節省每次透過原型鏈遍歷`length` 屬性的時間 (雖然不多)
 - classnames 的實作，會建立更多 function execution context
-  - 每次迴圈透過 function 處理 string concatenation，[source code](https://github.com/JedWatson/classnames/blob/2e3683264bab067d13938b5eb03a96391a089cb4/index.js#L19)
-  - parse array arg 的方式，[source code](https://github.com/JedWatson/classnames/blob/2e3683264bab067d13938b5eb03a96391a089cb4/index.js#L35-L37)
+  - 每次迴圈透過 function 處理 string concatenation，[code](https://github.com/JedWatson/classnames/blob/2e3683264bab067d13938b5eb03a96391a089cb4/index.js#L19)
+  - parse array arg 的方式，[code](https://github.com/JedWatson/classnames/blob/2e3683264bab067d13938b5eb03a96391a089cb4/index.js#L35-L37)
 
 針對上述幾點，參考 clsx 的做法，將 classnames 改寫
 
@@ -277,10 +286,10 @@ function parseValue (arg) {
 
 ## Summary
 
-- classnames v2.4.0 後，效能與 clsx 已經沒有顯著差別。要選哪一個也許可以檢查 lockfile 有沒有現存的依賴 (可能是某個套件有使用到)
+- classnames v2.4.0 後，在效能上與 clsx 已經沒有顯著差別。要選哪一個也許可以檢查 lockfile 有沒有既存的依賴 (可能是某個套件有使用到)
 - 頻繁讀取物件上的某個屬性，可以考慮暫存在某個變數，節省遍歷原型鏈的時間
 - 多數情況下，直接對字串做 string concatenation，比操作一個陣列，透過 `Array.join()` 轉成字串還快
-- 多數情況下，要追求效能或最小 bundle size，會犧牲可讀性 (但在小工具上或許很適合)
+- 多數情況下，追求極致效能或極小 bundle size，會犧牲可讀性 (但在小工具上或許很適合，視情境權衡)
 
 ## Reference
 
