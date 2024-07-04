@@ -20,16 +20,25 @@ import { Callout } from 'nextra/components'
 
 ## Quick overview of TanStack Query components
 
-- `QueryCache`：儲存、查詢 `Query` 實例相關實作
-- `Query`：
-  - 執行（重試、取消 ）`queryFn` 相關邏輯
-  - 紀錄請求相關狀態，例如：`data`, `dataUpdatedAt`, `fetchStatus`, `fetchFailureCount`, etc.
-  - 提供 `QueryObserver` 訂閱的機制，並通知變更
-- `QueryObserver`：
-  - 以 react 為例，在呼叫 `useQuery` 時被建立，作為與 query-core 與 react component 連接組件，提供 [useSyncExternalStore](https://react.dev/reference/react/useSyncExternalStore) 需要的 API
-  - 每個 `QueryObserver` 只會訂閱一個 `Query`
+`QueryCache`：儲存、查詢 `Query` 實例的相關實作
 
-下方圖片來自 [Inside React Query](https://tkdodo.eu/blog/inside-react-query)
+`Query`：
+
+- 執行（重試、取消 ）`queryFn` 相關邏輯
+- 紀錄請求相關狀態，例如：`data`, `dataUpdatedAt`, `fetchStatus`, `fetchFailureCount`, etc.
+- 提供 `QueryObserver` 訂閱的機制，並通知變更
+
+`QueryObserver`：
+
+- 每個 `QueryObserver` 只會訂閱一個 `Query`
+- 當 `Query` 狀態更新時，會通知 `QueryObserver`，由 `QueryObserver` 判斷是否需要觸發 component 更新
+- 以 react 為例，在 component 中，可以透過 `useQuery` 得到 `Query` 上的資料，`QueryObserver` 會在第一次呼叫 `useQuery` 時被建立，作為 query-core 與 component 之間的連結件
+
+<Callout>
+tanstack/react-query 目前是透過 [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore#subscribing-to-an-external-store) 同步 `Query` 上的資料，[source](https://github.com/TanStack/query/blob/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b/packages/react-query/src/useBaseQuery.ts#L72-L89)
+</Callout>
+
+下方圖片取用自 [Inside React Query](https://tkdodo.eu/blog/inside-react-query)
 
 ![](/react-query-architecture.png)
 
@@ -75,10 +84,14 @@ class QueryClient {
 }
 ```
 
-- `state.fetchStatus` (L8)
-- `#retryer` 保存 `options.queryFn` 回傳的 promise (L9)
-- `Query.fetch()` 會參考 `state.fetchStatus`，**當請求進行中，沿用 retryer 建立的 promise**，藉此避免送出重複請求 (L20-25)
-- 當有最新的請求送出，透過 `#dispatch` 更新 `Query` 內的 `state` (L29-L42)
+接著看到 `Query.fetch()`
+
+`Query.fetch()` 會參考 `state.fetchStatus`，**當請求進行中，沿用 retryer 上的 promise**，藉此避免送出重複請求 (L20-25)
+
+當有最新的請求送出：
+
+1. 透過 `#dispatch` 更新 `Query.state` (L34)
+1. 建立 `retryer` 處理 `queryFn`
 
 ```ts showLineNumbers filename="query.ts" {8-9, 20-25, 29-42}
 class Query<
@@ -134,7 +147,7 @@ class Query<
 - 每個 `QueryObserver` 都需遵守約定的策略介面
 - 將不同場景的算法封裝在不同的 `QueryObserver` 實作，透過類別取代 if-else
 
-以 `useQuery`, `useInfiniteQuery` 為例，兩者有不同的 `QueryObserver` 類別，`useBaseQuery` 會統一呼叫其策略介面的方法
+以 `useQuery` 及 `useInfiniteQuery` 為例，兩者有不同的 `QueryObserver` 類別。`useBaseQuery` 只關注 `QueryObserver` 上約定好的策略介面，每個 `QueryObserver` 可以關注在自己的使用情境，有不同的實作細節
 
 ```ts showLineNumbers filename="useQuery.ts" {8}
 import { QueryObserver } from '@tanstack/query-core'
@@ -212,12 +225,14 @@ export function useBaseQuery<
 }
 ```
 
-接著看到 `QueryObserver.setOptions()`，這裡關注兩個子流程：
+接著看到 `QueryObserver.setOptions()`，這裡關注幾個子流程：
 
-1. `this.#updateQuery()` (L39)
-1. `this.#executeFetch()` (L52)
+- `this.#updateQuery(){:js}` (L39)
+- `this.hasListeners(){:js}` (L40)
+- `shouldFetchOptionally(...){:js}` (L45-50)
+- `this.#executeFetch(){:js}` (L52)
 
-```ts showLineNumbers filename="queryObserver.ts" {39-53}
+```ts showLineNumbers filename="queryObserver.ts" {39, 40, 45-50, 52}
 class QueryObserver<
   TQueryFnData = unknown,
   TError = DefaultError,
@@ -276,19 +291,13 @@ class QueryObserver<
 }
 ```
 
-`QueryObserver.#updateQuery()`：
+`QueryObserver.#updateQuery()` 會檢查 `QueryObserver` 對應的 `Query` 實例是否改變，如果有則更新 `QueryObserver` 上對應的狀態，大致流程如下：
 
-- 透過最新的 `options`，呼叫 `QueryCache.build()` 查詢對應的 `Query`
-- 如果 `Query` 的 reference 不同 (L19-28)：
+1. 呼叫 `QueryCache.build()`，根據最新的 `this.#options` 得到 `Query` 實例（查詢已存在或建立新的）
+1. 比對步驟 1 得到的 `Query` 實例，與 `this.#currentQuery` 的 reference 是否相同，如果不同 (L19-28)：
     - 更新 `#currentQuery` 相關屬性
     - 取消訂閱 `prevQuery`
     - 訂閱 `#currentQuery`
-
-<Callout>
-`Query` 變化時通知 `QueryObserver`，觸發 component 更新，是透過 `useExternalStore`
-
-[參考連結](https://github.com/TanStack/query/blob/ac8f48a6a1b8bc89e80f5449464fbd4978fa179b/packages/react-query/src/useBaseQuery.ts#L72-L89)
-</Callout>
 
 <br/>
 
@@ -325,9 +334,79 @@ class QueryObserver<
 }
 ```
 
-`Query.#executeFetch` 可以在 L31-34 中得知是呼叫 `Query.fetch()`
+`QueryObserver.#hasListeners()` 是繼承自 `Subscribable`。應該是判斷有沒有 component 透過 [`useSyncExternalStore`](https://react.dev/reference/react/useSyncExternalStore#subscribing-to-an-external-store) 向 `QueryObserver` 註冊 callback
 
-如同前面提到，`Query.fetch()` 會參考 `state.fetchStatus` 決定是否送出請求
+```ts showLineNumbers filename="queryObserver.ts" {7}
+class QueryObserver<
+  TQueryFnData = unknown,
+  TError = DefaultError,
+  TData = TQueryFnData,
+  TQueryData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+> extends Subscribable<QueryObserverListener<TData, TError>> {
+  // ...
+}
+```
+
+```ts showLineNumbers filename="subscribable.ts" {13-15}
+class Subscribable<TListener extends Function = Listener> {
+  protected listeners: Set<TListener>
+
+  constructor() {
+    this.listeners = new Set()
+    this.subscribe = this.subscribe.bind(this)
+  }
+
+  subscribe(listener: TListener): () => void {
+    //...
+  }
+
+  hasListeners(): boolean {
+    return this.listeners.size > 0
+  }
+
+  protected onSubscribe(): void {
+    // ...
+  }
+
+  protected onUnsubscribe(): void {
+    // ...
+  }
+}
+```
+
+`shouldFetchOptionally` 相關實作如下，與 deduplication 相關的判斷，主要在 `isStale`：
+
+- `options.enabled` 不為 false
+- 未超過指定的 `option.staleTime`
+
+```ts showLineNumbers filename="queryObserver.ts" {19-20}
+function shouldFetchOptionally(
+  query: Query<any, any, any, any>,
+  prevQuery: Query<any, any, any, any>,
+  options: QueryObserverOptions<any, any, any, any, any>,
+  prevOptions: QueryObserverOptions<any, any, any, any, any>,
+): boolean {
+  return (
+    (query !== prevQuery || prevOptions.enabled === false) &&
+    (!options.suspense || query.state.status !== 'error') &&
+    isStale(query, options)
+  )
+}
+
+function isStale(
+  query: Query<any, any, any, any>,
+  options: QueryObserverOptions<any, any, any, any, any>,
+): boolean {
+  return (
+    options.enabled !== false &&
+    query.isStaleByTime(resolveStaleTime(options.staleTime, query))
+  )
+}
+```
+
+
+`QueryObserver.#executeFetch` 可以在下方程式碼L16-19 得知，也是呼叫 `Query.fetch()`
 
 ```ts showLineNumbers filename="queryObserver.ts" {16-19}
 class QueryObserver<
@@ -361,14 +440,18 @@ class QueryObserver<
 
 ## Summary
 
-簡單做個總結：
+呼叫 `QueryClient.fetchQuery()` 或 `useQuery`，都是透過 `queryKey` 找出 `Query` 實例 (一對一的關係)，根據 `Query` 實例上的狀態，決定是否呼叫 `Query.fetch()`，流程大致為：
 
-呼叫 `QueryClient.fetchQuery()` 或 `useQuery`，相同的 `queryKey` 會對應到相同的 `Query` 實例，query-core 會根據 `Query` 上的狀態，決定是否送出請求，流程大致為：
-  1. 合併 `QueryClient.defaultOptions.queries` 及 per-query level options，這裡以 `defaultedOptions` 代稱
-  1. 呼叫 `QueryCache.build(defaultedOptions){:js}` 找到對應 `Query`（如果不存在會建立新的實例，`defaultedOptions` 主要是參考 `queryKey`, `queryKeyHashFn`）
-  1. 找到對應的 `Query` 後，依據 `Query` 上的狀態，決定是否送出請求
-
-
+1. 合併 `QueryClient.defaultOptions.queries` 及 per-query level options，合併結果這裡以 `defaultedOptions` 代稱
+1. 呼叫 `QueryCache.build(defaultedOptions){:js}` 找到對應 `Query` (如果 `Query` 實例不存在，則建立新的實例)
+1. 根據 `Query` 實例狀態，決定是否呼叫 `Query.fetch()`
+    - `QueryClient.fetchQuery()` 透過 `Query.isStaleByTime()` 檢查資料是否過期，如果未過期，沿用目前的資料，反之呼叫 `Query.fetch()`
+    - `useQuery` 會透過 `QueryObserver` 與 component 做連結，會多比對：
+        - 確保 `QueryObserver` 目前有 component 訂閱中
+        - 確保 `QueryObserver` 對應正確的 `Query`
+        - 確保 `defaultedOptions.enabled !== false{:js}`
+        - 上述成立後，透過 `Query.isStaleByTime()` 決定是否呼叫 `Query.fetch()`
+1. 呼叫 `Query.fetch()`，如果 `Query.state.fetchStatus !== 'idle'{:js}`，則檢查 `retryer` 是否存在已經建立的 promise
 
 ## Reference
 
