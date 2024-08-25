@@ -5,19 +5,11 @@ type: page
 
 import Link from 'next/link'
 import { useData } from 'nextra/hooks'
+import { getStaticTags } from 'nextra-theme-blog'
 
 export function getStaticProps() {
   const NEXTRA_INTERNAL = Symbol.for('__nextra_internal__')
-  const postsPage = globalThis[NEXTRA_INTERNAL]?.pageMap?.find(({ name }) => name === 'posts')
-  const tags = postsPage?.children?.reduce((acc, post) => {
-    if (typeof post?.frontMatter?.tag !== 'string') return acc
-    const tagsFromFrontMatter = post.frontMatter.tag.split(',')
-    tagsFromFrontMatter.forEach((tag) => {
-      const _tag = tag.trim();
-      if (!acc.includes(_tag)) acc.push(_tag)
-    });
-    return acc
-  }, []) || []
+  const tags = getStaticTags(globalThis[NEXTRA_INTERNAL]?.pageMap ?? [])
 
   return Promise.resolve({
     props: {
