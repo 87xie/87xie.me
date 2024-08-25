@@ -8,20 +8,20 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "^14.2.5",
-    "nextra": "3.0.0-alpha.25",
-    "nextra-theme-blog": "3.0.0-alpha.25",
+    "next": "^14.2.6",
+    "nextra": "3.0.0-alpha.33",
+    "nextra-theme-blog": "3.0.0-alpha.33",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@types/node": "^20.12.11",
-    "@types/react": "^18.3.2",
+    "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "14.2.3",
+    "eslint-config-next": "14.2.6",
     "typescript": "^5.4.5"
   },
   "packageManager": "pnpm@9.5.0"
