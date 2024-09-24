@@ -15,13 +15,13 @@ import { Tabs } from 'nextra/components'
 
 ## With a basic example
 
-1. 第一個 formatting context 由 `<html>{:html}` 建立，因為下方範例沒有特別的 CSS 屬性，所以預設為 **block formatting context**
-1. `<body>{:html}`, `<h1>{:html}`, `<ul>{:html}` 同樣沒有特別的 CSS 屬性，預設為 block-level content，所以會跟著 `<html>{:html}` 的 normal-flow，不額外建立 **block formatting context**
-1. `<li>{:html}` 的 `style="display: inline-block"` 屬性，會建立新的 **block formatting context**
+1. 第一個 formatting context 由 `<html>{:html}` 建立，因為下方範例中的 `<html>{:html}`沒有特別的 CSS 屬性，所以預設為 **block formatting context** (BFC)
+1. `<body>{:html}`, `<h1>{:html}`, `<ul>{:html}` 預設為 block-level content，因為沒有特別的 CSS 屬性，例如，`position: absolute`, `float: left`, `overflow: auto`，所以為沿用當前的 BFC，不會觸發新的 BFC 建立
+1. `<li>{:html}` 的 `style="display: inline-block"` 屬性，觸發建立新的 BFC
 1. `<section>{:html}` 的 `style="display: flex"`，會建立新的 **flex formatting context**
 1. `<p><span>...</span></p>{:html}` 其中的 `<span>{:html}` 的內容為 inline-content，所以也會建立新的 **inline formatting context**
 
-<Tabs items={['HTML', 'Result']}>
+<Tabs items={['HTML', 'Formatting contexts']}>
 <Tabs.Tab>
 ```html showLineNumbers
 <html>
