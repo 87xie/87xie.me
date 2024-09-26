@@ -1,12 +1,12 @@
 ---
 title: Quick overview of stacking context
-tag: browser rendering, CSS
+tag: browser rendering, stacking context, CSS
 date: 2024-09-24
 ---
 
 import { Tabs } from 'nextra/components'
 
-**Stacking context** 決定元素在 z 軸上的排序，常見創建 **stacking context** 情況：
+Stacking context 決定元素在 z 軸上的排序，常見創建 stacking context 情況：
 
 - 根元素 `<html>{:html}`
 - `position: absolute`
@@ -21,8 +21,9 @@ import { Tabs } from 'nextra/components'
 
 規則：
 
-- 根元素 `<html>{:html}` 自動形成 **stacking context**，其子元素則根據特定屬性，形成新的 stacking context
+- 根元素 `<html>{:html}` 自動形成 stacking context，其子元素則根據特定屬性，形成新的 stacking context
 - 在同一個 stacking context 內，使用 `z-index` 值進行比較，較大的 `z-index` 在上方，值相同則按照的出現順序排列 (後者在上方)
+- Stacking context 內部的元素，不會影響到其外部的 stacking context，反之外部 stacking context 的元素，也不會影響到內部的 stacking context（適當隔離，可以減少 reflow 及 repaint 的次數）
 
 ## With a basic example
 
