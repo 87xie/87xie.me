@@ -1,0 +1,60 @@
+---
+title: Quick overview of browser formatting context
+tag: browser rendering, formatting context, CSS, HTML
+date: 2024-09-23
+---
+
+import { Tabs } from 'nextra/components'
+
+紀錄瀏覽器解析 HTML 時，如何建立 **formatting context** 結構，**formatting context** 用來定義畫面中某個區塊或元素的排版方式，常見的類型有：
+
+- block formatting context
+- inline formatting context
+- flex formatting context
+- grid formatting context
+
+## With a basic example
+
+1. 第一個 formatting context 由 `<html>{:html}` 建立，因為下方範例中的 `<html>{:html}`沒有特別的 CSS 屬性，所以預設為 **block formatting context** (BFC)
+1. `<body>{:html}`, `<h1>{:html}`, `<ul>{:html}` 預設為 block-level content，因為沒有特別的 CSS 屬性，例如，`position: absolute`, `float: left`, `overflow: auto`，所以為沿用當前的 BFC，不會觸發新的 BFC 建立
+1. `<li>{:html}` 的 `style="display: inline-block"` 屬性，觸發建立新的 BFC
+1. `<section>{:html}` 的 `style="display: flex"`，會建立新的 **flex formatting context**
+1. `<p><span>...</span></p>{:html}` 其中的 `<span>{:html}` 的內容為 inline-content，所以也會建立新的 **inline formatting context**
+
+<Tabs items={['HTML', 'Formatting contexts']}>
+<Tabs.Tab>
+```html showLineNumbers
+<html>
+  <body>
+    <h1>heading</h1>
+    <ul>
+      <li style="display: inline-block;">
+        <p>paragraph 1</p>
+        <p>paragraph 2</p>
+      </li>
+      <li style="display: inline-block;">
+        <p>paragraph 3</p>
+        <p>paragraph 4</p>
+      </li>
+    </ul>
+    <section style="display: flex; flex-direction:row;">
+      <p>paragraph 5</p>
+      <p>
+        <span>paragraph 6</span>
+      </p>
+      </section>
+    </section>
+  </body>
+</html>
+```
+</Tabs.Tab>
+
+<Tabs.Tab>
+![](/browser-formatting-context-example.png)
+</Tabs.Tab>
+</Tabs>
+
+## References
+
+- [`<Frontend System Design />` Fundamentals](https://static.frontendmasters.com/resources/2024-05-29-systems-design/frontend-system-design-fundamentals.pdf)
+- [MDN - Introduction to formatting contexts](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_flow_layout/Introduction_to_formatting_contexts)
