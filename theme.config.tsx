@@ -1,18 +1,23 @@
-import type { NextraBlogTheme } from 'nextra-theme-blog';
+import type { NextraBlogTheme } from 'nextra-theme-blog'
+import { useRouter } from 'nextra/hooks'
 
 const siteConfig = {
   title: '87xie.me',
   description: 'Personal writing by 87xie',
+  siteUrl: 'https://87xie.me',
   image: 'https://87xie.me/patrick-star-in-love.jpg',
 }
 
 const config: NextraBlogTheme = {
   darkMode: true,
-  head: ({ meta }) => {
+  head: function Head({ meta }) {
     const title = meta.title
       ? `${meta.title} | ${siteConfig.title}`
-      : siteConfig.title;
+      : siteConfig.title
     const description = meta.descriotion ?? siteConfig.description;
+    const { pathname } = useRouter()
+    const siteUrl = `${siteConfig.siteUrl}${pathname}`
+
     return (
       <>
         <link rel="icon" href="/favicon.ico" />
@@ -25,10 +30,11 @@ const config: NextraBlogTheme = {
         <meta property="og:image" content={siteConfig.image} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:url" content={siteUrl} />
       </>
-    );
+    )
   },
-  footer: null
+  footer: null,
 }
 
 export default config
