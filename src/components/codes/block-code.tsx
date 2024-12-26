@@ -1,116 +1,16 @@
-'use server'
 import {
-  type RawCode,
-  type AnnotationHandler,
-  type InlineAnnotation,
   Pre,
-  InnerLine,
   highlight,
+  type RawCode,
 } from 'codehike/code'
 import cx from 'clsx'
-import Mermaid from './mermaid.client'
 
-const lineNumbers: AnnotationHandler = {
-  name: 'line-numbers',
-  Line(props) {
-    const computedMinWidth = `${props.totalLines.toString().length + 1}ch`
-    return (
-      <div className="flex">
-        <span
-          style={{ minWidth: computedMinWidth }}
-          className=" text-gray-500 text-right"
-        >
-          {props.lineNumber}
-        </span>
-        <InnerLine merge={props} className="flex-auto ml-[2ch]" />
-      </div>
-    )
-  },
-}
-
-const mark: AnnotationHandler = {
-  name: 'mark',
-  Line({ annotation, ...props }) {
-    const color = annotation?.query || "rgb(14 165 233)"
-    return (
-      <div
-        style={{
-          borderLeft: 'solid 2px transparent',
-          borderLeftColor: annotation && color,
-          backgroundColor: annotation && `rgb(from ${color} r g b / 0.1)`,
-        }}
-      >
-        <InnerLine merge={props} />
-      </div>
-    )
-  },
-  Inline({ annotation, children }) {
-    const color = annotation?.query || "rgb(14 165 233)"
-    return (
-      <span
-        style={{
-          outline: `solid 1px rgb(from ${color} r g b / 0.5)`,
-          background: `rgb(from ${color} r g b / 0.13)`,
-        }}
-      >
-        {children}
-      </span>
-    )
-  },
-}
-
-const callout: AnnotationHandler = {
-  name: 'callout',
-  transform(annotation: InlineAnnotation) {
-    // transform inline annotation to block annotation
-    return {
-      name: annotation.name,
-      query: annotation.query,
-      fromLineNumber: annotation.lineNumber,
-      toLineNumber: annotation.lineNumber,
-      data: {
-        ...annotation.data,
-        column: (annotation.fromColumn + annotation.toColumn) / 2,
-      },
-    }
-  },
-  AnnotatedLine: ({ annotation, ...props }) => {
-    const { column } = annotation.data
-    const { indentation, children } = props
-    return (
-      <InnerLine merge={props}>
-        {children}
-        <div
-          data-callout=""
-          style={{
-            minWidth: `${column + 4}ch`,
-            marginLeft: `${indentation}ch`,
-          }}
-          className={cx(
-            'relative w-fit my-1',
-            'border rounded border-gray-300 bg-gray-50',
-            'whitespace-break-spaces'
-          )}
-        >
-          {/* callout arrow */}
-          <span
-            className={cx(
-              'absolute -top-[1px] w-2 h-2 rotate-45 -translate-y-1/2',
-              'border-l border-t border-gray-300 bg-gray-50',
-            )}
-            style={{ left: `${column - indentation}ch` }}
-          />
-          {/* callout content */}
-          {annotation.data.children || (
-            <div className="py-1 px-2">
-              {annotation.query}
-            </div>
-          )}
-        </div>
-      </InnerLine>
-    )
-  },
-}
+import { Mermaid } from './mermaid.client'
+// annotations
+import { mark } from './annotations/mark'
+import { diff } from './annotations/diff'
+import { lineNumbers } from './annotations/line-number'
+import { callout } from './annotations/callout'
 
 type BlockCodeProps = {
   codeblock: RawCode
@@ -124,19 +24,39 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
   }
 
   const highlighted = await highlight(codeblock, 'github-light')
+  const parsedMeta = parseMeta(codeblock.meta)
+
   return (
     <div
       className={cx(
         'not-prose overflow-x-auto',
-        'rounded-b-md border-1 border-gray-200 py-4 text-sm',
+        'rounded-b-md border-1 border-gray-200 text-sm',
       )}
     >
+      <div className="py-2 px-4 border-b-1 border-gray-200 bg-gray-50 text-xs">
+        {parsedMeta.filename || highlighted.lang.toUpperCase()}
+      </div>
       <Pre
         code={highlighted}
-        handlers={[mark, lineNumbers, callout]}
+        handlers={[
+          mark,
+          lineNumbers,
+          diff,
+          callout
+        ]}
+        className="py-4"
       />
     </div>
   )
+}
+
+function parseMeta(meta: string) {
+  const filenameReg = /filename="([^"]+)"/
+  const filenameMatch = meta.match(filenameReg)
+
+  return {
+    filename: filenameMatch?.[1] ?? '',
+  }
 }
 
 export default BlockCode
