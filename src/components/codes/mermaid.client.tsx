@@ -13,7 +13,6 @@ function useMermaidRenderResult(code: string) {
   const id = useId().replace(/:/g, '_')
 
   useEffect(() => {
-    console.log('start initialize', Date.now())
     mermaid.initialize({
       startOnLoad: false,
       fontFamily: 'inherit',
@@ -22,16 +21,9 @@ function useMermaidRenderResult(code: string) {
   }, [])
 
   useEffect(() => {
-    const start = Date.now()
-    console.log('start render', start)
     mermaid.render(id, code)
       .then((_result) => setResult(_result))
       .catch(() => {})
-      .finally(() => {
-        const end = Date.now()
-        console.log('finish render', end)
-        console.log('duration: ', end - start)
-      })
   }, [code, id])
 
   return result
@@ -41,7 +33,7 @@ type MermaidProps = {
   code: string
 }
 
-function Mermaid({ code }: MermaidProps) {
+export function Mermaid({ code }: MermaidProps) {
   const result = useMermaidRenderResult(code)
 
   if (!result) return null
@@ -55,5 +47,3 @@ function Mermaid({ code }: MermaidProps) {
     />
   )
 }
-
-export default Mermaid
