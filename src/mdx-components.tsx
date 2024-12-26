@@ -32,7 +32,7 @@ const components = {
     return (
       <code
         {...props}
-        className="not-prose rounded-md py-1 px-2 border-[0.5px] border-gray-300 bg-gray-50 text-sm"
+        className="not-prose rounded-md py-0.5 px-1.5 border-[0.5px] border-gray-300 bg-gray-50 text-sm"
       />
     )
   },

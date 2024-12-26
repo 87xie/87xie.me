@@ -2,39 +2,47 @@
 
 import type { MDXComponents } from 'mdx/types'
 import NextLink from 'next/link'
+import { LinkExternalIcon } from '@primer/octicons-react'
 
 type AnchorComponent = Exclude<MDXComponents['a'], undefined>
+
+const classes = {
+  link: 'group hover:text-gray-600',
+  // class-name for link external icon
+  icon: 'opacity-0 group-hover:opacity-100 transition-opacity inline-flex ml-1.5',
+}
 
 const Anchor: AnchorComponent = ({
   href = '/',
   children,
   ...props
 }) => {
-  const propsWithClass = {
-    className: 'text-blue-700 hover:text-blue-600',
-    ...props
-  }
-
   if (href.startsWith('/')) {
-    <NextLink href={href} {...propsWithClass}>
+    <NextLink
+      {...props}
+      href={href} 
+      className={classes.link}
+    >
       {children}
     </NextLink>
   }
   if (href.startsWith('#')) {
     return (
-      <a href={href} {...propsWithClass}>
+      <a href={href} className={classes.link}>
         {children}
       </a>
     )
   }
   return (
     <a
+      {...props}
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      {...propsWithClass}
+      className={classes.link}
     >
       {children}
+      <LinkExternalIcon size={14} className={classes.icon} />
     </a>
   )
 }

@@ -40,7 +40,7 @@ export function Mermaid({ code }: MermaidProps) {
 
   return (
     <div
-      className="not-prose"
+      className="not-prose my-8"
       dangerouslySetInnerHTML={{
         __html: result.svg
       }}

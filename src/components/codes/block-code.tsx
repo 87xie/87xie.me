@@ -29,7 +29,7 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
   return (
     <div
       className={cx(
-        'not-prose overflow-x-auto',
+        'not-prose overflow-x-auto my-8',
         'rounded-b-md border-1 border-gray-200 text-sm',
       )}
     >
