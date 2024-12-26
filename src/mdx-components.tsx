@@ -4,6 +4,7 @@ import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
 
 import BlockCode from './components/codes/block-code'
+import InlineCode from './components/codes/inline-code'
 
 const components = {
   h1({ id = '', children }) {
@@ -27,8 +28,17 @@ const components = {
       </LinkedHeading>
     )
   },
+  code(props) {
+    return (
+      <code
+        {...props}
+        className="not-prose rounded-md py-1 px-2 border-[0.5px] border-gray-300 bg-gray-50 text-sm"
+      />
+    )
+  },
   a: Anchor,
   BlockCode,
+  InlineCode,
 } satisfies MDXComponents
 
 export const useMDXComponents = () => components

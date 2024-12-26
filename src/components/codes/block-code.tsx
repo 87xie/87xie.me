@@ -1,5 +1,4 @@
 'use server'
-
 import {
   type RawCode,
   type AnnotationHandler,
@@ -9,17 +8,18 @@ import {
   highlight,
 } from 'codehike/code'
 import cx from 'clsx'
-
-type BlockCodeProps = {
-  codeblock: RawCode
-}
+import Mermaid from './mermaid.client'
 
 const lineNumbers: AnnotationHandler = {
   name: 'line-numbers',
   Line(props) {
+    const computedMinWidth = `${props.totalLines.toString().length + 1}ch`
     return (
-      <div className="flex w-full">
-        <span className="w-[5ch] text-gray-500 text-right">
+      <div className="flex">
+        <span
+          style={{ minWidth: computedMinWidth }}
+          className=" text-gray-500 text-right"
+        >
           {props.lineNumber}
         </span>
         <InnerLine merge={props} className="flex-auto ml-[2ch]" />
@@ -34,7 +34,6 @@ const mark: AnnotationHandler = {
     const color = annotation?.query || "rgb(14 165 233)"
     return (
       <div
-        
         style={{
           borderLeft: 'solid 2px transparent',
           borderLeftColor: annotation && color,
@@ -64,15 +63,14 @@ const callout: AnnotationHandler = {
   name: 'callout',
   transform(annotation: InlineAnnotation) {
     // transform inline annotation to block annotation
-    const { name, query, lineNumber, fromColumn, toColumn } = annotation
     return {
-      name,
-      query,
-      fromLineNumber: lineNumber,
-      toLineNumber: lineNumber,
+      name: annotation.name,
+      query: annotation.query,
+      fromLineNumber: annotation.lineNumber,
+      toLineNumber: annotation.lineNumber,
       data: {
         ...annotation.data,
-        column: (fromColumn + toColumn) / 2,
+        column: (annotation.fromColumn + annotation.toColumn) / 2,
       },
     }
   },
@@ -83,25 +81,30 @@ const callout: AnnotationHandler = {
       <InnerLine merge={props}>
         {children}
         <div
+          data-callout=""
           style={{
             minWidth: `${column + 4}ch`,
             marginLeft: `${indentation}ch`,
           }}
           className={cx(
-            'relative w-fit my-1 py-0.5',
-            'border rounded border-gray-400 bg-gray-50',
+            'relative w-fit my-1',
+            'border rounded border-gray-300 bg-gray-50',
             'whitespace-break-spaces'
           )}
         >
-          <div
-            style={{ left: `${column - indentation - 1}ch` }}
+          {/* callout arrow */}
+          <span
             className={cx(
-              'absolute w-2 h-2 rotate-45 -translate-y-1/2 -top-[1px]',
-              'border-l border-t border-gray-400 bg-gray-50',
+              'absolute -top-[1px] w-2 h-2 rotate-45 -translate-y-1/2',
+              'border-l border-t border-gray-300 bg-gray-50',
             )}
+            style={{ left: `${column - indentation}ch` }}
           />
+          {/* callout content */}
           {annotation.data.children || (
-            <div className="px-2">{annotation.query}</div>
+            <div className="py-1 px-2">
+              {annotation.query}
+            </div>
           )}
         </div>
       </InnerLine>
@@ -109,14 +112,23 @@ const callout: AnnotationHandler = {
   },
 }
 
+type BlockCodeProps = {
+  codeblock: RawCode
+}
+
 async function BlockCode({ codeblock }: BlockCodeProps) {
+  if (codeblock.lang === 'mermaid') {
+    return (
+      <Mermaid code={codeblock.value} />
+    )
+  }
+
   const highlighted = await highlight(codeblock, 'github-light')
   return (
     <div
       className={cx(
-        'not-prose',
-        'rounded-md border-1 border-gray-200 py-4',
-        'text-sm',
+        'not-prose overflow-x-auto',
+        'rounded-b-md border-1 border-gray-200 py-4 text-sm',
       )}
     >
       <Pre

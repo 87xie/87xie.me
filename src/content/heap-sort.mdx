@@ -67,14 +67,14 @@ graph TB
   - 由上至下，由左至右依順序加入節點
   - 若節點非葉節點，則一定擁有兩個子節點
 - 所有父節點大於子節點，稱為最大堆積 (max-heap)，反之所有父節點小於子節點，稱為最小堆積 (min-heap)
-- 上圖 max-heap 以陣列表示為 `[100, 19, 36, 17, 3, 25, 1, 2, 7]{:js}`
+- 上圖 max-heap 以陣列表示為 _`[100, 19, 36, 17, 3, 25, 1, 2, 7]`_
   - 假設父節點 index 為 `n`，左子節點 index 為 `2n + 1`，右子節點 index 為 `2n + 2` 
 
 ## Heapify
 
 將無序數列轉換成 heap 的過程稱為 heapify
 
-以 `[5, 3, 2, 10, 1, 9, 8, 6, 4, 7]{:js}` 為例：
+以 _`[5, 3, 2, 10, 1, 9, 8, 6, 4, 7]`_ 為例：
 
 ```mermaid
 graph TB
@@ -89,7 +89,7 @@ graph TB
   left_right---right_left_left((7))
 ```
 
-轉換成 max-heap 為： `[10, 7, 9, 6, 5, 2, 8, 3, 4, 1]{:js}`
+轉換成 max-heap 為： _`[10, 7, 9, 6, 5, 2, 8, 3, 4, 1]`_
 
 ```mermaid
 graph TB
@@ -113,7 +113,7 @@ graph TB
     1. 互換兩者位置 (L24-25)
     1. 對更新後的子節點，再進行一次 heapify (L26)
 
-```js showLineNumbers
+```js
 // create max-heap
 const nums = [5, 3, 2, 10, 1, 9, 8, 6, 4, 7];
 

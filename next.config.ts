@@ -15,9 +15,9 @@ import {
 } from 'codehike/mdx'
 
 const chConfig = {
-  components: { code: 'BlockCode' },
-  ignoreCode(codeblock) {
-    return codeblock.lang === 'mermaid'
+  components: {
+    code: 'BlockCode',
+    inlineCode: 'InlineCode',
   },
 } satisfies CodeHikeConfig
 

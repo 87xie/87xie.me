@@ -2,21 +2,23 @@
 
 import {
   type RawCode,
-  Pre,
+  Inline,
   highlight
 } from 'codehike/code'
 
-type BlockCodeProps = {
+type InlineCodeProps = {
   codeblock: RawCode
 }
 
-async function BlockCode({ codeblock }: BlockCodeProps) {
+async function InlineCode({ codeblock }: InlineCodeProps) {
   const highlighted = await highlight(codeblock, 'github-light')
   return (
-    <div className="not-prose">
-      <Pre code={highlighted} />
-    </div>
+    <Inline
+      code={highlighted}
+      style={{ ...highlighted.style, background: undefined }}
+      className="not-prose rounded-md py-1 px-2 border-[0.5px] border-gray-300 bg-gray-50 text-sm "
+    />
   )
 }
 
-export default BlockCode
+export default InlineCode

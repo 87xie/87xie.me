@@ -15,6 +15,7 @@
     "@primer/octicons-react": "^19.13.0",
     "clsx": "^2.1.1",
     "codehike": "^1.0.4",
+    "mermaid": "^11.4.1",
     "next": "15.1.0",
     "react": "19.0.0",
     "react-dom": "19.0.0"
