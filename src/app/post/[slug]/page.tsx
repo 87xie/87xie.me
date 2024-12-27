@@ -1,5 +1,5 @@
 import { allPosts } from 'content-collections'
-import { notFound } from 'next/navigation';
+import { notFound } from 'next/navigation'
 
 export async function generateStaticParams() {
   return allPosts.map((post) => ({

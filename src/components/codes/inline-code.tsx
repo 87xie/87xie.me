@@ -3,7 +3,7 @@
 import {
   type RawCode,
   Inline,
-  highlight
+  highlight,
 } from 'codehike/code'
 
 type InlineCodeProps = {

@@ -42,7 +42,7 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
           mark,
           lineNumbers,
           diff,
-          callout
+          callout,
         ]}
         className="py-4"
       />

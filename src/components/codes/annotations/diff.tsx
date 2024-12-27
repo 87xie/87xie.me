@@ -19,7 +19,7 @@ export const diff: AnnotationHandler = {
     return [annotation, {
       ...annotation,
       name: 'mark',
-      query: getDiffColor(annotation.query)
+      query: getDiffColor(annotation.query),
     }]
   },
   Line: ({ annotation, ...props }) => (

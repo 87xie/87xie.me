@@ -21,7 +21,7 @@ export const mark: AnnotationHandler = {
     )
   },
   Inline({ annotation, children }) {
-    const color = annotation?.query || "var(--color-rose-400)"
+    const color = annotation?.query || 'var(--color-rose-400)'
     return (
       <span
         style={{

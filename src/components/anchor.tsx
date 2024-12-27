@@ -20,7 +20,7 @@ const Anchor: AnchorComponent = ({
   if (href.startsWith('/')) {
     <NextLink
       {...props}
-      href={href} 
+      href={href}
       className={classes.link}
     >
       {children}

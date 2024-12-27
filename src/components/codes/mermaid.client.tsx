@@ -42,7 +42,7 @@ export function Mermaid({ code }: MermaidProps) {
     <div
       className="not-prose my-8"
       dangerouslySetInnerHTML={{
-        __html: result.svg
+        __html: result.svg,
       }}
     />
   )

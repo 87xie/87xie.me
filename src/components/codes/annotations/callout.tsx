@@ -35,7 +35,7 @@ export const callout: AnnotationHandler = {
           className={cx(
             'relative w-fit my-1',
             'border rounded border-gray-300 bg-gray-50',
-            'whitespace-break-spaces'
+            'whitespace-break-spaces',
           )}
         >
           {/* callout arrow */}
@@ -57,4 +57,3 @@ export const callout: AnnotationHandler = {
     )
   },
 }
-
