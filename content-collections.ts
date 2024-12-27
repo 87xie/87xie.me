@@ -13,19 +13,17 @@ const posts = defineCollection({
   schema: (z) => ({
     title: z.string(),
     date: z.string(),
-    slug: z.string(),
     tags: z.array(z.string()).optional(),
   }),
   transform: ({ _meta, ...post }) => {
-    const mdxContent = createDefaultImport<MDXContent>(`@/content/${_meta.filePath}`);
-
     return {
       ...post,
-      mdxContent,
+      slug: _meta.fileName.replace(/\.(md|mdx)$/, ''),
+      mdxContent: createDefaultImport<MDXContent>(`@/content/${_meta.filePath}`),
     };
   },
 });
- 
+
 export default defineConfig({
   collections: [posts],
 });
