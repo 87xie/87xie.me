@@ -21,6 +21,7 @@ function LinkedHeading({
     <Heading
       className={cx(
         'group relative',
+        level === 1 && 'text-3xl',
         level <= 2 && 'border-b-1 border-gray-200/90 pb-1',
       )}
     >
