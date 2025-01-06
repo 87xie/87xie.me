@@ -20,8 +20,6 @@ export default async function Page({ params }: PostPageProps) {
 
   const MdxContent = sample.mdxContent
   return (
-    <article className="prose max-w-4xl mx-auto py-12 px-5">
-      <MdxContent />
-    </article>
+    <MdxContent />
   )
 }

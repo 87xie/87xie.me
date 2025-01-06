@@ -1,4 +1,5 @@
 import type { MDXComponents } from 'mdx/types'
+import type { ReactNode } from 'react'
 
 import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
@@ -7,6 +8,13 @@ import BlockCode from './components/codes/block-code'
 import InlineCode from './components/codes/inline-code'
 
 const components = {
+  wrapper({ children }: { children: ReactNode }) {
+    return (
+      <article className="prose max-w-3xl mx-auto py-12 px-5">
+        {children}
+      </article>
+    )
+  },
   h1({ id = '', children }) {
     return (
       <LinkedHeading id={id} level={1}>
