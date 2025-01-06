@@ -2,14 +2,11 @@
 
 import type { MDXComponents } from 'mdx/types'
 import NextLink from 'next/link'
-import { LinkExternalIcon } from '@primer/octicons-react'
 
 type AnchorComponent = Exclude<MDXComponents['a'], undefined>
 
 const classes = {
   link: 'group hover:text-gray-600',
-  // class-name for link external icon
-  icon: 'opacity-0 group-hover:opacity-100 transition-opacity inline-flex ml-1.5',
 }
 
 const Anchor: AnchorComponent = ({
@@ -42,7 +39,6 @@ const Anchor: AnchorComponent = ({
       className={classes.link}
     >
       {children}
-      <LinkExternalIcon size={14} className={classes.icon} />
     </a>
   )
 }
