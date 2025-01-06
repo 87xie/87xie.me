@@ -2,6 +2,7 @@ import {
   type AnnotationHandler,
   InnerLine,
 } from 'codehike/code'
+import cx from 'clsx'
 
 export const mark: AnnotationHandler = {
   name: 'mark',
@@ -16,7 +17,12 @@ export const mark: AnnotationHandler = {
         }}
         className="flex"
       >
-        <InnerLine merge={props} className="flex-1" />
+        <InnerLine
+          merge={{
+            ...props,
+            className: cx(props.className, 'flex-1 px-[2ch]'),
+          }}
+        />
       </div>
     )
   },

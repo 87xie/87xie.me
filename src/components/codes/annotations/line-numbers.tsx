@@ -11,7 +11,7 @@ export const lineNumbers: AnnotationHandler = {
       <div className="flex">
         <span
           style={{ minWidth: computedMinWidth }}
-          className="mr-[2ch] text-gray-500 text-right"
+          className="text-gray-500 text-right"
         >
           {props.lineNumber}
         </span>

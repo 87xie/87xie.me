@@ -9,7 +9,7 @@ import { Mermaid } from './mermaid.client'
 // annotations
 import { mark } from './annotations/mark'
 import { diff } from './annotations/diff'
-import { lineNumbers } from './annotations/line-number'
+import { lineNumbers } from './annotations/line-numbers'
 import { callout } from './annotations/callout'
 
 type BlockCodeProps = {
@@ -24,7 +24,7 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
   }
 
   const highlighted = await highlight(codeblock, 'github-light')
-  const parsedMeta = parseMeta(codeblock.meta)
+  const meta = parseMeta(codeblock.meta)
 
   return (
     <div
@@ -34,13 +34,13 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
       )}
     >
       <div className="py-2 px-4 border-b-1 border-gray-200 bg-gray-50 text-xs">
-        {parsedMeta.filename || highlighted.lang.toUpperCase()}
+        {meta.filename || highlighted.lang.toUpperCase()}
       </div>
       <Pre
         code={highlighted}
         handlers={[
           mark,
-          lineNumbers,
+          ...meta.showLineNumbers ? [lineNumbers] : [],
           diff,
           callout,
         ]}
@@ -50,12 +50,21 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
   )
 }
 
-function parseMeta(meta: string) {
+function praseFileName(meta: string) {
   const filenameReg = /filename="([^"]+)"/
   const filenameMatch = meta.match(filenameReg)
+  return filenameMatch?.[1] ?? ''
+}
 
+function parseLineNumbers(meta: string) {
+  const lineNumbersReg = /\s--n\s?/
+  return lineNumbersReg.test(meta)
+}
+
+function parseMeta(meta: string) {
   return {
-    filename: filenameMatch?.[1] ?? '',
+    filename: praseFileName(meta),
+    showLineNumbers: parseLineNumbers(meta),
   }
 }
 
