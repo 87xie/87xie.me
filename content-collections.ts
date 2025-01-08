@@ -5,22 +5,6 @@ import {
 } from '@content-collections/core'
 import type { MDXContent } from 'mdx/types'
 
-const samples = defineCollection({
-  name: 'samples',
-  directory: 'src/samples',
-  include: '**/*.mdx',
-  schema: (z) => ({
-    title: z.string().optional(),
-  }),
-  transform: ({ _meta, ...post }) => {
-    return {
-      ...post,
-      slug: _meta.fileName.replace(/\.(md|mdx)$/, ''),
-      mdxContent: createDefaultImport<MDXContent>(`@/samples/${_meta.filePath}`),
-    }
-  },
-})
-
 const posts = defineCollection({
   name: 'posts',
   directory: 'src/content',
@@ -41,5 +25,5 @@ const posts = defineCollection({
 })
 
 export default defineConfig({
-  collections: [samples, posts],
+  collections: [posts],
 })

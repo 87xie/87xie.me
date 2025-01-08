@@ -57,7 +57,7 @@ function praseFileName(meta: string) {
 }
 
 function parseLineNumbers(meta: string) {
-  const lineNumbersReg = /\s--n\s?/
+  const lineNumbersReg = /\s?--n\s?/
   return lineNumbersReg.test(meta)
 }
 
