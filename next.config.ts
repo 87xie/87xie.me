@@ -11,7 +11,7 @@ import rehypeGithubAlert from 'rehype-github-alert'
 import {
   type CodeHikeConfig,
   remarkCodeHike,
-  recmaCodeHike
+  recmaCodeHike,
 } from 'codehike/mdx'
 
 const chConfig = {
@@ -34,9 +34,9 @@ const withMdx = createMdx({
       rehypeGithubAlert,
     ],
     recmaPlugins: [
-      [recmaCodeHike, chConfig]
+      [recmaCodeHike, chConfig],
     ],
-  }
+  },
 })
 
 export default withContentCollections(withMdx({
