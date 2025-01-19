@@ -15,13 +15,15 @@ const Anchor: AnchorComponent = ({
   ...props
 }) => {
   if (href.startsWith('/')) {
-    <NextLink
-      {...props}
-      href={href}
-      className={classes.link}
-    >
-      {children}
-    </NextLink>
+    return (
+      <NextLink
+        {...props}
+        href={href}
+        className={classes.link}
+      >
+        {children}
+      </NextLink>
+    )
   }
   if (href.startsWith('#')) {
     return (
