@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
 
+import CodeWithTabs from './components/codes/block-code-with-tabs'
 import BlockCode from './components/codes/block-code'
 import InlineCode from './components/codes/inline-code'
 
@@ -47,6 +48,7 @@ const components = {
   a: Anchor,
   BlockCode,
   InlineCode,
+  CodeWithTabs,
 } satisfies MDXComponents
 
 export const useMDXComponents = () => components

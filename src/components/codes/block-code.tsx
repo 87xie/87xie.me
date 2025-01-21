@@ -30,7 +30,7 @@ async function BlockCode({ codeblock }: BlockCodeProps) {
     <div
       className={cx(
         'not-prose overflow-x-auto my-8',
-        'rounded-b-md border-1 border-gray-200 text-sm',
+        'rounded-md border border-gray-200 text-sm',
       )}
     >
       <div className="py-2 px-4 border-b-1 border-gray-200 bg-gray-50 text-xs">

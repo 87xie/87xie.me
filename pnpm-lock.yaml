@@ -38,6 +38,9 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      zod:
+        specifier: ^3.24.1
+        version: 3.24.1
     devDependencies:
       '@content-collections/core':
         specifier: ^0.8.0
@@ -3103,8 +3106,8 @@ packages:
     resolution: {integrity: sha512-b4JR1PFR10y1mKjhHY9LaGo6tmrgjit7hxVIeAmyMw3jegXR4dhYqLaQF5zMXZxY7tLpMyJeLjr1C4rLmkVe8g==}
     engines: {node: '>=12.20'}
 
-  zod@3.23.8:
-    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+  zod@3.24.1:
+    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -3213,7 +3216,7 @@ snapshots:
       tinyglobby: 0.2.10
       typescript: 5.7.2
       yaml: 2.6.1
-      zod: 3.23.8
+      zod: 3.24.1
 
   '@content-collections/integrations@0.2.1(@content-collections/core@0.8.0(typescript@5.7.2))':
     dependencies:
@@ -7038,6 +7041,6 @@ snapshots:
 
   yocto-queue@1.1.1: {}
 
-  zod@3.23.8: {}
+  zod@3.24.1: {}
 
   zwitch@2.0.4: {}
