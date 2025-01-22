@@ -10,7 +10,7 @@ type InlineCodeProps = {
   codeblock: RawCode
 }
 
-async function InlineCode({ codeblock }: InlineCodeProps) {
+export async function InlineCode({ codeblock }: InlineCodeProps) {
   const highlighted = await highlight(codeblock, 'github-light')
   return (
     <Inline
@@ -20,5 +20,3 @@ async function InlineCode({ codeblock }: InlineCodeProps) {
     />
   )
 }
-
-export default InlineCode

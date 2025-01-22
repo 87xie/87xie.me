@@ -4,9 +4,9 @@ import type { ReactNode } from 'react'
 import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
 
-import CodeWithTabs from './components/codes/block-code-with-tabs'
-import BlockCode from './components/codes/block-code'
-import InlineCode from './components/codes/inline-code'
+import { BlockCode } from './components/codes/block-code'
+import { InlineCode } from './components/codes/inline-code'
+import { CodeWithTabs } from './components/codes/block-code-with-tabs'
 
 const components = {
   wrapper({ children }: { children: ReactNode }) {

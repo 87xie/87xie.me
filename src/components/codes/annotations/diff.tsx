@@ -24,7 +24,7 @@ export const diff: AnnotationHandler = {
   },
   Line: ({ annotation, ...props }) => (
     <>
-      <div className="min-w-[1ch] box-content opacity-70 px-2">
+      <div className="min-w-[1ch] px-2 opacity-70">
         {annotation?.query}
       </div>
       <InnerLine merge={props} />

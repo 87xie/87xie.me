@@ -6,49 +6,63 @@ import {
 import { z } from 'zod'
 import cx from 'clsx'
 import { Tabs as ArkTabs } from '@ark-ui/react'
-import { mark } from './annotations/mark'
-import { diff } from './annotations/diff'
-import { callout } from './annotations/callout'
+import {
+  classes,
+  parseMeta,
+  getHandlers,
+} from './block-code'
 
 const Schema = Block.extend({ tabs: z.array(CodeBlock) })
 
-async function CodeWithTabs(props: unknown) {
+export async function CodeWithTabs(props: unknown) {
   const { tabs } = parseProps(props, Schema)
   const highlighted = await Promise.all(
     tabs.map((tab) => highlight(tab, 'github-light')),
   )
+  const tabDatas = tabs.map((tab, index) => {
+    const parsedMeta = parseMeta(tab.meta)
+
+    return {
+      code: highlighted[index],
+      filename: parsedMeta.filename,
+      handlers: getHandlers(parsedMeta),
+      rawMeta: tab.meta,
+      language: tab.lang,
+    }
+  })
 
   return (
     <ArkTabs.Root
       defaultValue={tabs[0]?.meta}
-      className="not-prose border border-gray-200 rounded-md overflow-x-auto"
+      className={classes.codeBlockRoot}
     >
-      <ArkTabs.List className="relative border-b border-gray-200 bg-gray-50">
-        {tabs.map((tab) => (
+      <ArkTabs.List className={classes.codeBlockHeader}>
+        {tabDatas.map((tabData) => (
           <ArkTabs.Trigger
-            key={tab.meta}
-            value={tab.meta}
+            key={tabData.rawMeta}
+            value={tabData.rawMeta}
             className={cx(
-              'py-1 px-4',
+              'py-2 px-4',
               'cursor-pointer',
               'data-selected:bg-gray-200 data-selected:font-semibold',
             )}
           >
-            {tab.meta}
+            {tabData.filename || tabData.rawMeta}
           </ArkTabs.Trigger>
         ))}
       </ArkTabs.List>
-      {tabs.map((tab, i) => (
-        <ArkTabs.Content key={tab.meta} value={tab.meta}>
+      {tabDatas.map((tabData, i) => (
+        <ArkTabs.Content
+          key={tabData.rawMeta}
+          value={tabData.rawMeta}
+        >
           <Pre
             code={highlighted[i]}
-            className="py-4 text-sm"
-            handlers={[mark, diff, callout]}
+            handlers={tabData.handlers}
+            className={classes.codeBlockPre}
           />
         </ArkTabs.Content>
       ))}
     </ArkTabs.Root>
   )
 }
-
-export default CodeWithTabs

@@ -34,7 +34,7 @@ export const callout: AnnotationHandler = {
           }}
           className={cx(
             'relative w-fit my-1',
-            'border rounded border-gray-300 bg-gray-50',
+            'border rounded border-gray-200 bg-gray-50',
             'whitespace-break-spaces',
           )}
         >
