@@ -1,5 +1,3 @@
-'use server'
-
 import type { ReactNode } from 'react'
 import { LinkIcon } from '@primer/octicons-react'
 import cx from 'clsx'

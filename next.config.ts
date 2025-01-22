@@ -40,5 +40,6 @@ const withMdx = createMdx({
 })
 
 export default withContentCollections(withMdx({
+  output: 'export',
   pageExtensions: ['mdx', 'tsx'],
 }))

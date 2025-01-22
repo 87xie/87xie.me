@@ -1,5 +1,3 @@
-'use server'
-
 import type { MDXComponents } from 'mdx/types'
 import NextLink from 'next/link'
 

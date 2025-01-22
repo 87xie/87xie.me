@@ -12,12 +12,12 @@
   "dependencies": {
     "@ark-ui/react": "^4.8.1",
     "@mdx-js/react": "^3.1.0",
-    "@next/mdx": "^15.1.3",
+    "@next/mdx": "^15.1.6",
     "@primer/octicons-react": "^19.14.0",
     "clsx": "^2.1.1",
     "codehike": "^1.0.4",
     "mermaid": "^11.4.1",
-    "next": "15.1.3",
+    "next": "15.1.6",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "zod": "^3.24.1"
@@ -34,13 +34,13 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "eslint": "^9.17.0",
-    "eslint-config-next": "15.1.3",
+    "eslint-config-next": "15.1.6",
     "rehype-github-alert": "^1.0.0",
     "rehype-slug": "^6.0.0",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.0",
     "remark-mdx-frontmatter": "^5.0.0",
-    "tailwindcss": "4.0.0-beta.4",
+    "tailwindcss": "4.0.0-beta.10",
     "typescript": "^5"
   },
   "packageManager": "pnpm@9.14.4+sha512.c8180b3fbe4e4bca02c94234717896b5529740a6cbadf19fa78254270403ea2f27d4e1d46a08a0f56c89b63dc8ebfd3ee53326da720273794e6200fcf0d184ab"
