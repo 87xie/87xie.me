@@ -42,9 +42,10 @@ export async function CodeWithTabs(props: unknown) {
             key={tabData.rawMeta}
             value={tabData.rawMeta}
             className={cx(
-              'py-2 px-4',
               'cursor-pointer',
-              'data-selected:bg-gray-200 data-selected:font-semibold',
+              'py-2 px-4',
+              'data-selected:border-b-2 border-blue-500',
+              'data-selected:bg-gray-200/70 data-selected:font-semibold',
             )}
           >
             {tabData.filename || tabData.rawMeta}
