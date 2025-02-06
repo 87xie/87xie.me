@@ -27,8 +27,8 @@
     "@content-collections/next": "^0.2.4",
     "@mdx-js/loader": "^3.1.0",
     "@stylistic/eslint-plugin": "^2.12.1",
-    "@tailwindcss/postcss": "4.0.0-beta.4",
-    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/postcss": "4.0.3",
+    "@tailwindcss/typography": "^0.5.16",
     "@types/mdx": "^2.0.13",
     "@types/node": "^20",
     "@types/react": "^19.0.7",
@@ -40,7 +40,7 @@
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.0",
     "remark-mdx-frontmatter": "^5.0.0",
-    "tailwindcss": "4.0.0-beta.10",
+    "tailwindcss": "4.0.3",
     "typescript": "^5"
   },
   "packageManager": "pnpm@9.14.4+sha512.c8180b3fbe4e4bca02c94234717896b5529740a6cbadf19fa78254270403ea2f27d4e1d46a08a0f56c89b63dc8ebfd3ee53326da720273794e6200fcf0d184ab"
