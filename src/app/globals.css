@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* github alerts */
+.markdown-alert {
+  @apply my-4 p-4 rounded-md text-gray-600;
+}
+
+.markdown-alert-note {
+  @apply bg-blue-50;
+}
+
+.markdown-alert-tip {
+  @apply bg-green-50;
+}
+
+.markdown-alert-important {
+  @apply bg-purple-50;
+}
+
+.markdown-alert-warning {
+  @apply bg-amber-50;
+}
+
+.markdown-alert-caution {
+  @apply bg-rose-50;
+}
+
+.markdown-alert-title {
+  @apply flex items-center gap-2 m-0 font-semibold;
+}
+
+:where(.markdown-alert) p:not(.markdown-alert-title) {
+  @apply my-2;
+}

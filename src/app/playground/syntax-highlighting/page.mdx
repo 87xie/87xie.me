@@ -1,0 +1,121 @@
+# Syntax highlighting
+
+Adding syntax highlighting in Markdown file
+
+## Inline code
+
+Inlined syntax highlighting in Markdown:
+
+_`const defaultLang = 'jsx'`_
+
+_ts`type Code = string | number`_
+
+_css`a { color: #fff }`_
+
+## Filename
+
+Display filename.
+
+```tsx filename="app/layout.tsx"
+type LayoutProps = {
+  children: ReactNode
+}
+
+export default function Layout({ children}: LayoutProps) {
+  return (
+    <html lang="en">
+      <body>
+        <main>{children}</main>
+      </body>
+    </html>
+  )
+}
+```
+
+## Line numbers
+
+Display line numbers.
+
+```ts --n
+type Status = 'idle' | 'loading' | 'success' | 'error';
+
+const [status, setStatus] = useState<Status>('idle');
+```
+
+## Highlighting
+
+Highlighting lines.
+
+```js
+function lorem(ipsum, dolor = 1) {
+  // !mark
+  return dolor
+}
+
+function ipsum(lorem, dolor = 1) {
+  // !mark(1:2) orange
+  const sit = lorem == null ? 0 : lorem.sit
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(lorem) : []
+}
+```
+
+Highlighting tokens inside a line.
+
+```ts
+// !mark[/count/]
+// !mark[/0/] green
+const [count, setCount] = useState(0)
+```
+
+## Diff
+
+Diff syntax highlighting.
+
+```js
+function lorem(ipsum, dolor = 1) {
+  const sit = ipsum == null ? 0 : ipsum.sit
+  // !diff -
+  dolor = ipsum - sit
+  // !diff +
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(ipsum) : []
+}
+```
+
+## Callout
+
+Add a short message in the code block.
+
+```js
+const lorem = ipsum(dolor, sit)
+// !mark[/amet/]
+// !callout[/amet/] hey yo
+const [amet, consectetur] = [0, 0]
+lorem.adipiscing((sed, elit) => {
+  if (sed) {
+    amet += elit
+  }
+})
+```
+
+## Code with tabs
+
+Group code blocks into tabs.
+
+<CodeWithTabs>
+```js !!tabs filename="main.js" --n
+function lorem(ipsum, dolor = 1) {
+  const sit = ipsum == null ? 0 : ipsum.sit
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(ipsum) : []
+}
+```
+
+```css !!tabs filename="styles.css" --n
+body {
+  margin: 0;
+  padding: 0;
+}
+```
+</CodeWithTabs>
