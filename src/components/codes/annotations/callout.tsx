@@ -34,7 +34,7 @@ export const callout: AnnotationHandler = {
           }}
           className={cx(
             'relative w-fit my-1',
-            'border rounded border-gray-200 bg-gray-50',
+            'border rounded border-gray-400/60 bg-gray-50',
             'whitespace-break-spaces',
           )}
         >
@@ -42,7 +42,7 @@ export const callout: AnnotationHandler = {
           <span
             className={cx(
               'absolute -top-[1px] w-2 h-2 rotate-45 -translate-y-1/2',
-              'border-l border-t border-gray-200 bg-gray-50',
+              'border-l border-t border-gray-400/60 bg-gray-50',
             )}
             style={{ left: `${column - indentation}ch` }}
           />

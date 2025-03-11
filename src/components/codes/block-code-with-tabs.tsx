@@ -45,7 +45,7 @@ export async function CodeWithTabs(props: unknown) {
               'cursor-pointer',
               'py-2 px-4',
               'data-selected:border-b-2 border-blue-500',
-              'data-selected:bg-gray-200/70 data-selected:font-semibold',
+              'data-selected:bg-gray-200/70',
             )}
           >
             {tabData.filename || tabData.rawMeta}

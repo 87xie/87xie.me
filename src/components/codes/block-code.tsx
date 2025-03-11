@@ -8,6 +8,7 @@ import { Mermaid } from './mermaid.client'
 import { mark } from './annotations/mark'
 import { diff } from './annotations/diff'
 import { callout } from './annotations/callout'
+import { collapseHandlers } from './annotations/collapse'
 import { lineNumbers } from './annotations/line-numbers'
 
 type BlockCodeProps = {
@@ -16,6 +17,7 @@ type BlockCodeProps = {
 
 export const classes = {
   codeBlockRoot: cx(
+    'grid', // ensure the code block header's background is filled when scrollbar appears
     'not-prose', // remove prose styles
     'overflow-x-auto', // horizontal scrollbar
     'rounded-md border border-gray-200', // bordered
@@ -79,8 +81,9 @@ type ParsedMeta = ReturnType<typeof parseMeta>
 export function getHandlers(options: Pick<ParsedMeta, 'showLineNumbers'>) {
   return [
     mark,
-    options.showLineNumbers && lineNumbers,
     diff,
+    ...options.showLineNumbers ? [lineNumbers] : [],
+    ...collapseHandlers,
     callout,
-  ].filter((handler) => !!handler)
+  ]
 }

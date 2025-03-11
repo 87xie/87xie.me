@@ -6,11 +6,9 @@ Adding syntax highlighting in Markdown file
 
 Inlined syntax highlighting in Markdown:
 
-_`const defaultLang = 'jsx'`_
-
-_ts`type Code = string | number`_
-
-_css`a { color: #fff }`_
+- CSS: _css`a { color: #fff }`_
+- TypeScript: _ts`type Code = string | number`_
+- Default (JSX):  _`const defaultLang = 'jsx'`_
 
 ## Filename
 
@@ -97,6 +95,45 @@ lorem.adipiscing((sed, elit) => {
     amet += elit
   }
 })
+```
+
+## Collapse
+
+Default collapsed.
+
+```js
+// !collapse(1:4)
+function lorem(ipsum, dolor = 1) {
+  const sit = ipsum == null ? 0 : 1
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(ipsum) : []
+}
+
+// !collapse(1:4) collapsed
+function ipsum(ipsum, dolor = 1) {
+  const sit = ipsum == null ? 0 : 1
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(ipsum) : []
+}
+```
+
+Collapse with line numbers and highlighting lines.
+
+```js --n
+// !collapse(1:4)
+// !diff(1:5) -
+function lorem(ipsum, dolor = 1) {
+  const sit = ipsum == null ? 0 : 1
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(ipsum) : []
+}
+// !diff(1:5) +
+// !collapse(1:4)
+function ipsum(ipsum, dolor = 1) {
+  const sit = ipsum == null ? 0 : 1
+  dolor = sit - amet(dolor)
+  return sit ? consectetur(ipsum) : []
+}
 ```
 
 ## Code with tabs

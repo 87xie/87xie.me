@@ -15,7 +15,7 @@ export const lineNumbers: AnnotationHandler = {
         >
           {props.lineNumber}
         </span>
-        <InnerLine merge={props} className="flex-1" />
+        <InnerLine merge={props} />
       </div>
     )
   },
