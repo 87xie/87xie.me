@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 import type { ReactNode } from 'react'
 
+import cx from 'clsx'
 import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
 
@@ -11,7 +12,15 @@ import { CodeWithTabs } from './components/codes/block-code-with-tabs'
 const components = {
   wrapper({ children }: { children: ReactNode }) {
     return (
-      <article className="prose max-w-3xl mx-auto py-12 px-5">
+      <article
+        className={cx(
+          'prose max-w-3xl mx-auto py-12 px-5',
+          // unordered list
+          'prose-ul:marker:text-gray-600',
+          // ordered list
+          'prose-ul:marker:text-gray-600',
+        )}
+      >
         {children}
       </article>
     )
