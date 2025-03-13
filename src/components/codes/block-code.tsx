@@ -41,7 +41,7 @@ export async function BlockCode({ codeblock }: BlockCodeProps) {
   const handlers = getHandlers(meta)
 
   return (
-    <div className={cx(classes.codeBlockRoot, 'my-8')}>
+    <div className={cx(classes.codeBlockRoot, 'my-6')}>
       <div className={cx(classes.codeBlockHeader, 'py-2 px-4')}>
         {meta.filename || highlighted.lang.toUpperCase()}
       </div>

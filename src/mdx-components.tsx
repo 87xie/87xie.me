@@ -16,9 +16,9 @@ const components = {
         className={cx(
           'prose max-w-3xl mx-auto py-12 px-5',
           // unordered list
-          'prose-ul:marker:text-gray-600',
+          'prose-ul:marker:text-(--tw-prose-body)',
           // ordered list
-          'prose-ul:marker:text-gray-600',
+          'prose-ol:marker:text-(--tw-prose-body)',
         )}
       >
         {children}

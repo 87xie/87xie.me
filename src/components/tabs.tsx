@@ -34,7 +34,7 @@ export function TabList({
         <ArkTabs.Trigger
           key={item}
           value={item}
-          className="min-w-10 p-2 cursor-pointer"
+          className="min-w-10 p-2 cursor-pointer text-sm"
         >
           {item}
         </ArkTabs.Trigger>
