@@ -36,16 +36,16 @@ export async function CodeWithTabs(props: unknown) {
       defaultValue={tabs[0]?.meta}
       className={classes.codeBlockRoot}
     >
-      <ArkTabs.List className={classes.codeBlockHeader}>
+      <ArkTabs.List className="py-1.5 px-0.5">
         {tabDatas.map((tabData) => (
           <ArkTabs.Trigger
             key={tabData.rawMeta}
             value={tabData.rawMeta}
             className={cx(
+              'py-1 px-3',
               'cursor-pointer',
-              'py-2 px-4',
-              'data-selected:border-b-2 border-blue-500',
-              'data-selected:bg-gray-200/70',
+              'data-selected:underline',
+              'decoration-2 decoration-blue-500 underline-offset-4',
             )}
           >
             {tabData.filename || tabData.rawMeta}

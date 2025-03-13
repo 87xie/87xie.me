@@ -9,49 +9,45 @@ import { BlockCode } from './components/codes/block-code'
 import { InlineCode } from './components/codes/inline-code'
 import { CodeWithTabs } from './components/codes/block-code-with-tabs'
 
+const classes = {
+  ul: 'prose-ul:marker:text-(--tw-prose-body)',
+  ol: 'prose-ol:marker:text-(--tw-prose-body)',
+  code: cx(
+    'prose-code:rounded-md prose-code:border-[0.5px] prose-code:border-gray-300',
+    'prose-code:py-0.5 prose-code:px-1.5',
+    'prose-code:bg-gray-50 prose-code:text-sm prose-code:font-normal',
+    'prose-code:before:content-none prose-code:after:content-none',
+  ),
+}
+
 const components = {
   wrapper({ children }: { children: ReactNode }) {
     return (
       <article
         className={cx(
           'prose max-w-3xl mx-auto py-12 px-5',
-          // unordered list
-          'prose-ul:marker:text-(--tw-prose-body)',
-          // ordered list
-          'prose-ol:marker:text-(--tw-prose-body)',
+          classes.ol,
+          classes.ul,
+          classes.code,
         )}
       >
         {children}
       </article>
     )
   },
-  h1({ id = '', children }) {
+  h1(props) {
     return (
-      <LinkedHeading id={id} level={1}>
-        {children}
-      </LinkedHeading>
+      <LinkedHeading {...props} level={1} />
     )
   },
-  h2({ id = '', children }) {
+  h2(props) {
     return (
-      <LinkedHeading id={id} level={2}>
-        {children}
-      </LinkedHeading>
+      <LinkedHeading {...props} level={2} />
     )
   },
-  h3({ id = '', children }) {
+  h3(props) {
     return (
-      <LinkedHeading id={id} level={3}>
-        {children}
-      </LinkedHeading>
-    )
-  },
-  code(props) {
-    return (
-      <code
-        {...props}
-        className="not-prose rounded-md py-0.5 px-1.5 border-[0.5px] border-gray-300 bg-gray-50 text-sm"
-      />
+      <LinkedHeading {...props} level={3} />
     )
   },
   a: Anchor,

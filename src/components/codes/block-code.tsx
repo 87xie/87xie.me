@@ -17,16 +17,17 @@ type BlockCodeProps = {
 
 export const classes = {
   codeBlockRoot: cx(
-    'grid', // ensure the code block header's background is filled when scrollbar appears
     'not-prose', // remove prose styles
+    'grid', // ensure the code block header's background is filled when scrollbar appears
     'overflow-x-auto', // horizontal scrollbar
     'rounded-md border border-gray-200', // bordered
+    'px-0.5 pb-0.5 bg-gray-50 ',
     'text-sm',
   ),
-  codeBlockHeader: cx(
-    'border-b-1 border-gray-200 bg-gray-50', // border bottom
+  codeBlockPre: cx(
+    'rounded-md border-1 border-gray-200',
+    'py-4 bg-white',
   ),
-  codeBlockPre: 'py-4',
 }
 
 export async function BlockCode({ codeblock }: BlockCodeProps) {
@@ -42,8 +43,8 @@ export async function BlockCode({ codeblock }: BlockCodeProps) {
 
   return (
     <div className={cx(classes.codeBlockRoot, 'my-6')}>
-      <div className={cx(classes.codeBlockHeader, 'py-2 px-4')}>
-        {meta.filename || highlighted.lang.toUpperCase()}
+      <div className={cx('py-1.5 px-4')}>
+        {meta.filename || highlighted.lang}
       </div>
       <Pre
         code={highlighted}

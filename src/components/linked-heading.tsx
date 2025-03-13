@@ -1,12 +1,10 @@
-import type { ReactNode } from 'react'
+import type { ComponentPropsWithoutRef } from 'react'
 import { LinkIcon } from '@primer/octicons-react'
 import cx from 'clsx'
 
 type LinkedHeadingProps = {
-  id: string
   level: 1 | 2 | 3
-  children: ReactNode
-}
+} & ComponentPropsWithoutRef<'h1' | 'h2' | 'h3'>
 
 function LinkedHeading({
   id,
@@ -21,23 +19,25 @@ function LinkedHeading({
   return (
     <Heading
       className={cx(
-        'group relative',
+        'group',
         level === 1 && 'text-3xl',
         level <= 2 && 'border-b-1 border-gray-200 pb-1',
       )}
     >
-      <a
-        id={id}
-        href={`#${id}`}
-        aria-label={linkAriaLabel}
-        className={cx(
-          'inline-flex absolute top-[calc(50%-0.5rem)] -left-6',
-          'opacity-0 group-hover:opacity-100 focus:opacity-100',
-        )}
-      >
-        <LinkIcon />
-      </a>
       {children}
+      {id && (
+        <a
+          id={id}
+          href={`#${id}`}
+          aria-label={linkAriaLabel}
+          className={cx(
+            'inline-flex ml-2',
+            'opacity-0 group-hover:opacity-100 focus:opacity-100',
+          )}
+        >
+          <LinkIcon size={16} />
+        </a>
+      )}
     </Heading>
   )
 }
