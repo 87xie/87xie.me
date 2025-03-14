@@ -16,18 +16,13 @@ type BlockCodeProps = {
 }
 
 export const classes = {
-  codeBlockRoot: cx(
+  blockCodeRoot: cx(
     'not-prose', // remove prose styles
-    'grid', // ensure the code block header's background is filled when scrollbar appears
-    'overflow-x-auto', // horizontal scrollbar
-    'rounded-md border border-gray-200', // bordered
-    'px-0.5 pb-0.5 bg-gray-50 ',
-    'text-sm',
+    'rounded-md border border-gray-200',
+    'px-0.5 pb-0.5 bg-gray-50 text-sm',
   ),
-  codeBlockPre: cx(
-    'rounded-md border-1 border-gray-200',
-    'py-4 bg-white',
-  ),
+  blockCodeHeader: 'py-1.5 px-4',
+  blockCodeBody: 'rounded-md border-1 border-gray-200 bg-white overflow-x-scroll py-4',
 }
 
 export async function BlockCode({ codeblock }: BlockCodeProps) {
@@ -42,15 +37,16 @@ export async function BlockCode({ codeblock }: BlockCodeProps) {
   const handlers = getHandlers(meta)
 
   return (
-    <div className={cx(classes.codeBlockRoot, 'my-6')}>
-      <div className={cx('py-1.5 px-4')}>
+    <div className={cx(classes.blockCodeRoot, 'my-6')}>
+      <div className={classes.blockCodeHeader}>
         {meta.filename || highlighted.lang}
       </div>
-      <Pre
-        code={highlighted}
-        handlers={handlers}
-        className={classes.codeBlockPre}
-      />
+      <div className={classes.blockCodeBody}>
+        <Pre
+          code={highlighted}
+          handlers={handlers}
+        />
+      </div>
     </div>
   )
 }
