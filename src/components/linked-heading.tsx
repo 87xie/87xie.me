@@ -19,7 +19,7 @@ function LinkedHeading({
   return (
     <Heading
       className={cx(
-        'group',
+        'group relative',
         level === 1 && 'text-3xl',
         level <= 2 && 'border-b-1 border-gray-200 pb-1',
       )}
@@ -31,7 +31,8 @@ function LinkedHeading({
           href={`#${id}`}
           aria-label={linkAriaLabel}
           className={cx(
-            'inline-flex ml-2',
+            'hidden lg:inline-block',
+            'absolute top-[calc(50%-8px)] -left-6',
             'opacity-0 group-hover:opacity-100 focus:opacity-100',
           )}
         >
