@@ -34,7 +34,7 @@ export async function CodeWithTabs(props: unknown) {
   return (
     <ArkTabs.Root
       defaultValue={tabs[0]?.meta}
-      className={classes.codeBlockRoot}
+      className={classes.blockCodeRoot}
     >
       <ArkTabs.List className="py-1.5 px-0.5">
         {tabDatas.map((tabData) => (
@@ -57,11 +57,12 @@ export async function CodeWithTabs(props: unknown) {
           key={tabData.rawMeta}
           value={tabData.rawMeta}
         >
-          <Pre
-            code={highlighted[i]}
-            handlers={tabData.handlers}
-            className={classes.codeBlockPre}
-          />
+          <div className={classes.blockCodeBody}>
+            <Pre
+              code={highlighted[i]}
+              handlers={tabData.handlers}
+            />
+          </div>
         </ArkTabs.Content>
       ))}
     </ArkTabs.Root>

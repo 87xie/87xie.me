@@ -7,23 +7,23 @@
 }
 
 .markdown-alert-note {
-  @apply bg-blue-50;
+  @apply bg-blue-100;
 }
 
 .markdown-alert-tip {
-  @apply bg-green-50;
+  @apply bg-green-100;
 }
 
 .markdown-alert-important {
-  @apply bg-purple-50;
+  @apply bg-purple-100;
 }
 
 .markdown-alert-warning {
-  @apply bg-amber-50;
+  @apply bg-amber-100;
 }
 
 .markdown-alert-caution {
-  @apply bg-rose-50;
+  @apply bg-rose-100;
 }
 
 .markdown-alert-title {

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import cx from 'clsx'
 import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
+import { Details } from './components/details'
 
 import { BlockCode } from './components/codes/block-code'
 import { InlineCode } from './components/codes/inline-code'
@@ -50,6 +51,26 @@ const components = {
       <LinkedHeading {...props} level={3} />
     )
   },
+  table(props) {
+    return (
+      <div
+        className={cx(
+          'my-6 rounded-md border-1 border-(--tw-prose-th-borders)',
+          'overflow-x-auto',
+          // table
+          'prose-table:my-0',
+          // th
+          'prose-th:py-2 prose-th:px-4 prose-th:bg-gray-100',
+          'prose-th:align-middle',
+          // td
+          'prose-td:py-2 prose-td:px-4 prose-td:align-middle',
+        )}
+      >
+        <table {...props} />
+      </div>
+    )
+  },
+  Details,
   a: Anchor,
   BlockCode,
   InlineCode,

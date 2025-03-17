@@ -1,0 +1,37 @@
+# Tables
+
+Use tables for data with multiple attributes or comparisons, like feature comparisons. Since tables can be challenging to read and maintain, make sure that the data suits a table format, as tables can be hard to read and maintain. This aligns with GitHub's [style guide](https://docs.github.com/en/contributing/style-guide-and-content-model/style-guide#tables) on table usage.
+
+## Usage
+
+Tables simplify comparing differences, such as the distinctions between various subscription plans.
+
+| Feature       | Basic Plan | Premium Plan |
+|---------------|------------|--------------|
+| Storage       | 10 GB      | 100 GB       |
+| Support       | Email only | 24/7 Support |
+| Monthly Price | $5         | $15          |
+
+Tables can map relationships, such as Tailwind CSS classes to their corresponding styles.
+
+| Class       | Styles       |
+|------------|---------------|
+| text-left    | text-align: left;   |
+| text-center  | text-align: center; |
+| text-right   | text-align: right;  |
+| text-justify | text-align: justify; |
+| text-start   | text-align: start;  |
+| text-end     | text-align: end;    |
+
+Tables are useful for organizing detailed data sets, such as WebSocket connection close codes.
+
+| Status Code | Meaning                          | Description |
+|------------|-----------------------------------|-------------|
+| `0`–`999`  | None                        | Not used. |
+| `1000`     | Normal Closure              | The connection successfully completed the purpose for which it was created. |
+| `1001`     | Going Away                  | The endpoint is going away, possibly due to a server shutdown or browser navigation. |
+| `1002`     | Protocol Error              | The connection was closed due to a protocol error. |
+| `1003`     | Unsupported Data            | The endpoint received data it cannot process (e.g., binary data sent to a text-only endpoint). |
+| `1004`     | Reserved                    | This status code is reserved for future use. |
+| `1005`     | No Status Received          | Indicates no status code was provided even though one was expected. |
+| `1006`     | Abnormal Closure            | Indicates the connection was closed abnormally (without a close frame). |

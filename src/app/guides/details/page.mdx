@@ -1,0 +1,62 @@
+# Details
+
+`<Details>` is a closed component that simplifies the use of `<details>` and `<summary>` HTML elements in MDX.
+
+It is suitable for optional or supplementary information but should not be used for critical content that all users need to see.
+
+## Usage
+
+To use `<Details>`, pass the `summary` and `open` props as shown below:
+
+````mdx
+<Details summary="Why is my Node.js application crashing?">
+There are several common reasons for a Node.js application crash:
+
+1. **Uncaught Exceptions:** Use a try-catch block or a process-level error handler.
+2. **Memory Leaks:** Monitor memory usage with tools like `heapdump`.
+3. **Dependency Issues:** Ensure all dependencies are compatible by running `npm audit`.
+
+For detailed debugging, check the logs or use a debugger like `node --inspect`.
+</Details>
+
+<Details summary="POST /users" open>
+Creates a new user:
+
+- **Parameters:** `name` (string, required), `email` (string, required)
+- **Response:** `201 Created` with JSON of new user
+
+**Example:**
+
+```bash
+curl -X POST -d '{"name": "John", "email": "john@example.com"}' https://api.example.com/v1/users
+```
+</Details>
+````
+
+Displayed as:
+
+<Details summary="Why is my Node.js application crashing?">
+There are several common reasons for a Node.js application crash:
+
+1. **Uncaught Exceptions:** Use a try-catch block or a process-level error handler.
+2. **Memory Leaks:** Monitor memory usage with tools like `heapdump`.
+3. **Dependency Issues:** Ensure all dependencies are compatible by running `npm audit`.
+
+For detailed debugging, check the logs or use a debugger like `node --inspect`.
+</Details>
+
+<Details summary="POST /users" open>
+Creates a new user:
+
+- **Parameters:** `name` (string, required), `email` (string, required)
+- **Response:** `201 Created` with JSON of new user
+
+**Example:**
+
+```bash
+curl -X POST -d '{"name": "John", "email": "john@example.com"}' https://api.example.com/v1/users
+```
+</Details>
+
+>[!TIP]
+>The summary should clearly indicate what content is hidden (e.g., "Why is my Node.js application crashing?" instead of just "Click here").
