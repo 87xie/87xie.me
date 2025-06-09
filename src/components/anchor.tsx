@@ -1,15 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 import NextLink from 'next/link'
-import cx from 'clsx'
 
 type AnchorComponent = Exclude<MDXComponents['a'], undefined>
-
-const classes = {
-  link: cx(
-    'hover:text-gray-500',
-    'decoration-1.5 underline-offset-4 decoration-blue-500',
-  ),
-}
 
 const Anchor: AnchorComponent = ({
   href = '/',
@@ -18,18 +10,14 @@ const Anchor: AnchorComponent = ({
 }) => {
   if (href.startsWith('/')) {
     return (
-      <NextLink
-        {...props}
-        href={href}
-        className={classes.link}
-      >
+      <NextLink {...props} href={href}>
         {children}
       </NextLink>
     )
   }
   if (href.startsWith('#')) {
     return (
-      <a href={href} className={classes.link}>
+      <a href={href}>
         {children}
       </a>
     )
@@ -40,7 +28,6 @@ const Anchor: AnchorComponent = ({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={classes.link}
     >
       {children}
     </a>
