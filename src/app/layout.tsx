@@ -26,7 +26,7 @@ export default function RootLayout({
           className={cx(
             inter.className,
             'w-full h-full max-w-4xl mx-auto px-4',
-            'grid grid-rows-[min-content_1fr_min-content]',
+            'grid grid-rows-[min-content] grid-cols-1',
           )}
         >
           <header className="flex mt-4 mb-6 md:mt-10 md:mb-10">
