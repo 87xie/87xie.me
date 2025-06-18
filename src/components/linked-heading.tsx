@@ -19,9 +19,10 @@ function LinkedHeading({
   return (
     <Heading
       className={cx(
-        'group relative',
+        'group relative font-semibold',
         level === 1 && 'text-3xl',
-        level <= 2 && 'border-b-1 border-gray-200 pb-1',
+        level === 2 && 'text-2xl',
+        level === 3 && 'text-xl',
       )}
     >
       {children}

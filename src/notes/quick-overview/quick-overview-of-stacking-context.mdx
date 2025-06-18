@@ -10,6 +10,8 @@ import {
   TabContent,
 } from '@/components/tabs'
 
+# Quick overview of stacking context
+
 Stacking context 決定元素在 z 軸上的排序，常見創建 stacking context 情況：
 
 - 根元素 `<html>{:html}`
@@ -31,7 +33,7 @@ Stacking context 決定元素在 z 軸上的排序，常見創建 stacking conte
 
 ## With a basic example
 
-<Tabs>
+<Tabs defaultValue="HTML">
   <TabList items={['HTML', 'DOM tree', 'Stacking context']} />
   <TabContent value="HTML">
     ```html
@@ -65,5 +67,5 @@ Stacking context 決定元素在 z 軸上的排序，常見創建 stacking conte
 
 ## References
 
-- Frontend System Design Fundamentals(https://static.frontendmasters.com/resources/2024-05-29-systems-design/frontend-system-design-fundamentals.pdf)
+- [Frontend System Design Fundamentals](https://static.frontendmasters.com/resources/2024-05-29-systems-design/frontend-system-design-fundamentals.pdf)
 - [MDN - Stacking context](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_positioned_layout/Understanding_z-index/Stacking_context)
