@@ -3,8 +3,8 @@ import { LinkIcon } from '@primer/octicons-react'
 import cx from 'clsx'
 
 type LinkedHeadingProps = {
-  level: 1 | 2 | 3
-} & ComponentPropsWithoutRef<'h1' | 'h2' | 'h3'>
+  level: 2 | 3
+} & ComponentPropsWithoutRef<'h2' | 'h3'>
 
 function LinkedHeading({
   id,
@@ -20,8 +20,7 @@ function LinkedHeading({
     <Heading
       className={cx(
         'group relative font-semibold',
-        level === 1 && 'text-3xl',
-        level === 2 && 'text-2xl',
+        level === 2 && 'text-2xl mt-10',
         level === 3 && 'text-xl',
       )}
     >

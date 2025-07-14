@@ -32,7 +32,7 @@ const components = {
   },
   h1(props) {
     return (
-      <LinkedHeading {...props} level={1} />
+      <h1 {...props} className="not-prose" />
     )
   },
   h2(props) {
