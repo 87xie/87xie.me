@@ -31,9 +31,8 @@ function LinkedHeading({
           href={`#${id}`}
           aria-label={linkAriaLabel}
           className={cx(
-            'hidden lg:inline-block',
-            'absolute top-[calc(50%-8px)] -left-6',
-            'opacity-0 group-hover:opacity-100 focus:opacity-100',
+            'inline-block absolute top-[calc(50%-8px)] -left-6',
+            'opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100',
           )}
         >
           <LinkIcon size={16} />

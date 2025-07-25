@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+h1 {
+  @apply text-3xl font-semibold mb-6;
+}
+
 /* github alerts */
 .markdown-alert {
   @apply my-4 p-4 rounded-md text-gray-600;

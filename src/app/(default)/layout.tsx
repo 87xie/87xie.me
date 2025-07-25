@@ -10,17 +10,14 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
     <div
       className={cx(
-        'grid',
-        'md:grid-cols-[min-content_1fr]',
-        'max-w-4xl mx-auto py-14 px-6',
+        'grid max-w-4xl mx-auto py-14 px-6',
+        'md:grid-cols-[min-content_1fr] md:px-0',
       )}
     >
       <div className="md:sticky md:top-14 md:self-start">
         <Nav />
       </div>
-      <main
-        className={cx('[&_h1]:text-3xl [&_h1]:font-semibold [&_h1]:mb-6')}
-      >
+      <main>
         {children}
       </main>
     </div>

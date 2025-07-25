@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html className={cx('h-full', inter.className)}>
-      <body className="h-full">
+    <html className={cx(inter.className, 'scroll-pt-14')}>
+      <body>
         {children}
       </body>
     </html>
