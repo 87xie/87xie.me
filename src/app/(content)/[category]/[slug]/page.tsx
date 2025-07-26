@@ -25,17 +25,17 @@ export default async function Page({ params }: PostPageProps) {
   return (
     <div
       className={cx(
-        'max-w-4xl mx-auto py-14 px-5',
-        'lg:flex lg:px-0',
+        'max-w-4xl mx-auto py-16 px-6',
+        'md:flex',
       )}
     >
-      <main className="w-full lg:flex-auto">
+      <main className="md:w-3/4">
         <MdxContent />
       </main>
       <aside
         className={cx(
-          'hidden w-1/4 ml-12 sticky top-14',
-          'lg:block lg:self-start lg:shrink-0',
+          'hidden self-start sticky top-14 w-1/4 ml-12',
+          'md:block',
         )}
       >
         <p className="font-medium mb-3">
