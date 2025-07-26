@@ -4,6 +4,7 @@ import {
   defineConfig,
 } from '@content-collections/core'
 import { getToc } from '@/utils/toc-parser'
+import { z } from 'zod'
 import type { MDXContent } from 'mdx/types'
 
 const posts = defineCollection({
@@ -11,7 +12,7 @@ const posts = defineCollection({
   directory: 'src/content',
   include: '**/*.mdx',
   parser: 'frontmatter',
-  schema: (z) => ({
+  schema: z.object({
     title: z.string().optional(),
     date: z.string().optional(),
     tags: z.array(z.string()).optional(),
