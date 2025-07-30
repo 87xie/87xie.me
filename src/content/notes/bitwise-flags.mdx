@@ -1,0 +1,171 @@
+---
+date: 2025-07-31
+title: Bitwise flags
+tags:
+  - bitwise
+  - bitwise flags
+---
+
+# Bitwise flags
+
+- 用一個整數表示多個狀態，不需用物件（陣列）儲存多個獨立狀態，節省記憶體
+- 位元運算與物件（陣列）的存取操作相比，執行效率高
+- 每個 flag 佔用唯一的位元位置，確保可以獨立組合
+- JavaScript 位元運算子處理的是 32 位元、帶符號的整數
+
+## Operators
+
+範例參考 [alien-signal@2.0.5](https://github.com/stackblitz/alien-signals/tree/814626641bd7341b4d9b6f61eba23c7757e8e34a) 實作
+
+- `<<` 定義 flag
+- `&` 檢查 flag
+- `|` 設置 flag
+- `~` 搭配 `&` 清除 flag
+
+### Left shift
+
+透過 `<<` 定義 bitwise flags（將第一個數字以二進制表示，向左移動指定位元）
+
+```ts
+export enum ReactiveFlags {
+  None = 0,               // 000000
+  Mutable = 1 << 0,       // 000001
+  Watching = 1 << 1,      // 000010
+  RecursedCheck = 1 << 2, // 000100
+  Recursed = 1 << 3,      // 001000
+  Dirty = 1 << 4,         // 010000
+  Pending = 1 << 5,       // 100000
+}
+```
+
+對應制十進制的整數：
+
+| Flags | Decimal |
+|-------|---------|
+| None  | 0 |
+| Mutable | 1 |
+| Watching | 2 |
+| RecursedCheck | 4 |
+| Recursed | 8 |
+| Dirty | 16 |
+| Pending | 32 |
+
+以 `computed` 為例，初始 `flags: 17` 表示同時包含 `Mutable`, `Dirty` flag
+
+```ts
+export function computed<T>(getter: (previousValue?: T) => T): () => T {
+  return computedOper.bind({
+    value: undefined,
+    subs: undefined,
+    subsTail: undefined,
+    deps: undefined,
+    depsTail: undefined,
+    // !mark
+    flags: 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty,
+    getter: getter as (previousValue?: unknown) => unknown,
+  }) as () => T;
+}
+```
+
+### Bitwise OR
+
+`|` 用來設置 flag，運算規則如下：
+
+1. 將兩個數字轉換成二進制，逐一比對對應位元
+1. 當兩者對應的位元其中一者為 `1`，該位元的結果為 `1`
+
+假設只有 `Mutable` flag 的 `computed` 需要加上 `Dirty` flag 即為
+
+```ts
+1 | 16 // 17
+
+/**
+ * 16 = 010000
+ *  1 = 000001
+ * --------------
+ * 17 = 010001
+ **/
+```
+
+### Bitwise AND
+
+`&` 用來檢查特定的 flag 是否設置，運算規則如下：
+
+1. 將兩個數字轉換成二進制，逐一比對對應位元
+1. 當兩者對應的位元都為 `1`，該位元的結果為 `1`
+
+以下方程式碼為例
+
+檢查 `computed` 是否包含 `Mutable` 或 `Watching` flag：
+
+```ts
+if (
+  // !mark
+  flags & 3 as ReactiveFlags.Mutable | ReactiveFlags.Watching
+) {
+  // check for a Mutable or Watching flag
+}
+
+/**
+ * assume flags is 17:
+ * 
+ * 17 & 3 = 1
+ * 
+ * 17 = 010001
+ *  3 = 000011
+ * --------------
+ *  1 = 000001
+ **/
+```
+
+檢查 `computed` 同時擁有 `Mutable` 及 `Watching` flags：
+
+```ts
+if (
+  // !mark
+  (flags & 17 as ReactiveFlags.Mutable | ReactiveFlags.Dirty) === 17
+) {
+  // check for Mutable and Watching flags
+}
+```
+
+### Bitwise NOT
+
+`~` 用來反轉每個位元：
+- `0` 會變成 `1`
+- `1` 會變成 `0`
+
+以 `Dirty` flag 的 `16` 為例：
+
+```ts
+~16 // -17
+
+/**
+ *  16 = 010000
+ * ~16 = 101111
+ **/
+```
+
+> [!NOTE]
+> 當最高位元是 1 時數字為負數
+
+搭配 `&` 清除 flag，以 `flags: 17` 的 `computed` 完成計算後刪除 `Dirty` 為例：
+
+```ts
+flags &= ~16 // 1
+
+/**
+ * flags = 17 & ~16
+ * 
+ *  17 = 010001
+ * ~16 = 101111
+ * -------------
+ *   1 = 000001
+ **/
+```
+
+## References
+
+- [MDN - Bitwise flags](https://developer.mozilla.org/en-US/docs/Glossary/Bitwise_flags)
+- [alien-signals](https://github.com/stackblitz/alien-signals)
+- [DeepWiki - alien-signals](https://deepwiki.com/stackblitz/alien-signals)

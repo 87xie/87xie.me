@@ -19,7 +19,9 @@ const posts = defineCollection({
   }),
   transform: ({ _meta, content, ...post }) => {
     return {
-      ...post,
+      date: post.date,
+      tags: post.tags ?? [],
+      title: post.title ?? '',
       toc: getToc(content),
       slug: _meta.fileName.replace(/\.(md|mdx)$/, ''),
       category: _meta.directory === '.' ? 'uncategory' : _meta.directory,

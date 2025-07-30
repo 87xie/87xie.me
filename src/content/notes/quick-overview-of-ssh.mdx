@@ -1,19 +1,22 @@
 ---
-title: Quick overview of SSH
-tag: linux, ssh, security
 date: 2021-06-04
+title: Quick overview of SSH
+tags:
+  - linux
+  - ssh
+  - security
 ---
 
 # Quick overview of SSH
 
 >The SSH protocol uses encryption to secure the connection between a client and a server. All user authentication, commands, output, and file transfers are encrypted to protect against attacks in the network.
 
-## Cliet Server Model
+## Cliet server model
 
 - client 需要有 ssh program 負責發送 connection request
 - server 運行一個 ssh daemon，負責監聽 ssh connection request (預設 TCP port22)
 
-## Public Key Cryptography
+## Public key cryptography
   
 - 一個 publick key 對應一個 private key，兩者可以互相解密
 - public key 加密資料、驗證簽名
@@ -33,7 +36,7 @@ signature 確保資料傳輸的能符合
 1. 收到資料與簽名後，以同樣的 hash 方式將資料轉為 hash value
 1. 透過公鑰解開簽名，比對步驟 3 的 hash value
   
-## Password Authentication
+## Password authentication
 
 未將 client 端的 public key 加至 server `.ssh/authorized_keys`
 
@@ -54,7 +57,7 @@ sequenceDiagram
   server -> client: connection established
 ```
 
-## Public Key Authentication
+## Public key authentication
 
 generating ssh keys
 
@@ -92,10 +95,10 @@ sequenceDiagram
   client -> server: connention established
 ```
 
-## Reference
+## References
 
 - [Complete Intro to Linux and the CLI - SSH](https://btholt.github.io/complete-intro-to-linux-and-the-cli/ssh)
 - [SSH (Secure Shell)](https://www.ssh.com/academy/ssh#the-ssh-protocol)
-- [[Security] 你該知道所有關於 SSH 的那些事](https://jennycodes.me/posts/security-ssh)
+- [Security 你該知道所有關於 SSH 的那些事](https://jennycodes.me/posts/security-ssh)
 - [筆記 - 加解密與數位簽章](https://sibevin.github.io/posts/2017-05-19-113900-notes-encryption-digital-signature)
 - [RSA數位簽章的簡單流程](https://dotblogs.com.tw/litfal/2014/03/08/144298)

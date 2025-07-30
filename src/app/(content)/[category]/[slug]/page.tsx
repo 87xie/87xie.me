@@ -1,7 +1,9 @@
-import { allPosts } from 'content-collections'
+import { allPosts } from '@/sorted-content'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowLeftIcon } from '@primer/octicons-react'
 import cx from 'clsx'
-import { TocList } from '../../_components/toc-list'
+import { TocList } from '@/components/toc/toc-list'
 
 export async function generateStaticParams() {
   return allPosts.map((post) => ({
@@ -30,6 +32,13 @@ export default async function Page({ params }: PostPageProps) {
       )}
     >
       <main className="md:w-3/4">
+        <Link
+          className="flex items-center gap-2 mb-6 text-sm"
+          href={`/${category}`}
+        >
+          <ArrowLeftIcon size={14} />
+          {`Back to ${category}`}
+        </Link>
         <MdxContent />
       </main>
       <aside
