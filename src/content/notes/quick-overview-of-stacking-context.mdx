@@ -1,7 +1,10 @@
 ---
-title: Quick overview of stacking context
-tag: browser rendering, stacking context, CSS
 date: 2024-09-24
+title: Quick overview of stacking context
+tags:
+  - browser rendering
+  - stacking context
+  - css
 ---
 
 import {
@@ -12,26 +15,27 @@ import {
 
 # Quick overview of stacking context
 
-Stacking context 決定元素在 z 軸上的排序，常見創建 stacking context 情況：
+Stacking context 決定元素在 z 軸上的堆疊順序，以下爲常見建立新的 stacking context 的情況：
 
-- 根元素 `<html>{:html}`
+- 根元素 `<html>`
 - `position: absolute`
 - `position: fixed`
 - `position: sticky`
-- `position: relative` 且 `z-index` 值不為 `auto`
+- `position: relative` 且 `z-index` 不為 `auto`
 - `opacity` 小於 `1`
-- `transform`, `scale`, `rotate`
-- Flex-item, 且 `z-index` 不為 `auto`
-- Grid-item, 且 `z-index` 不為 `auto`
-- `will-change` 不為初始值
+- 使用 `transform`, `scale`, `rotate`
+- Flex item 且 `z-index` 不為 `auto`
+- Grid item 且 `z-index` 不為 `auto`
+- `will-change` 不為 `auto`
 
-規則：
+核心規則：
 
-- 根元素 `<html>{:html}` 自動形成 stacking context，其子元素則根據特定屬性，形成新的 stacking context
-- 在同一個 stacking context 內，使用 `z-index` 值進行比較，較大的 `z-index` 在上方，值相同則按照的出現順序排列 (後者在上方)
-- Stacking context 內部的元素，不會影響到其外部的 stacking context，反之外部 stacking context 的元素，也不會影響到內部的 stacking context（適當隔離，可以減少 reflow 及 repaint 的次數）
+- `<html>` 會自動形成一個 stacking context，當子元素若符合條件，也會形成新的 stacking context
+- 同一個 stacking context 中，元素依 `z-index` 進行比較，`z-index` 較大者在上方
+- 若 `z-index` 相同，後出現的元素會覆蓋先出現的元素
+- Stacking context 內的元素只影響同層級內的堆疊，內外部互不干擾（適當隔離可以減少 reflow 及 repaint 的次數）
 
-## With a basic example
+## Basic example
 
 <Tabs defaultValue="HTML">
   <TabList items={['HTML', 'DOM tree', 'Stacking context']} />
