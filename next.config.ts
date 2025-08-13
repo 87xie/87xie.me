@@ -42,4 +42,12 @@ const withMdx = createMdx({
 export default withContentCollections(withMdx({
   output: 'export',
   pageExtensions: ['mdx', 'tsx'],
+  /**
+   * https://chakra-ui.com/docs/get-started/frameworks/next-app#optimize-bundle
+   * resolve warnings like:
+   * [webpack.cache.PackFileCacheStrategy] Serializing big strings (xxxkiB)
+   */
+  experimental: {
+    optimizePackageImports: ['@ark-ui/react'],
+  },
 }))
