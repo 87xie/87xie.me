@@ -33,7 +33,7 @@ export default async function Page({ params }: PostPageProps) {
     >
       <main className="md:w-3/4">
         <Link
-          className="flex items-center gap-2 mb-6 text-sm"
+          className="link-gray flex items-center gap-2 mb-6 text-sm"
           href={`/${category}`}
         >
           <ArrowLeftIcon size={14} />
@@ -52,7 +52,7 @@ export default async function Page({ params }: PostPageProps) {
         </p>
         {post.toc.length > 0
           ? (<TocList toc={post.toc} />)
-          : (<p className="text-sm text-zinc-500">No headings found</p>)}
+          : (<p className="text-sm text-gray-500">No headings found</p>)}
       </aside>
     </div>
   )

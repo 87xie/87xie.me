@@ -14,7 +14,7 @@ const components = {
     return (
       <article
         className={cx(
-          'prose max-w-none',
+          'prose max-w-none leading-relaxed',
           // marker
           'prose-ol:marker:text-(--tw-prose-body)',
           'prose-ul:marker:text-(--tw-prose-body)',

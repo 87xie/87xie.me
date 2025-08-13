@@ -5,6 +5,16 @@ h1 {
   @apply text-3xl font-semibold mb-6;
 }
 
+@layer components {
+  .link-gray {
+    color: var(--color-gray-500);
+    &:hover,
+    &.link-active {
+      color: var(--color-gray-900);
+    }
+  }
+}
+
 /* github alerts */
 .markdown-alert {
   @apply my-4 p-4 rounded-md text-gray-600;

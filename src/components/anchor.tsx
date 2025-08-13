@@ -8,16 +8,22 @@ const Anchor: AnchorComponent = ({
   children,
   ...props
 }) => {
+  const className = 'not-prose underline'
   if (href.startsWith('/')) {
     return (
-      <NextLink {...props} href={href}>
+      <NextLink
+        {...props}
+        prefetch={false}
+        href={href}
+        className={className}
+      >
         {children}
       </NextLink>
     )
   }
   if (href.startsWith('#')) {
     return (
-      <a href={href}>
+      <a {...props} href={href} className={className}>
         {children}
       </a>
     )
@@ -26,6 +32,7 @@ const Anchor: AnchorComponent = ({
     <a
       {...props}
       href={href}
+      className={className}
       target="_blank"
       rel="noopener noreferrer"
     >
