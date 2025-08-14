@@ -93,7 +93,7 @@ async function processQueue() {
 }
 
 function renderMermaid(id: string, code: string) {
-  return new Promise((resolve, reject) => {
+  return new Promise<RenderResult>((resolve, reject) => {
     queue.push({ id, code, resolve, reject })
     setTimeout(() => {
       processQueue()
