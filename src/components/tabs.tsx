@@ -3,7 +3,7 @@ import type {
   TabListProps as ArkTabListProps,
   TabContentProps as ArkTabContentProps,
 } from '@ark-ui/react'
-import { Tabs as ArkTabs } from '@ark-ui/react'
+import { Tabs as ArkTabs } from '@ark-ui/react/tabs'
 import cx from 'clsx'
 
 export function Tabs(props: ArkTabsRootProps) {

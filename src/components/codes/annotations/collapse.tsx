@@ -1,4 +1,4 @@
-import { Collapsible } from '@ark-ui/react'
+import { Collapsible } from '@ark-ui/react/collapsible'
 import { ChevronDownIcon } from '@primer/octicons-react'
 import {
   type AnnotationHandler,

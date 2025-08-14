@@ -5,7 +5,7 @@ import {
 } from 'codehike/code'
 import { z } from 'zod'
 import cx from 'clsx'
-import { Tabs as ArkTabs } from '@ark-ui/react'
+import { Tabs as ArkTabs } from '@ark-ui/react/tabs'
 import {
   classes,
   parseMeta,
