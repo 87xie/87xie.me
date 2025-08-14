@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "analyze": "ANALYZE=true pnpm build",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -12,6 +13,7 @@
   "dependencies": {
     "@ark-ui/react": "^5.0.1",
     "@mdx-js/react": "^3.1.0",
+    "@next/bundle-analyzer": "^15.4.6",
     "@next/mdx": "^15.4.6",
     "@primer/octicons-react": "^19.15.5",
     "clsx": "^2.1.1",
