@@ -4,7 +4,7 @@ import {
   type RawCode,
 } from 'codehike/code'
 import cx from 'clsx'
-import { Mermaid } from './mermaid.client'
+import { Mermaid } from './mermaid'
 import { mark } from './annotations/mark'
 import { diff } from './annotations/diff'
 import { callout } from './annotations/callout'
