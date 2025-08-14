@@ -17,31 +17,31 @@ h1 {
 
 /* github alerts */
 .markdown-alert {
-  @apply my-4 p-4 rounded-md text-gray-600;
+  @apply my-4 p-4 rounded-md;
 }
 
 .markdown-alert-note {
-  @apply bg-blue-100;
+  @apply bg-blue-100/80;
 }
 
 .markdown-alert-tip {
-  @apply bg-green-100;
+  @apply bg-green-100/80;
 }
 
 .markdown-alert-important {
-  @apply bg-purple-100;
+  @apply bg-purple-100/80;
 }
 
 .markdown-alert-warning {
-  @apply bg-amber-100;
+  @apply bg-amber-100/80;
 }
 
 .markdown-alert-caution {
-  @apply bg-rose-100;
+  @apply bg-rose-100/80;
 }
 
 .markdown-alert-title {
-  @apply flex items-center gap-2 m-0 font-semibold;
+  @apply flex items-center gap-2 m-0 font-medium;
 }
 
 :where(.markdown-alert) p:not(.markdown-alert-title) {
