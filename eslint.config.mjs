@@ -19,7 +19,7 @@ const eslintConfig = [
   }),
   {
     rules: {
-      '@stylistic/operator-linebreak': ['ignore'],
+      '@stylistic/operator-linebreak': 'off',
       '@stylistic/member-delimiter-style': ['error', {
         singleline: {
           delimiter: 'semi',
