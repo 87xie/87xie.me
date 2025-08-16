@@ -6,13 +6,13 @@ import {
 import type { RenderResult } from 'mermaid'
 
 type Action =
-  | { type: 'render:success', payload: RenderResult }
-  | { type: 'render:error', payload: Error }
+| { type: 'render:success'; payload: RenderResult }
+| { type: 'render:error'; payload: Error }
 
 type DataState =
-  | { status: 'pending', data: undefined, error: undefined }
-  | { status: 'success', data: RenderResult, error: undefined }
-  | { status: 'error', data: undefined, error: Error }
+| { status: 'pending'; data: undefined; error: undefined }
+| { status: 'success'; data: RenderResult; error: undefined }
+| { status: 'error'; data: undefined; error: Error }
 
 function reducer(state: DataState, action: Action): DataState {
   switch (action.type) {
@@ -80,11 +80,9 @@ async function processQueue() {
     }
     const result = await mermaid.render(task.id, task.code)
     task.resolve(result)
-  }
-  catch (error) {
+  } catch (error) {
     task.reject(error as Error)
-  }
-  finally {
+  } finally {
     activeCount--
     setTimeout(() => {
       processQueue()

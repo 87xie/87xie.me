@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeftIcon } from '@primer/octicons-react'
 import cx from 'clsx'
-import { TocList } from '@/components/toc/toc-list'
+import { Toc } from '@/components/toc/toc'
 
 export async function generateStaticParams() {
   return allPosts.map((post) => ({
@@ -13,7 +13,7 @@ export async function generateStaticParams() {
 }
 
 type PostPageProps = {
-  params: Promise<{ slug: string, category: string }>
+  params: Promise<{ slug: string; category: string }>
 }
 
 export default async function Page({ params }: PostPageProps) {
@@ -47,12 +47,7 @@ export default async function Page({ params }: PostPageProps) {
           'md:block',
         )}
       >
-        <p className="font-medium mb-3">
-          Table of contents
-        </p>
-        {post.toc.length > 0
-          ? (<TocList toc={post.toc} />)
-          : (<p className="text-sm text-gray-500">No headings found</p>)}
+        <Toc toc={post.toc} />
       </aside>
     </div>
   )
