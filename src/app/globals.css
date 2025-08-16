@@ -1,8 +1,13 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-h1 {
-  @apply text-3xl font-semibold mb-6;
+@layer base {
+  html {
+    @apply text-gray-700;
+  }
+  h1 {
+    @apply text-3xl font-semibold mb-6;
+  }
 }
 
 @layer components {
@@ -17,33 +22,32 @@ h1 {
 
 /* github alerts */
 .markdown-alert {
-  @apply my-4 p-4 rounded-md;
-}
-
-.markdown-alert-note {
-  @apply bg-blue-100/80;
-}
-
-.markdown-alert-tip {
-  @apply bg-green-100/80;
-}
-
-.markdown-alert-important {
-  @apply bg-purple-100/80;
-}
-
-.markdown-alert-warning {
-  @apply bg-amber-100/80;
-}
-
-.markdown-alert-caution {
-  @apply bg-rose-100/80;
+  @apply my-5 border-l-4 py-2 px-4 border-(--color-github-alert) bg-(--color-github-alert)/3;
+  @apply [&_:where(p)]:my-3;
+  @apply [&>:last-child]:mb-0;
 }
 
 .markdown-alert-title {
-  @apply flex items-center gap-2 m-0 font-medium;
+  @apply flex items-center gap-2 my-0 text-(--color-github-alert);
+  @apply [&_svg]:fill-(--color-github-alert);
 }
 
-:where(.markdown-alert) p:not(.markdown-alert-title) {
-  @apply my-2;
+.markdown-alert-note {
+  --color-github-alert: var(--color-blue-500);
+}
+
+.markdown-alert-tip {
+  --color-github-alert: var(--color-emerald-600);
+}
+
+.markdown-alert-important {
+  --color-github-alert: var(--color-purple-600);
+}
+
+.markdown-alert-warning {
+  --color-github-alert: var(--color-yellow-600);
+}
+
+.markdown-alert-caution {
+  --color-github-alert: var(--color-red-600);
 }

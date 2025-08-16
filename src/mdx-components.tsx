@@ -14,10 +14,10 @@ const components = {
     return (
       <article
         className={cx(
-          'prose max-w-none leading-relaxed',
+          'prose max-w-none text-gray-700 leading-relaxed',
           // marker
-          'prose-ol:marker:text-(--tw-prose-body)',
-          'prose-ul:marker:text-(--tw-prose-body)',
+          'prose-ol:marker:text-gray-700',
+          'prose-ul:marker:text-gray-700',
           // code
           'prose-code:rounded-md prose-code:border-[0.5px] prose-code:border-gray-300',
           'prose-code:py-0.5 prose-code:px-1.5',

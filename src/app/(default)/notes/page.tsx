@@ -12,17 +12,13 @@ export default function NotesPage() {
   return (
     <div>
       <h1>Notes</h1>
-      <ul className="space-y-2">
+      <ul className="space-y-4">
         {notes.map((note) => (
           <li key={note.slug}>
             <Link
-              className={cx(
-                'grid',
-                'md:flex md:flex-wrap md:items-baseline md:gap-3',
-              )}
+              className={cx('grid')}
               href={`/notes/${note.slug}`}
             >
-              {note.title}
               {note.date && (
                 <time
                   dateTime={note.date}
@@ -31,6 +27,7 @@ export default function NotesPage() {
                   {formatter.format(new Date(note.date))}
                 </time>
               )}
+              <span>{note.title}</span>
             </Link>
           </li>
         ))}

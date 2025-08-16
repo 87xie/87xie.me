@@ -34,12 +34,15 @@ export function TabList({
         <ArkTabs.Trigger
           key={item}
           value={item}
-          className="min-w-10 p-2 cursor-pointer text-sm"
+          className={cx(
+            'min-w-10 py-2 px-4 cursor-pointer text-gray-500',
+            'data-selected:text-(--tw-prose-body)',
+          )}
         >
           {item}
         </ArkTabs.Trigger>
       ))}
-      <ArkTabs.Indicator className="absolute w-[var(--width)] h-[2px] bottom-0 bg-blue-500" />
+      <ArkTabs.Indicator className="absolute w-[var(--width)] h-[2px] bottom-0 bg-gray-500" />
     </ArkTabs.List>
   )
 }
