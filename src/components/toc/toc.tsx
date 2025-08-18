@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo } from 'react'
 import cn from 'clsx'
+import { useEffect, useState, useRef, useMemo, useTransition } from 'react'
 import type { TocItem } from '@/utils/toc-parser'
 
 type TocListProps = {
@@ -10,12 +10,16 @@ type TocListProps = {
 
 export function Toc({ toc }: TocListProps) {
   const activeIds = useAnchorObserver(toc)
-  const indicatorMeta = useMemo(() => {
+  const indicatorStyle = useMemo(() => {
     const startIndex = toc.findIndex((heading) => activeIds.includes(heading.id))
-    return {
-      position: `${Math.max(startIndex, 0) * 1.75}rem`,
-      height: `${activeIds.length * 1.75}rem`,
+    const style = { top: '0', height: 'auto' }
+    if (startIndex > -1) {
+      style.top = startIndex * 1.75 + 'rem'
     }
+    if (activeIds.length > 0) {
+      style.height = activeIds.length * 1.75 + 'rem'
+    }
+    return style
   }, [toc, activeIds])
 
   return (
@@ -26,13 +30,10 @@ export function Toc({ toc }: TocListProps) {
       {toc.length > 0 && (
         <div className="relative">
           <span
-            className="absolute left-2.5 w-[2px] bg-gray-500 transition-[height_top] duration-300"
-            style={{
-              top: indicatorMeta.position,
-              height: indicatorMeta.height,
-            }}
+            style={indicatorStyle}
+            className="absolute left-1 w-[1px] bg-gray-500 [transition:top_0.5s,height_0.2s_0.3s]"
           />
-          <ul className="border-l ml-2.5 pl-3 border-gray-300">
+          <ul className="border-l ml-1 pl-3 border-gray-300">
             {toc.map((heading) => (
               <li key={heading.id}>
                 <a
@@ -50,7 +51,6 @@ export function Toc({ toc }: TocListProps) {
           </ul>
         </div>
       )}
-
       {toc.length === 0 && (
         <p className="text-sm text-gray-500">No headings found</p>
       )}
@@ -61,6 +61,7 @@ export function Toc({ toc }: TocListProps) {
 function useAnchorObserver(toc: TocItem[]) {
   const [activeIds, setActiveIds] = useState<string[]>([])
   const intersectingIdsRef = useRef(new Set<string>())
+  const [, startTransition] = useTransition()
 
   useEffect(() => {
     if (toc.length === 0) return
@@ -77,14 +78,11 @@ function useAnchorObserver(toc: TocItem[]) {
       }
       /**
        * In a large section (e.g. between <h2> and the next <h2>), the heading itself has already scrolled far above the viewport.
-       * If nothing is active yet, fallback to the last seen heading.
+       * If nothing is active yet, keep the previous.
        */
-      if (intersectingIds.size === 0) {
-        setActiveIds((prev) => prev.slice(-1))
-        return
-      }
-      setActiveIds([...intersectingIds])
-    }, { rootMargin: '64px 0px -84px' })
+      if (intersectingIds.size === 0) return
+      startTransition(() => setActiveIds([...intersectingIds]))
+    }, { rootMargin: '84px 0px -84px' })
 
     for (const link of links) {
       observer.observe(link)
