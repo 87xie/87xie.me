@@ -6,4 +6,5 @@ export const allPosts = _allPosts.toSorted((a, b) => {
   return +new Date(b.date) - +new Date(a.date)
 })
 
+export const blogPosts = allPosts.filter(({ category }) => category === 'blog')
 export const notes = allPosts.filter(({ category }) => category === 'notes')

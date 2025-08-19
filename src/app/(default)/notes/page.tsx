@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import cx from 'clsx'
 import { notes } from '@/sorted-content'
 
 const formatter = new Intl.DateTimeFormat('en-US', {
@@ -16,18 +15,18 @@ export default function NotesPage() {
         {notes.map((note) => (
           <li key={note.slug}>
             <Link
-              className={cx('grid')}
+              className="grid"
               href={`/notes/${note.slug}`}
             >
               {note.date && (
                 <time
                   dateTime={note.date}
-                  className="text-black/50 text-xs"
+                  className="text-black/60 text-xs"
                 >
                   {formatter.format(new Date(note.date))}
                 </time>
               )}
-              <span>{note.title}</span>
+              <span className="underline">{note.title}</span>
             </Link>
           </li>
         ))}

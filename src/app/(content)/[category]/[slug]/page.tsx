@@ -33,7 +33,7 @@ export default async function Page({ params }: PostPageProps) {
     >
       <main className="md:w-3/4">
         <Link
-          className="link-gray flex items-center gap-2 mb-6 text-sm"
+          className="link-gray inline-flex items-center gap-2 mb-6 text-sm"
           href={`/${category}`}
         >
           <ArrowLeftIcon size={14} />

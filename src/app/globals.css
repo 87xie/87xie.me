@@ -3,7 +3,7 @@
 
 @layer base {
   html {
-    @apply text-gray-700;
+    @apply scroll-pt-16 leading-relaxed text-gray-700;
   }
   h1 {
     @apply text-3xl font-semibold mb-6;

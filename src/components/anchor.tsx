@@ -1,14 +1,16 @@
-import type { MDXComponents } from 'mdx/types'
+import type { ComponentPropsWithoutRef } from 'react'
 import NextLink from 'next/link'
+import cn from 'clsx'
 
-type AnchorComponent = Exclude<MDXComponents['a'], undefined>
+type AnchorProps = ComponentPropsWithoutRef<'a'>
 
-const Anchor: AnchorComponent = ({
+const Anchor = ({
   href = '/',
   children,
+  className: classNameProp,
   ...props
-}) => {
-  const className = 'not-prose underline'
+}: AnchorProps) => {
+  const className = cn(classNameProp, 'not-prose underline')
   if (href.startsWith('/')) {
     return (
       <NextLink
