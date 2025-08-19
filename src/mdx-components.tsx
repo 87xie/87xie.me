@@ -23,6 +23,8 @@ const components = {
           'prose-code:py-0.5 prose-code:px-1.5',
           'prose-code:bg-gray-50 prose-code:text-sm prose-code:font-normal',
           'prose-code:before:content-none prose-code:after:content-none',
+          // footnotes
+          '*:data-footnotes:text-sm',
         )}
       >
         {children}

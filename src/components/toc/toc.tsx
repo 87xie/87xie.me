@@ -28,20 +28,25 @@ export function Toc({ toc }: TocListProps) {
         Table of contents
       </p>
       {toc.length > 0 && (
-        <div className="relative">
+        <div className="relative overflow-hidden">
           <span
             style={indicatorStyle}
             className="absolute left-1 w-[1px] bg-gray-500 [transition:top_0.5s,height_0.2s_0.3s]"
           />
           <ul className="border-l ml-1 pl-3 border-gray-300">
             {toc.map((heading) => (
-              <li key={heading.id}>
+              <li
+                key={heading.id}
+                className={cn(
+                  'flex items-center py-1 leading-none',
+                  heading.level === 3 && 'pl-3',
+                )}
+              >
                 <a
                   href={`#${heading.id}`}
                   className={cn(
-                    'inline-block w-full py-1 link-gray text-sm',
+                    'link-gray text-sm',
                     activeIds.includes(heading.id) && 'link-active',
-                    heading.level === 3 && 'pl-3',
                   )}
                 >
                   {heading.text}
