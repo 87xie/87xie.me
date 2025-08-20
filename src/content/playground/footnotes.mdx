@@ -1,21 +1,34 @@
 # Footnotes
 
-Providing additional information at the bottom of the page.
+Footnotes let you provide extra context or references without interrupting the main flow of your content. They are collected and displayed at the bottom of the page.
+
+**Further reading**:
+
+- [remarkjs/remark-gfm](https://github.com/remarkjs/remark-gfm)
+- [GitHub Docs - footnotes](https://docs.github.com/en/enterprise-cloud@latest/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#footnotes)
+
+## Syntax
 
 GitHub Flavored Markdown (GFM) supports footnotes using bracket syntax:
 
 ```md
 Here is a footnote reference.[^1]
 
-Foo[^2]
+Another reference appears here.[^2]
 
-[^1]: This is the content of the footnote.
-[^2]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
-  nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
-  massa, nec semper lorem quam in massa.
+[^1]: This is the content of the first footnote.  
+[^2]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod  
+  nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor  
+  massa, nec semper lorem quam in massa.  
 ```
 
-## Further reading
+## Rendered output
 
-- [remarkjs/remark-gfm](https://github.com/remarkjs/remark-gfm)
-- [GitHub Docs - footnotes](https://docs.github.com/en/enterprise-cloud@latest/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#footnotes)
+Here is a footnote reference.[^1]
+
+Another reference appears here.[^2]
+
+[^1]: This is the content of the first footnote.  
+[^2]: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod  
+  nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor  
+  massa, nec semper lorem quam in massa.

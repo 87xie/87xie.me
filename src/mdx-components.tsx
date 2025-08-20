@@ -23,8 +23,6 @@ const components = {
           'prose-code:py-0.5 prose-code:px-1.5',
           'prose-code:bg-gray-50 prose-code:text-sm prose-code:font-normal',
           'prose-code:before:content-none prose-code:after:content-none',
-          // footnotes
-          '*:data-footnotes:text-sm',
         )}
       >
         {children}
@@ -63,6 +61,27 @@ const components = {
       >
         <table {...props} />
       </div>
+    )
+  },
+  section(props) {
+    if (props['data-footnotes'] === undefined) {
+      return (
+        <section {...props} />
+      )
+    }
+
+    return (
+      <>
+        <hr className="not-prose my-5 border-gray-500/30" />
+        <section
+          {...props}
+          className={cx(
+            'text-sm text-gray-500/80!',
+            'prose-p:my-2',
+            'marker:text-gray-500/80! prose-li:my-2',
+          )}
+        />
+      </>
     )
   },
   Details,

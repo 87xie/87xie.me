@@ -4,8 +4,6 @@ export function getToc(content: string) {
   const lines = content.split('\n')
   const toc: TocItem[] = []
   const sluger = new GithubSlugger()
-  const footnoteRefs = new Set<string>()
-  const footnotes = new Map<string, string>()
   let isInCodeBlock = false
 
   for (const _line of lines) {
@@ -30,29 +28,8 @@ export function getToc(content: string) {
         level,
       })
     }
-    // match footnote reference
-    const footnoteRefMatch = line.match(/^\[\^([^\]]+)\]/)
-    if (footnoteRefMatch) {
-      footnoteRefs.add(footnoteRefMatch[1])
-    }
-    // match footnote definition
-    const footnoteDefMatch = line.match(/^\[\^([^\]]+)\]:\s+(.*)$/)
-    if (footnoteDefMatch) {
-      const footnoteRef = footnoteDefMatch[1]
-      if (footnoteRefs.has(footnoteRef)) {
-        const footnoteDef = footnoteDefMatch[2]
-        footnotes.set(footnoteRef, footnoteDef)
-      }
-    }
   }
 
-  if (footnotes.size > 0) {
-    toc.push({
-      id: 'footnote-label',
-      text: 'Footnotes',
-      level: 2,
-    })
-  }
   return toc
 }
 

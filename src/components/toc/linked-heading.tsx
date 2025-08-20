@@ -11,6 +11,11 @@ function LinkedHeading({
   level,
   children,
 }: LinkedHeadingProps) {
+  // id from remark-gfm
+  if (id === 'footnote-label') return (
+    <h2 className="sr-only">Footnotes</h2>
+  )
+
   const Heading = `h${level}` as const
   const linkAriaLabel = typeof children === 'string'
     ? `Permalink: ${children}`
