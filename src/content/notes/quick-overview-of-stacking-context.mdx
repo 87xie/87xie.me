@@ -9,8 +9,7 @@ tags:
 
 import {
   Tabs,
-  TabList,
-  TabContent,
+  TabItem,
 } from '@/components/tabs'
 
 # Quick overview of stacking context
@@ -38,8 +37,7 @@ Stacking context 決定元素在 z 軸上的堆疊順序，以下爲常見建立
 ## Basic example
 
 <Tabs defaultValue="HTML">
-  <TabList items={['HTML', 'DOM tree', 'Stacking context']} />
-  <TabContent value="HTML">
+  <TabItem label="HTML">
     ```html
     <html>
       <body>
@@ -59,14 +57,14 @@ Stacking context 決定元素在 z 軸上的堆疊順序，以下爲常見建立
       </body>
     </html>
     ```
-  </TabContent>
-  <TabContent value="DOM tree">
+  </TabItem>
+  <TabItem label="DOM tree">
     ![dom tree example](/stacking-contexts-dom-tree-example.png)
-  </TabContent>
+  </TabItem>
 
-  <TabContent value="Stacking context">
+  <TabItem label="Stacking context">
     ![stacking contexts example](/stacking-contexts-example.png)
-  </TabContent>
+  </TabItem>
 </Tabs>
 
 ## References
