@@ -46,7 +46,6 @@ const withBundleAnalyzer = createBundlerAnalyzer({
 
 const nextConfig = withBundleAnalyzer(
   withMdx({
-    typedRoutes: true,
     output: 'export',
     pageExtensions: ['mdx', 'tsx'],
     /**
