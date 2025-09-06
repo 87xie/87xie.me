@@ -2,7 +2,7 @@ import type { MDXComponents } from 'mdx/types'
 import type { ReactNode } from 'react'
 
 import cx from 'clsx'
-import LinkedHeading from './components/toc/linked-heading'
+import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
 import { Details } from './components/details'
 import { BlockCode } from './components/codes/block-code'

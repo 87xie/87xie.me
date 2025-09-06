@@ -31,7 +31,7 @@ export function Toc({ toc }: TocListProps) {
         <div className="relative overflow-hidden">
           <span
             style={indicatorStyle}
-            className="absolute left-1 w-[1px] bg-gray-500 [transition:top_0.5s,height_0.2s_0.3s]"
+            className="absolute left-1 w-[1px] bg-gray-500 [transition:top_0.5s,height_0.5s]"
           />
           <ul className="border-l ml-1 pl-3 border-gray-300">
             {toc.map((heading) => (

@@ -6,7 +6,7 @@
     @apply scroll-pt-16 leading-relaxed text-gray-700;
   }
   h1 {
-    @apply text-3xl font-semibold mb-6;
+    @apply text-3xl font-medium mb-6;
   }
 }
 

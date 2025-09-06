@@ -1,6 +1,6 @@
 import type { ComponentPropsWithoutRef } from 'react'
 import { LinkIcon } from '@primer/octicons-react'
-import cx from 'clsx'
+import cn from 'clsx'
 
 type LinkedHeadingProps = {
   level: 2 | 3
@@ -23,9 +23,9 @@ function LinkedHeading({
 
   return (
     <Heading
-      className={cx(
-        'group relative font-semibold',
-        level === 2 && 'text-2xl mt-10',
+      className={cn(
+        'group relative font-medium',
+        level === 2 && 'text-2xl not-first:mt-10',
         level === 3 && 'text-xl',
       )}
     >
@@ -35,7 +35,7 @@ function LinkedHeading({
           id={id}
           href={`#${id}`}
           aria-label={linkAriaLabel}
-          className={cx(
+          className={cn(
             'inline-block absolute top-[calc(50%-8px)] -left-6',
             'opacity-0 lg:group-hover:opacity-100 lg:focus:opacity-100',
           )}

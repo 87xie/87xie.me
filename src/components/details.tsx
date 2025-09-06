@@ -21,7 +21,7 @@ export function Details({
         '[&_li]:my-1.5',
       )}
     >
-      <summary className="font-semibold">
+      <summary className="font-medium">
         {summary}
       </summary>
       {children}

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeftIcon } from '@primer/octicons-react'
 import cx from 'clsx'
-import { Toc } from '@/components/toc/toc'
+import { Toc } from '@/components/toc'
 
 export async function generateStaticParams() {
   return allPosts.map((post) => ({
