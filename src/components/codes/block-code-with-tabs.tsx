@@ -17,7 +17,7 @@ const Schema = Block.extend({ tabs: z.array(CodeBlock) })
 export async function CodeWithTabs(props: unknown) {
   const { tabs } = parseProps(props, Schema)
   const highlighted = await Promise.all(
-    tabs.map((tab) => highlight(tab, 'github-light')),
+    tabs.map((tab) => highlight(tab, 'github-from-css')),
   )
   const tabDatas = tabs.map((tab, index) => {
     const parsedMeta = parseMeta(tab.meta)

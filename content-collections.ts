@@ -23,7 +23,7 @@ const posts = defineCollection({
       toc: getToc(content),
       slug: _meta.fileName.replace(/\.(md|mdx)$/, ''),
       category: _meta.directory === '.' ? 'uncategory' : _meta.directory,
-      rawContent: content,
+      filePath: _meta.filePath,
     }
   },
 })

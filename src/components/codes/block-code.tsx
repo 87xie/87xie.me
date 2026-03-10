@@ -32,7 +32,7 @@ export async function BlockCode({ codeblock }: BlockCodeProps) {
     )
   }
 
-  const highlighted = await highlight(codeblock, 'github-light')
+  const highlighted = await highlight(codeblock, 'github-from-css')
   const meta = parseMeta(codeblock.meta)
   const handlers = getHandlers(meta)
 

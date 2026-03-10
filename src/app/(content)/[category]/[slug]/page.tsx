@@ -25,7 +25,7 @@ export default async function Page({ params }: PostPageProps) {
     return notFound()
   }
 
-  const MdxContent = await compileMdx(post.rawContent)
+  const MdxContent = await compileMdx(post.filePath)
   return (
     <div
       className={cx(

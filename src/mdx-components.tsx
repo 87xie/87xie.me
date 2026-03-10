@@ -92,5 +92,3 @@ const components = {
 } satisfies MDXComponents
 
 export const mdxComponents = components
-
-export const useMDXComponents = () => components
