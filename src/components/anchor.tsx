@@ -1,5 +1,5 @@
 import type { ComponentPropsWithoutRef } from 'react'
-import NextLink from 'next/link'
+import { Link } from '@tanstack/react-router'
 import cn from 'clsx'
 
 type AnchorProps = ComponentPropsWithoutRef<'a'>
@@ -13,14 +13,13 @@ const Anchor = ({
   const className = cn(classNameProp, 'not-prose underline')
   if (href.startsWith('/')) {
     return (
-      <NextLink
+      <Link
         {...props}
-        prefetch={false}
-        href={href}
+        to={href}
         className={className}
       >
         {children}
-      </NextLink>
+      </Link>
     )
   }
   if (href.startsWith('#')) {

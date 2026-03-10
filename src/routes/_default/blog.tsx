@@ -1,9 +1,14 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { blogPosts } from '@/sorted-content'
 import Anchor from '@/components/anchor'
 
+export const Route = createFileRoute('/_default/blog')({
+  component: BlogPage,
+})
+
 type Post = typeof blogPosts[number]
 
-const yearCollections = blogPosts.reduce((acc, post) => {
+const yearCollections = blogPosts.reduce<Record<string, Post[]>>((acc, post) => {
   const year = new Date(post.date!).getFullYear()
   if (!acc[year]) {
     acc[year] = []
@@ -36,12 +41,12 @@ function PostSection({ year, posts }: PostSectionProps) {
   )
 }
 
-export default function BlogPage() {
+function BlogPage() {
   return (
     <div>
       <h1>Blog</h1>
       {entries.length > 0
-        ? entries.map(([year, posts]) => (
+        ? entries.map(([year, posts]: [string, Post[]]) => (
             <PostSection
               key={year}
               year={year}

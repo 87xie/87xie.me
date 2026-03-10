@@ -1,12 +1,13 @@
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import cx from 'clsx'
 
-import { Nav } from './_components/nav'
+import { Nav } from '@/components/nav'
 
-type DefaultLayoutProps = {
-  children: React.ReactNode
-}
+export const Route = createFileRoute('/_default')({
+  component: DefaultLayout,
+})
 
-export default function DefaultLayout({ children }: DefaultLayoutProps) {
+function DefaultLayout() {
   return (
     <div
       className={cx(
@@ -18,7 +19,7 @@ export default function DefaultLayout({ children }: DefaultLayoutProps) {
         <Nav />
       </div>
       <main>
-        {children}
+        <Outlet />
       </main>
     </div>
   )

@@ -1,7 +1,5 @@
-'use client'
-import Link from 'next/link'
+import { Link, useLocation } from '@tanstack/react-router'
 import cx from 'clsx'
-import { usePathname } from 'next/navigation'
 
 const links = [
   ['About', '/'],
@@ -11,7 +9,7 @@ const links = [
 ]
 
 export function Nav() {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
 
   return (
     <nav className="pb-12 md:w-38 md:pb-0">
@@ -24,7 +22,7 @@ export function Nav() {
         {links.map(([label, href]) => (
           <li key={href}>
             <Link
-              href={href}
+              to={href}
               className={cx('link-gray', pathname === href && 'link-active')}
             >
               {label}

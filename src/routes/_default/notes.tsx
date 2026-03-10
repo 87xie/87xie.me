@@ -1,5 +1,9 @@
-import Link from 'next/link'
+import { Link, createFileRoute } from '@tanstack/react-router'
 import { notes } from '@/sorted-content'
+
+export const Route = createFileRoute('/_default/notes')({
+  component: NotesPage,
+})
 
 const formatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
@@ -7,16 +11,17 @@ const formatter = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
 })
 
-export default function NotesPage() {
+function NotesPage() {
   return (
     <div>
       <h1>Notes</h1>
       <ul className="space-y-4">
-        {notes.map((note) => (
+        {notes.map((note: typeof notes[number]) => (
           <li key={note.slug}>
             <Link
               className="grid"
-              href={`/notes/${note.slug}`}
+              to="/$category/$slug"
+              params={{ category: 'notes', slug: note.slug }}
             >
               {note.date && (
                 <time
