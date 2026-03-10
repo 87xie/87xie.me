@@ -18,8 +18,13 @@ const chConfig = {
   },
 } satisfies CodeHikeConfig
 
+const CONTENT_DIR = path.join(process.cwd(), 'src/content')
+
 export async function compileMdx(filePath: string): Promise<MDXContent> {
-  const fullPath = path.join(process.cwd(), 'src/content', filePath)
+  const fullPath = path.resolve(CONTENT_DIR, filePath)
+  if (!fullPath.startsWith(CONTENT_DIR)) {
+    throw new Error('Invalid file path')
+  }
   const source = fs.readFileSync(fullPath, 'utf-8')
   const { content } = matter(source)
 
