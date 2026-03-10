@@ -1,9 +1,10 @@
+import { use, Suspense } from 'react'
 import {
   Pre,
-  highlight,
   type RawCode,
 } from 'codehike/code'
 import cx from 'clsx'
+import { cachedHighlight } from './cached-highlight'
 import { Mermaid } from './mermaid'
 import { mark } from './annotations/mark'
 import { diff } from './annotations/diff'
@@ -25,14 +26,8 @@ export const classes = {
   blockCodeBody: 'rounded-md border-1 border-gray-200 bg-white overflow-x-scroll py-4',
 }
 
-export async function BlockCode({ codeblock }: BlockCodeProps) {
-  if (codeblock.lang === 'mermaid') {
-    return (
-      <Mermaid code={codeblock.value} />
-    )
-  }
-
-  const highlighted = await highlight(codeblock, 'github-light')
+function BlockCodeInner({ codeblock }: BlockCodeProps) {
+  const highlighted = use(cachedHighlight(codeblock, 'github-light'))
   const meta = parseMeta(codeblock.meta)
   const handlers = getHandlers(meta)
 
@@ -48,6 +43,20 @@ export async function BlockCode({ codeblock }: BlockCodeProps) {
         />
       </div>
     </div>
+  )
+}
+
+export function BlockCode({ codeblock }: BlockCodeProps) {
+  if (codeblock.lang === 'mermaid') {
+    return (
+      <Mermaid code={codeblock.value} />
+    )
+  }
+
+  return (
+    <Suspense fallback={<div className={cx(classes.blockCodeRoot, 'my-6 p-4')}>Loading...</div>}>
+      <BlockCodeInner codeblock={codeblock} />
+    </Suspense>
   )
 }
 

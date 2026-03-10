@@ -2,6 +2,15 @@ import stylistic from '@stylistic/eslint-plugin'
 import tanstackRouter from '@tanstack/eslint-plugin-router'
 
 const eslintConfig = [
+  {
+    ignores: [
+      '.content-collections/**',
+      '.output/**',
+      '.tanstack/**',
+      '.nitro/**',
+      'src/routeTree.gen.ts',
+    ],
+  },
   ...tanstackRouter.configs['flat/recommended'],
   stylistic.configs.customize({
     semi: false,

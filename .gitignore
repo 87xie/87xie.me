@@ -17,6 +17,7 @@
 .output
 .nitro
 .tanstack
+/.next/
 
 # production
 /build

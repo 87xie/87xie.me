@@ -1,11 +1,12 @@
+import { use, Suspense } from 'react'
 import { Block, CodeBlock, parseProps } from 'codehike/blocks'
 import {
   Pre,
-  highlight,
 } from 'codehike/code'
 import { z } from 'zod'
 import cx from 'clsx'
 import { Tabs as ArkTabs } from '@ark-ui/react/tabs'
+import { cachedHighlight } from './cached-highlight'
 import {
   classes,
   parseMeta,
@@ -14,11 +15,9 @@ import {
 
 const Schema = Block.extend({ tabs: z.array(CodeBlock) })
 
-export async function CodeWithTabs(props: unknown) {
+function CodeWithTabsInner({ props }: { props: unknown }) {
   const { tabs } = parseProps(props, Schema)
-  const highlighted = await Promise.all(
-    tabs.map((tab) => highlight(tab, 'github-light')),
-  )
+  const highlighted = tabs.map((tab) => use(cachedHighlight(tab, 'github-light')))
   const tabDatas = tabs.map((tab, index) => {
     const parsedMeta = parseMeta(tab.meta)
 
@@ -66,5 +65,13 @@ export async function CodeWithTabs(props: unknown) {
         </ArkTabs.Content>
       ))}
     </ArkTabs.Root>
+  )
+}
+
+export function CodeWithTabs(props: unknown) {
+  return (
+    <Suspense fallback={<div className={cx(classes.blockCodeRoot, 'p-4')}>Loading...</div>}>
+      <CodeWithTabsInner props={props} />
+    </Suspense>
   )
 }
