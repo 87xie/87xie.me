@@ -1,19 +1,9 @@
 import { withContentCollections } from '@content-collections/next'
 import createMdx from '@next/mdx'
 import createBundlerAnalyzer from '@next/bundle-analyzer'
+import { resolve } from 'node:path'
 
-import remarkGfm from 'remark-gfm'
-import remarkFrontmatter from 'remark-frontmatter'
-import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
-
-import rehypeSlug from 'rehype-slug'
-import rehypeGithubAlert from 'rehype-github-alert'
-
-import {
-  type CodeHikeConfig,
-  remarkCodeHike,
-  recmaCodeHike,
-} from 'codehike/mdx'
+import type { CodeHikeConfig } from 'codehike/mdx'
 
 const chConfig = {
   components: {
@@ -25,17 +15,17 @@ const chConfig = {
 const withMdx = createMdx({
   options: {
     remarkPlugins: [
-      remarkGfm,
-      remarkFrontmatter,
-      remarkMdxFrontmatter,
-      [remarkCodeHike, chConfig],
+      'remark-gfm',
+      'remark-frontmatter',
+      'remark-mdx-frontmatter',
+      [resolve(process.cwd(), 'src/plugins/remark-codehike.mjs'), chConfig],
     ],
     rehypePlugins: [
-      rehypeSlug,
-      rehypeGithubAlert,
+      'rehype-slug',
+      'rehype-github-alert',
     ],
     recmaPlugins: [
-      [recmaCodeHike, chConfig],
+      [resolve(process.cwd(), 'src/plugins/recma-codehike.mjs'), chConfig],
     ],
   },
 })
@@ -48,11 +38,6 @@ const nextConfig = withBundleAnalyzer(
   withMdx({
     output: 'export',
     pageExtensions: ['mdx', 'tsx'],
-    /**
-     * https://chakra-ui.com/docs/get-started/frameworks/next-app#optimize-bundle
-     * resolve warnings like:
-     * [webpack.cache.PackFileCacheStrategy] Serializing big strings (xxxkiB)
-    */
     experimental: {
       optimizePackageImports: ['@ark-ui/react'],
     },
