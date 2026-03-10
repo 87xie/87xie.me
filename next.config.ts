@@ -1,15 +1,62 @@
 import { withContentCollections } from '@content-collections/next'
+import createMdx from '@next/mdx'
 import createBundlerAnalyzer from '@next/bundle-analyzer'
+
+import remarkGfm from 'remark-gfm'
+import remarkFrontmatter from 'remark-frontmatter'
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
+
+import rehypeSlug from 'rehype-slug'
+import rehypeGithubAlert from 'rehype-github-alert'
+
+import {
+  type CodeHikeConfig,
+  remarkCodeHike,
+  recmaCodeHike,
+} from 'codehike/mdx'
+
+const chConfig = {
+  components: {
+    code: 'BlockCode',
+    inlineCode: 'InlineCode',
+  },
+} satisfies CodeHikeConfig
+
+const withMdx = createMdx({
+  options: {
+    remarkPlugins: [
+      remarkGfm,
+      remarkFrontmatter,
+      remarkMdxFrontmatter,
+      [remarkCodeHike, chConfig],
+    ],
+    rehypePlugins: [
+      rehypeSlug,
+      rehypeGithubAlert,
+    ],
+    recmaPlugins: [
+      [recmaCodeHike, chConfig],
+    ],
+  },
+})
 
 const withBundleAnalyzer = createBundlerAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
-const nextConfig = withBundleAnalyzer({
-  output: 'export',
-  experimental: {
-    optimizePackageImports: ['@ark-ui/react'],
-  },
-})
+const nextConfig = withBundleAnalyzer(
+  withMdx({
+    output: 'export',
+    pageExtensions: ['mdx', 'tsx'],
+    /**
+     * https://chakra-ui.com/docs/get-started/frameworks/next-app#optimize-bundle
+     * resolve warnings like:
+     * [webpack.cache.PackFileCacheStrategy] Serializing big strings (xxxkiB)
+    */
+    experimental: {
+      optimizePackageImports: ['@ark-ui/react'],
+    },
+  }),
+)
 
 export default withContentCollections(nextConfig)

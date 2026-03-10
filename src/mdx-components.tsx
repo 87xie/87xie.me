@@ -91,4 +91,4 @@ const components = {
   CodeWithTabs,
 } satisfies MDXComponents
 
-export const mdxComponents = components
+export const useMDXComponents = () => components

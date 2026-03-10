@@ -9,7 +9,7 @@ type InlineCodeProps = {
 }
 
 export async function InlineCode({ codeblock }: InlineCodeProps) {
-  const highlighted = await highlight(codeblock, 'github-from-css')
+  const highlighted = await highlight(codeblock, 'github-light')
   return (
     <Inline
       code={highlighted}

@@ -4,8 +4,6 @@ import Link from 'next/link'
 import { ArrowLeftIcon } from '@primer/octicons-react'
 import cx from 'clsx'
 import { Toc } from '@/components/toc'
-import { compileMdx } from '@/lib/compile-mdx'
-import { mdxComponents } from '@/mdx-components'
 
 export async function generateStaticParams() {
   return allPosts.map((post) => ({
@@ -25,7 +23,7 @@ export default async function Page({ params }: PostPageProps) {
     return notFound()
   }
 
-  const MdxContent = await compileMdx(post.filePath)
+  const MdxContent = post.mdxContent
   return (
     <div
       className={cx(
@@ -41,7 +39,7 @@ export default async function Page({ params }: PostPageProps) {
           <ArrowLeftIcon size={14} />
           {`Back to ${category}`}
         </Link>
-        <MdxContent components={mdxComponents} />
+        <MdxContent />
       </main>
       <aside
         className={cx(
