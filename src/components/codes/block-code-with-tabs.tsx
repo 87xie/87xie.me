@@ -1,28 +1,26 @@
-import { use, Suspense } from 'react'
-import { Block, CodeBlock, parseProps } from 'codehike/blocks'
+import { Block, HighlightedCodeBlock, parseProps } from 'codehike/blocks'
 import {
   Pre,
+  type HighlightedCode,
 } from 'codehike/code'
 import { z } from 'zod'
 import cx from 'clsx'
 import { Tabs as ArkTabs } from '@ark-ui/react/tabs'
-import { cachedHighlightAll } from './cached-highlight'
 import {
   classes,
   parseMeta,
   getHandlers,
 } from './block-code'
 
-const Schema = Block.extend({ tabs: z.array(CodeBlock) })
+const Schema = Block.extend({ tabs: z.array(HighlightedCodeBlock) })
 
-function CodeWithTabsInner({ props }: { props: unknown }) {
+export function CodeWithTabs(props: unknown) {
   const { tabs } = parseProps(props, Schema)
-  const highlighted = use(cachedHighlightAll(tabs, 'github-light'))
-  const tabDatas = tabs.map((tab, index) => {
+  const tabDatas = tabs.map((tab) => {
     const parsedMeta = parseMeta(tab.meta)
 
     return {
-      code: highlighted[index],
+      code: tab as HighlightedCode,
       filename: parsedMeta.filename,
       handlers: getHandlers(parsedMeta),
       rawMeta: tab.meta,
@@ -51,27 +49,19 @@ function CodeWithTabsInner({ props }: { props: unknown }) {
           </ArkTabs.Trigger>
         ))}
       </ArkTabs.List>
-      {tabDatas.map((tabData, i) => (
+      {tabDatas.map((tabData) => (
         <ArkTabs.Content
           key={tabData.rawMeta}
           value={tabData.rawMeta}
         >
           <div className={classes.blockCodeBody}>
             <Pre
-              code={highlighted[i]}
+              code={tabData.code}
               handlers={tabData.handlers}
             />
           </div>
         </ArkTabs.Content>
       ))}
     </ArkTabs.Root>
-  )
-}
-
-export function CodeWithTabs(props: unknown) {
-  return (
-    <Suspense fallback={<div className={cx(classes.blockCodeRoot, 'p-4')}>Loading...</div>}>
-      <CodeWithTabsInner props={props} />
-    </Suspense>
   )
 }

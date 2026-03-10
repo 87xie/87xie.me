@@ -1,10 +1,8 @@
-import { use, Suspense } from 'react'
 import {
   Pre,
-  type RawCode,
+  type HighlightedCode,
 } from 'codehike/code'
 import cx from 'clsx'
-import { cachedHighlight } from './cached-highlight'
 import { Mermaid } from './mermaid'
 import { mark } from './annotations/mark'
 import { diff } from './annotations/diff'
@@ -13,7 +11,7 @@ import { collapseHandlers } from './annotations/collapse'
 import { lineNumbers } from './annotations/line-numbers'
 
 type BlockCodeProps = {
-  codeblock: RawCode
+  codeblock: HighlightedCode
 }
 
 export const classes = {
@@ -26,26 +24,6 @@ export const classes = {
   blockCodeBody: 'rounded-md border-1 border-gray-200 bg-white overflow-x-scroll py-4',
 }
 
-function BlockCodeInner({ codeblock }: BlockCodeProps) {
-  const highlighted = use(cachedHighlight(codeblock, 'github-light'))
-  const meta = parseMeta(codeblock.meta)
-  const handlers = getHandlers(meta)
-
-  return (
-    <div className={cx(classes.blockCodeRoot, 'my-6')}>
-      <div className={classes.blockCodeHeader}>
-        {meta.filename || highlighted.lang}
-      </div>
-      <div className={classes.blockCodeBody}>
-        <Pre
-          code={highlighted}
-          handlers={handlers}
-        />
-      </div>
-    </div>
-  )
-}
-
 export function BlockCode({ codeblock }: BlockCodeProps) {
   if (codeblock.lang === 'mermaid') {
     return (
@@ -53,10 +31,21 @@ export function BlockCode({ codeblock }: BlockCodeProps) {
     )
   }
 
+  const meta = parseMeta(codeblock.meta)
+  const handlers = getHandlers(meta)
+
   return (
-    <Suspense fallback={<div className={cx(classes.blockCodeRoot, 'my-6 p-4')}>Loading...</div>}>
-      <BlockCodeInner codeblock={codeblock} />
-    </Suspense>
+    <div className={cx(classes.blockCodeRoot, 'my-6')}>
+      <div className={classes.blockCodeHeader}>
+        {meta.filename || codeblock.lang}
+      </div>
+      <div className={classes.blockCodeBody}>
+        <Pre
+          code={codeblock}
+          handlers={handlers}
+        />
+      </div>
+    </div>
   )
 }
 

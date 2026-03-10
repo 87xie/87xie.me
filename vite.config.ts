@@ -25,6 +25,9 @@ const chConfig: CodeHikeConfig = {
     code: 'BlockCode',
     inlineCode: 'InlineCode',
   },
+  syntaxHighlighting: {
+    theme: 'github-light',
+  },
 }
 
 export default defineConfig({
@@ -32,7 +35,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-    conditions: ['default', 'module', 'import'],
   },
   server: {
     port: 3000,
@@ -51,9 +53,14 @@ export default defineConfig({
         failOnError: false,
       },
     }),
-    {
-      enforce: 'pre',
-      ...mdx({
+    (() => {
+      // Workaround: CodeHike's syntaxHighlighting generates AST nodes without
+      // source positions during MDX compilation. The @mdx-js/rollup plugin
+      // enables SourceMapGenerator by default, causing astring to crash when
+      // serializing these nodes. We override SourceMapGenerator to undefined
+      // and remove the plugin's config hook so that processors are created in
+      // the transform fallback path where our override takes effect.
+      const plugin = mdx({
         include: /\.mdx$/,
         providerImportSource: '@mdx-js/react',
         remarkPlugins: [
@@ -69,8 +76,11 @@ export default defineConfig({
         recmaPlugins: [
           [recmaCodeHike, chConfig],
         ],
-      }),
-    },
+        ...({ SourceMapGenerator: undefined } as Record<string, unknown>),
+      })
+      delete (plugin as Record<string, unknown>).config
+      return { enforce: 'pre' as const, ...plugin }
+    })(),
     viteReact(),
   ],
 })
