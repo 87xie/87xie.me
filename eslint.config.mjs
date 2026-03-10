@@ -8,6 +8,7 @@ const eslintConfig = [
       '.output/**',
       '.tanstack/**',
       '.nitro/**',
+      'dist/**',
       'src/routeTree.gen.ts',
     ],
   },

@@ -13,11 +13,10 @@
 # testing
 /coverage
 
-# tanstack start / vite / nitro
+# tanstack start / vite
 .output
-.nitro
 .tanstack
-/.next/
+/dist
 
 # production
 /build

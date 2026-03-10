@@ -3,7 +3,6 @@ import { defineConfig } from 'vite'
 import tsConfigPaths from 'vite-tsconfig-paths'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { nitro } from 'nitro/vite'
 import mdx from '@mdx-js/rollup'
 import contentCollections from '@content-collections/vite'
 import path from 'node:path'
@@ -33,6 +32,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
+    conditions: ['default', 'module', 'import'],
   },
   server: {
     port: 3000,
@@ -45,6 +45,11 @@ export default defineConfig({
     }),
     tanstackStart({
       srcDirectory: 'src',
+      prerender: {
+        enabled: true,
+        crawlLinks: true,
+        failOnError: false,
+      },
     }),
     {
       enforce: 'pre',
@@ -67,6 +72,5 @@ export default defineConfig({
       }),
     },
     viteReact(),
-    nitro(),
   ],
 })
