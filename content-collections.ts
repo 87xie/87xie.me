@@ -13,7 +13,7 @@ const posts = defineCollection({
   include: '**/*.mdx',
   parser: 'frontmatter',
   schema: z.object({
-    content: z.string(),
+    content: z.string(), // required by content-collections v0.14+
     title: z.string().optional(),
     date: z.string().optional(),
     tags: z.array(z.string()).optional(),

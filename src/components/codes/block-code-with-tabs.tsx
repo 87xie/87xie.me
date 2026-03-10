@@ -6,7 +6,7 @@ import {
 import { z } from 'zod'
 import cx from 'clsx'
 import { Tabs as ArkTabs } from '@ark-ui/react/tabs'
-import { cachedHighlight } from './cached-highlight'
+import { cachedHighlightAll } from './cached-highlight'
 import {
   classes,
   parseMeta,
@@ -17,7 +17,7 @@ const Schema = Block.extend({ tabs: z.array(CodeBlock) })
 
 function CodeWithTabsInner({ props }: { props: unknown }) {
   const { tabs } = parseProps(props, Schema)
-  const highlighted = tabs.map((tab) => use(cachedHighlight(tab, 'github-light')))
+  const highlighted = use(cachedHighlightAll(tabs, 'github-light'))
   const tabDatas = tabs.map((tab, index) => {
     const parsedMeta = parseMeta(tab.meta)
 
