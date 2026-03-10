@@ -1,11 +1,9 @@
 import {
-  createDefaultImport,
   defineCollection,
   defineConfig,
 } from '@content-collections/core'
 import { getToc } from '@/utils/toc-parser'
 import { z } from 'zod'
-import type { MDXContent } from 'mdx/types'
 
 const posts = defineCollection({
   name: 'posts',
@@ -25,7 +23,7 @@ const posts = defineCollection({
       toc: getToc(content),
       slug: _meta.fileName.replace(/\.(md|mdx)$/, ''),
       category: _meta.directory === '.' ? 'uncategory' : _meta.directory,
-      mdxContent: createDefaultImport<MDXContent>(`@/content/${_meta.filePath}`),
+      rawContent: content,
     }
   },
 })

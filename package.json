@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ark-ui/react": "^5.0.1",
+    "@mdx-js/mdx": "^3.1.1",
     "@mdx-js/react": "^3.1.0",
     "@next/bundle-analyzer": "^16.1.6",
     "@next/mdx": "^16.1.6",
