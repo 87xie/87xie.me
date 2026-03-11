@@ -1,0 +1,62 @@
+import { Link, createFileRoute, notFound } from '@tanstack/react-router'
+import { ArrowLeftIcon } from '@primer/octicons-react'
+import cx from 'clsx'
+import { allPosts } from '@/sorted-content'
+import { Toc } from '@/components/toc'
+import { MdxContentProvider } from '@/mdx-components'
+
+function findPost(category: string, slug: string) {
+  return allPosts.find((p) => p.slug === slug && p.category === category)
+}
+
+export const Route = createFileRoute('/$category/$slug')({
+  component: PostPage,
+  loader: ({ params: { category, slug } }) => {
+    const post = findPost(category, slug)
+    if (!post) {
+      throw notFound()
+    }
+    return {
+      category: post.category,
+      slug: post.slug,
+      toc: post.toc,
+    }
+  },
+})
+
+function PostPage() {
+  const { category, slug, toc } = Route.useLoaderData()
+  const post = findPost(category, slug)!
+  const MdxContent = post.mdxContent
+  const backRoute = category === 'blog' ? '/blog' : category === 'notes' ? '/notes' : '/'
+
+  return (
+    <div
+      className={cx(
+        'max-w-4xl mx-auto py-16 px-6',
+        'md:flex',
+      )}
+    >
+      <main className="md:w-3/4">
+        <Link
+          className="link-gray inline-flex items-center gap-2 mb-6 text-sm"
+          to={backRoute}
+        >
+          <ArrowLeftIcon size={14} />
+          {`Back to ${category}`}
+        </Link>
+        <MdxContentProvider>
+          <MdxContent />
+        </MdxContentProvider>
+      </main>
+      <aside
+        className={cx(
+          'hidden self-start sticky top-14 w-1/4 ml-12',
+          'md:block',
+        )}
+      >
+        <Toc toc={toc} />
+      </aside>
+    </div>
+  )
+}

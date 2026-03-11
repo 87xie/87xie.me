@@ -1,5 +1,3 @@
-'use client'
-
 import cn from 'clsx'
 import { useEffect, useState, useRef, useMemo, useTransition } from 'react'
 import type { TocItem } from '@/utils/toc-parser'

@@ -1,4 +1,3 @@
-'use client'
 import type { ReactElement, ReactNode } from 'react'
 import { Children, isValidElement, useMemo } from 'react'
 import type { TabsRootProps as ArkTabsRootProps } from '@ark-ui/react'

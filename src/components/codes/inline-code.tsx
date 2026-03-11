@@ -1,19 +1,17 @@
 import {
-  type RawCode,
+  type HighlightedCode,
   Inline,
-  highlight,
 } from 'codehike/code'
 
 type InlineCodeProps = {
-  codeblock: RawCode
+  codeblock: HighlightedCode
 }
 
-export async function InlineCode({ codeblock }: InlineCodeProps) {
-  const highlighted = await highlight(codeblock, 'github-light')
+export function InlineCode({ codeblock }: InlineCodeProps) {
   return (
     <Inline
-      code={highlighted}
-      style={{ ...highlighted.style, background: undefined }}
+      code={codeblock}
+      style={{ ...codeblock.style, background: undefined }}
     />
   )
 }

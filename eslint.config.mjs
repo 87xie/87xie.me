@@ -1,17 +1,18 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
 import stylistic from '@stylistic/eslint-plugin'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-})
+import tanstackRouter from '@tanstack/eslint-plugin-router'
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  {
+    ignores: [
+      '.content-collections/**',
+      '.output/**',
+      '.tanstack/**',
+      '.nitro/**',
+      'dist/**',
+      'src/routeTree.gen.ts',
+    ],
+  },
+  ...tanstackRouter.configs['flat/recommended'],
   stylistic.configs.customize({
     semi: false,
     arrowParens: 'always',
@@ -28,10 +29,10 @@ const eslintConfig = [
         multiline: {
           delimiter: 'none',
           requireLast: false,
-        }
+        },
       }],
-    }
-  }
+    },
+  },
 ]
 
 export default eslintConfig

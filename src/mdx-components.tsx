@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 import type { ReactNode } from 'react'
 
+import { MDXProvider } from '@mdx-js/react'
 import cx from 'clsx'
 import LinkedHeading from './components/linked-heading'
 import Anchor from './components/anchor'
@@ -91,4 +92,12 @@ const components = {
   CodeWithTabs,
 } satisfies MDXComponents
 
-export const useMDXComponents = () => components
+export function MdxContentProvider({ children }: { children: ReactNode }) {
+  return (
+    <MDXProvider components={components}>
+      {children}
+    </MDXProvider>
+  )
+}
+
+export { components as mdxComponents }

@@ -1,5 +1,3 @@
-'use client'
-
 import { useMermaidResult } from './use-mermaid-result'
 import cx from 'clsx'
 
