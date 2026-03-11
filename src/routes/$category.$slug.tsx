@@ -1,4 +1,5 @@
 import { Link, createFileRoute, notFound } from '@tanstack/react-router'
+import type { FileRoutesByTo } from '@/routeTree.gen'
 import { ArrowLeftIcon } from '@primer/octicons-react'
 import cx from 'clsx'
 import { allPosts } from '@/sorted-content'
@@ -39,7 +40,7 @@ function PostPage() {
       <main className="md:w-3/4">
         <Link
           className="link-gray inline-flex items-center gap-2 mb-6 text-sm"
-          to={`/${category}` as '/'}
+          to={`/${category}` as keyof FileRoutesByTo}
         >
           <ArrowLeftIcon size={14} />
           {`Back to ${category}`}

@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import type { ReactNode } from 'react'
 import {
   HeadContent,
   Scripts,
@@ -32,7 +33,7 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({ children }: { children: ReactNode }) {
   return (
     <html style={{ fontFamily: 'Inter, sans-serif' }}>
       <head>
