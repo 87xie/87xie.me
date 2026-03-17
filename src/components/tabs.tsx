@@ -1,14 +1,18 @@
 'use client'
 import type { ReactElement, ReactNode } from 'react'
 import { Children, isValidElement, useMemo } from 'react'
-import type { TabsRootProps as ArkTabsRootProps } from '@ark-ui/react'
-import { Tabs as ArkTabs } from '@ark-ui/react/tabs'
+import { Tabs as BaseTabs } from '@base-ui/react/tabs'
 import cn from 'clsx'
+
+type TabsProps = {
+  children?: ReactNode
+  defaultValue?: string
+}
 
 export function Tabs({
   children,
   defaultValue: defaultValueProp,
-}: ArkTabsRootProps) {
+}: TabsProps) {
   const labels = useMemo(() => {
     const filtered = Children.toArray(children).filter(hasLabelProp)
     return filtered.map(({ props }) => props.label)
@@ -16,29 +20,29 @@ export function Tabs({
   const defaultValue = defaultValueProp ?? labels?.[0] ?? ''
 
   return (
-    <ArkTabs.Root defaultValue={defaultValue}>
-      <ArkTabs.List
+    <BaseTabs.Root defaultValue={defaultValue}>
+      <BaseTabs.List
         className={cn(
           'relative mb-6',
           'shadow-[0_-1px_0_0_inset_var(--color-gray-300)]',
         )}
       >
         {labels.map((label) => (
-          <ArkTabs.Trigger
+          <BaseTabs.Tab
             key={label}
             value={label}
             className={cn(
               'min-w-10 py-2 px-4 cursor-pointer text-gray-500 font-medium',
-              'data-selected:text-(--tw-prose-body)',
+              'data-active:text-(--tw-prose-body)',
             )}
           >
             {label}
-          </ArkTabs.Trigger>
+          </BaseTabs.Tab>
         ))}
-        <ArkTabs.Indicator className="absolute w-[var(--width)] h-[2px] bottom-0 bg-gray-500" />
-      </ArkTabs.List>
+        <BaseTabs.Indicator className="absolute left-[var(--active-tab-left)] w-[var(--active-tab-width)] h-[2px] bottom-0 bg-gray-500" />
+      </BaseTabs.List>
       {children}
-    </ArkTabs.Root>
+    </BaseTabs.Root>
   )
 }
 
@@ -49,9 +53,9 @@ type TabItemProps = {
 
 export function TabItem({ label, children }: TabItemProps) {
   return (
-    <ArkTabs.Content value={label}>
+    <BaseTabs.Panel value={label}>
       {children}
-    </ArkTabs.Content>
+    </BaseTabs.Panel>
   )
 }
 
