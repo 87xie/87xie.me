@@ -1,4 +1,4 @@
-import { Collapsible } from '@ark-ui/react/collapsible'
+import { Collapsible } from '@base-ui/react/collapsible'
 import { ChevronDownIcon } from '@primer/octicons-react'
 import {
   type AnnotationHandler,
@@ -62,7 +62,8 @@ const collapseTrigger: AnnotationHandler = {
                 'my-auto mr-auto',
                 'text-gray-400/70',
                 'select-none',
-                'group-data-[state=closed]:-rotate-90',
+                '-rotate-90',
+                'group-data-[panel-open]:rotate-0',
               )}
             />
           )}
@@ -75,7 +76,7 @@ const collapseTrigger: AnnotationHandler = {
 
 const collapseContent: AnnotationHandler = {
   name: 'CollapseContent',
-  Block: Collapsible.Content,
+  Block: Collapsible.Panel,
 }
 
 export const collapseHandlers = [collapse, collapseTrigger, collapseContent]

@@ -54,7 +54,7 @@ const nextConfig = withBundleAnalyzer(
      * [webpack.cache.PackFileCacheStrategy] Serializing big strings (xxxkiB)
     */
     experimental: {
-      optimizePackageImports: ['@ark-ui/react'],
+      optimizePackageImports: ['@base-ui/react'],
     },
   }),
 )
