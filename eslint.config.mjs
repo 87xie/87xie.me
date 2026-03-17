@@ -1,10 +1,11 @@
+import { fixupConfigRules } from '@eslint/compat'
 import coreWebVitals from 'eslint-config-next/core-web-vitals'
 import typescript from 'eslint-config-next/typescript'
 import stylistic from '@stylistic/eslint-plugin'
 
 const eslintConfig = [
-  ...coreWebVitals,
-  ...typescript,
+  ...fixupConfigRules(coreWebVitals),
+  ...fixupConfigRules(typescript),
   stylistic.configs.customize({
     semi: false,
     arrowParens: 'always',
