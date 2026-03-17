@@ -1,7 +1,6 @@
 import {
   Pre,
-  highlight,
-  type RawCode,
+  type HighlightedCode,
 } from 'codehike/code'
 import cx from 'clsx'
 import { Mermaid } from './mermaid'
@@ -12,7 +11,7 @@ import { collapseHandlers } from './annotations/collapse'
 import { lineNumbers } from './annotations/line-numbers'
 
 type BlockCodeProps = {
-  codeblock: RawCode
+  codeblock: HighlightedCode
 }
 
 export const classes = {
@@ -25,25 +24,24 @@ export const classes = {
   blockCodeBody: 'rounded-md border-1 border-gray-200 bg-white overflow-x-scroll py-4',
 }
 
-export async function BlockCode({ codeblock }: BlockCodeProps) {
+export function BlockCode({ codeblock }: BlockCodeProps) {
   if (codeblock.lang === 'mermaid') {
     return (
       <Mermaid code={codeblock.value} />
     )
   }
 
-  const highlighted = await highlight(codeblock, 'github-light')
   const meta = parseMeta(codeblock.meta)
   const handlers = getHandlers(meta)
 
   return (
     <div className={cx(classes.blockCodeRoot, 'my-6')}>
       <div className={classes.blockCodeHeader}>
-        {meta.filename || highlighted.lang}
+        {meta.filename || codeblock.lang}
       </div>
       <div className={classes.blockCodeBody}>
         <Pre
-          code={highlighted}
+          code={codeblock}
           handlers={handlers}
         />
       </div>

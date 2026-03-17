@@ -1,7 +1,6 @@
-import { Block, CodeBlock, parseProps } from 'codehike/blocks'
+import { Block, HighlightedCodeBlock, parseProps } from 'codehike/blocks'
 import {
   Pre,
-  highlight,
 } from 'codehike/code'
 import { z } from 'zod'
 import cx from 'clsx'
@@ -12,18 +11,15 @@ import {
   getHandlers,
 } from './block-code'
 
-const Schema = Block.extend({ tabs: z.array(CodeBlock) })
+const Schema = Block.extend({ tabs: z.array(HighlightedCodeBlock) })
 
-export async function CodeWithTabs(props: unknown) {
+export function CodeWithTabs(props: unknown) {
   const { tabs } = parseProps(props, Schema)
-  const highlighted = await Promise.all(
-    tabs.map((tab) => highlight(tab, 'github-light')),
-  )
-  const tabDatas = tabs.map((tab, index) => {
+  const tabDatas = tabs.map((tab) => {
     const parsedMeta = parseMeta(tab.meta)
 
     return {
-      code: highlighted[index],
+      code: tab,
       filename: parsedMeta.filename,
       handlers: getHandlers(parsedMeta),
       rawMeta: tab.meta,
@@ -52,14 +48,14 @@ export async function CodeWithTabs(props: unknown) {
           </BaseTabs.Tab>
         ))}
       </BaseTabs.List>
-      {tabDatas.map((tabData, i) => (
+      {tabDatas.map((tabData) => (
         <BaseTabs.Panel
           key={tabData.rawMeta}
           value={tabData.rawMeta}
         >
           <div className={classes.blockCodeBody}>
             <Pre
-              code={highlighted[i]}
+              code={tabData.code}
               handlers={tabData.handlers}
             />
           </div>

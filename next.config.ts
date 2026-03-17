@@ -20,6 +20,9 @@ const chConfig = {
     code: 'BlockCode',
     inlineCode: 'InlineCode',
   },
+  syntaxHighlighting: {
+    theme: 'github-light',
+  },
 } satisfies CodeHikeConfig
 
 const withMdx = createMdx({
