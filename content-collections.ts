@@ -16,6 +16,7 @@ const posts = defineCollection({
     title: z.string().optional(),
     date: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    content: z.string(),
   }),
   transform: ({ _meta, content, ...post }) => {
     return {
@@ -31,5 +32,5 @@ const posts = defineCollection({
 })
 
 export default defineConfig({
-  collections: [posts],
+  content: [posts],
 })
