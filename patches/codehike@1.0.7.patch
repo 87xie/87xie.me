@@ -1,0 +1,18 @@
+diff --git a/dist/mdx/estree.js b/dist/mdx/estree.js
+index 047bed41edc9cb6f2fddd3f922a9afdab30f1326..2553db72749e4abca5c210729a9a6604ff0a8075 100644
+--- a/dist/mdx/estree.js
++++ b/dist/mdx/estree.js
+@@ -52,6 +52,13 @@ function program(body) {
+     };
+ }
+ function serialize(value) {
++    // is undefined
++    if (value === undefined) {
++        return {
++            type: "Identifier",
++            name: "undefined",
++        };
++    }
+     // is null
+     if (value === null) {
+         return {
