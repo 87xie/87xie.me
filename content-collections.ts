@@ -7,10 +7,34 @@ import { getToc } from '@/utils/toc-parser'
 import { z } from 'zod'
 import type { MDXContent } from 'mdx/types'
 
-const posts = defineCollection({
-  name: 'posts',
-  directory: 'src/content',
-  include: '**/*.mdx',
+const getSlug = (fileName: string) => fileName.replace(/\.(md|mdx)$/, '')
+
+const blogs = defineCollection({
+  name: 'blogs',
+  directory: 'src/content/blog',
+  include: '*.mdx',
+  parser: 'frontmatter',
+  schema: z.object({
+    title: z.string(),
+    date: z.string(),
+    tags: z.array(z.string()).optional(),
+    content: z.string(),
+  }),
+  transform: ({ _meta, ...post }) => {
+    return {
+      date: post.date,
+      tags: post.tags ?? [],
+      title: post.title,
+      slug: getSlug(_meta.fileName),
+      mdxContent: createDefaultImport<MDXContent>(`@/content/blog/${_meta.fileName}`),
+    }
+  },
+})
+
+const notes = defineCollection({
+  name: 'notes',
+  directory: 'src/content/notes',
+  include: '*.mdx',
   parser: 'frontmatter',
   schema: z.object({
     title: z.string().optional(),
@@ -18,19 +42,37 @@ const posts = defineCollection({
     tags: z.array(z.string()).optional(),
     content: z.string(),
   }),
-  transform: ({ _meta, content, ...post }) => {
+  transform: ({ _meta, content, ...note }) => {
     return {
-      date: post.date,
-      tags: post.tags ?? [],
-      title: post.title ?? '',
+      date: note.date,
+      tags: note.tags ?? [],
+      title: note.title ?? '',
       toc: getToc(content),
-      slug: _meta.fileName.replace(/\.(md|mdx)$/, ''),
-      category: _meta.directory === '.' ? 'uncategory' : _meta.directory,
-      mdxContent: createDefaultImport<MDXContent>(`@/content/${_meta.filePath}`),
+      slug: getSlug(_meta.fileName),
+      mdxContent: createDefaultImport<MDXContent>(`@/content/notes/${_meta.fileName}`),
+    }
+  },
+})
+
+const playgrounds = defineCollection({
+  name: 'playgrounds',
+  directory: 'src/content/playground',
+  include: '*.mdx',
+  parser: 'frontmatter',
+  schema: z.object({
+    title: z.string().optional(),
+    content: z.string(),
+  }),
+  transform: ({ _meta, content, ...playground }) => {
+    return {
+      title: playground.title ?? '',
+      toc: getToc(content),
+      slug: getSlug(_meta.fileName),
+      mdxContent: createDefaultImport<MDXContent>(`@/content/playground/${_meta.fileName}`),
     }
   },
 })
 
 export default defineConfig({
-  content: [posts],
+  content: [blogs, notes, playgrounds],
 })
