@@ -4,6 +4,9 @@ import typescript from 'eslint-config-next/typescript'
 import stylistic from '@stylistic/eslint-plugin'
 
 const eslintConfig = [
+  {
+    ignores: ['.content-collections/**'],
+  },
   ...fixupConfigRules(coreWebVitals),
   ...fixupConfigRules(typescript),
   stylistic.configs.customize({
